@@ -11,15 +11,18 @@
  */
 import "./i18n"
 import "./utils/ignoreWarnings"
-import { useFonts } from "expo-font"
+
 import React from "react"
+
+import { useFonts } from "expo-font"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
+
 import { useInitialRootStore } from "./models"
 import { AppNavigator, useNavigationPersistence } from "./navigators"
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary"
 import * as storage from "./utils/storage"
-import { customFontsToLoad } from "./theme"
+import { customFontsToLoad } from "./common-ui/constants/typography"
 import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
 

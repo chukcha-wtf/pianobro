@@ -16,7 +16,7 @@ import type {
   ApiConfig,
   ApiFeedResponse, // @demo remove-current-line
 } from "./api.types"
-import type { EpisodeSnapshotIn } from "../../models/Episode" // @demo remove-current-line
+import type { EpisodeSnapshotIn } from "../../models/PracticeSession" // @demo remove-current-line
 
 /**
  * Configuring the apisauce instance.

@@ -14,9 +14,22 @@
     "target": "esnext",
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@assets/*": ["assets/*"],
+      "@components/*": ["app/components/*"],
+      "@common-ui/*": ["app/common-ui/*"],
+      "@config/*": ["app/config/*"],
+      "@i18n/*": ["app/i18n/*"],
+      "@models/*": ["app/models/*"],
+      "@navigators/*": ["app/navigators/*"],
+      "@screens/*": ["app/screens/*"],
+      "@services/*": ["app/services/*"],
+      "@theme": ["app/theme/*"],
+      "@utils/*": ["app/utils/*"],
+    }
   },
-  "exclude": ["node_modules"],
   "include": ["index.js", "App.js", "app", "test"],
   "extends": "expo/tsconfig.base"
 }

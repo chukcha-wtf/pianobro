@@ -17,7 +17,9 @@
       "fallbackToCacheTimeout": 0
     },
     "jsEngine": "hermes",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "icon": "./assets/images/app-icon-android-legacy.png",
       "package": "com.pianobroapp",
@@ -48,6 +50,11 @@
         "image": "./assets/images/splash-logo-web.png",
         "resizeMode": "contain",
         "backgroundColor": "#191015"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e1ede32e-a321-4cee-a234-7c35925cb159"
       }
     }
   }
