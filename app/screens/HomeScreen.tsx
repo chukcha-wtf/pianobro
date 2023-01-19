@@ -14,6 +14,7 @@ import { formatDateTime } from "@utils/formatDate"
 import { If } from "@common-ui/components/Conditional"
 import { useInterval } from "@utils/useInterval"
 import { Cell, Row } from "@common-ui/components/Common"
+import Tag from "@common-ui/components/Tag"
 
 const ActiveSession = observer(
   function ActiveSession(_props) {
@@ -63,8 +64,14 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
           <SolidButton large type="primary" title={buttonTitle} onPress={handleStartStop} rightIcon={buttonIcon} rightIconSize={Spacing.large} />
         </Cell>
         <Content scrollable>
+          <Row vertical={Spacing.extraSmall}>
+            <Tag text="Song learning" />
+            <Tag left={Spacing.extraSmall} text="Arpeggios" />
+            <Tag left={Spacing.extraSmall} text="Ear training" />
+          </Row>
+
           <If condition={!!practiceSessionStore.activeSession}>
-            <ActiveSession practiceSession={practiceSessionStore.activeSession} />
+            <ActiveSession />
           </If>
 
           {practiceSessionStore.sessionsCompletedToday.map((practiceSession) => {

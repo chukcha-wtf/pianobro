@@ -50,6 +50,8 @@ export const Colors = {
   text: Palette.black, // text color
   tint: Palette.black300, // tint color
   background: Palette.white,
+
+  tagBackground: Palette.red800, // tag background color
   
   // colors
   transparent: Palette.transparent,

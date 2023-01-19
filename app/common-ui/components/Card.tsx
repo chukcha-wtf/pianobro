@@ -139,6 +139,9 @@ const $card: ViewStyle = {
   borderColor: Colors.dark,
   padding: 16,
   shadowColor: Colors.dark,
+  shadowOpacity: 1,
+  shadowRadius: 0,
+  elevation: 4,
   shadowOffset: {
     width: 0,
     height: 4,

@@ -36,6 +36,7 @@ type BaseButtonProps = {
   backgroundColor?: ColorValue
   borderColor?: ColorValue
   align?: "left" | "right"
+  shadowOffset?: { width: number; height: number }
 } & TouchableOpacityProps &
   OffsetProps
 
@@ -63,6 +64,7 @@ function BaseButton(props: BaseButtonProps) {
     large,
     small,
     align,
+    shadowOffset,
     ...offsetProps
   } = props
 
@@ -116,6 +118,10 @@ function BaseButton(props: BaseButtonProps) {
 
   if (align) {
     buttonStyle.push(align === "left" ? $alignLeft : $alignRight)
+  }
+
+  if (shadowOffset) {
+    buttonStyle.push({ shadowOffset: shadowOffset })
   }
 
   return (
@@ -235,19 +241,27 @@ export function LinkButton(props: ButtonProps) {
 
   const textColor = type ? Colors[type] : Colors.primary
 
-  return <BaseButton borderColor="transparent" backgroundColor="transparent" textColor={textColor} {...rest} />
+  return <BaseButton borderColor="transparent" backgroundColor="transparent" textColor={textColor} shadowOffset={{ width: 0, height: 0 }} {...rest} />
 }
 
 const $button: ViewStyle = {
   alignItems: "center",
   backgroundColor: Colors.white,
   borderColor: Colors.lightGrey,
-  borderRadius: Spacing.extraSmall,
+  borderRadius: Spacing.medium,
   borderWidth: 1,
   flexDirection: "row",
   height: Spacing.button,
   justifyContent: "center",
   paddingHorizontal: Spacing.medium,
+  shadowColor: Colors.dark,
+  shadowOpacity: 1,
+  shadowRadius: 0,
+  elevation: 6,
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
 }
 
 const $largeButton: ViewStyle = {
@@ -268,8 +282,8 @@ const $buttonText: TextStyle = {
 }
 
 const $largeButtonText: TextStyle = {
-  fontSize: Spacing.medium,
-  lineHeight: Spacing.large,
+  fontSize: Spacing.large,
+  lineHeight: Spacing.larger,
 }
 
 const $smallButtonText: TextStyle = {

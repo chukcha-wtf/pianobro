@@ -5,6 +5,10 @@ export type OffsetProps = {
   left?: number
   bottom?: number
   right?: number
+  vertical?: number
+  horizontal?: number
+  innerVertical?: number
+  innerHorizontal?: number
   innerTop?: number
   innerLeft?: number
   innerBottom?: number
@@ -31,7 +35,7 @@ export type OffsetProps = {
  */
 
 export function useOffsetStyles(styles: FlexStyle[], props: OffsetProps): Array<FlexStyle> {
-  const { top, left, bottom, right, innerTop, innerLeft, innerBottom, innerRight, height, width } = props
+  const { top, left, bottom, right, vertical, horizontal, innerVertical, innerHorizontal, innerTop, innerLeft, innerBottom, innerRight, height, width } = props
 
   if (top) {
     styles.push({ marginTop: top })
@@ -47,6 +51,22 @@ export function useOffsetStyles(styles: FlexStyle[], props: OffsetProps): Array<
 
   if (right) {
     styles.push({ marginRight: right })
+  }
+
+  if (vertical) {
+    styles.push({ marginTop: vertical, marginBottom: vertical })
+  }
+
+  if (horizontal) {
+    styles.push({ marginLeft: horizontal, marginRight: horizontal })
+  }
+
+  if (innerVertical) {
+    styles.push({ paddingTop: innerVertical, paddingBottom: innerVertical })
+  }
+
+  if (innerHorizontal) {
+    styles.push({ paddingLeft: innerHorizontal, paddingRight: innerHorizontal })
   }
 
   if (innerTop) {
