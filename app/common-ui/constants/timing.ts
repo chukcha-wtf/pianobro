@@ -1,8 +1,8 @@
-export const Timing = {
-  /**
-   * The duration (ms) for quick animations.
-   */
-  quick: 300,
-  normal: 500,
-  slow: 1000,
+/**
+ * The duration (ms) for animations.
+ */
+export enum Timing {
+  quick = 300,
+  normal = 500,
+  slow = 1000,
 }

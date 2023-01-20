@@ -1,3 +1,4 @@
+import { formatDuration } from "@utils/formatDate"
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 
@@ -6,13 +7,14 @@ export enum ActivityEnum {
   "scales" = "Scales",
   "arpeggios" = "Arpeggios",
   "chords" = "Chords",
-  "sightreading" = "Sightreading",
-  "eartraining" = "Eartraining",
+  "sightreading" = "Sight Reading",
+  "eartraining" = "Ear Training",
   "rhythm" = "Rhythm",
   "technique" = "Technique",
   "repertoire" = "Repertoire",
   "composition" = "Composition",
   "improvisation" = "Improvisation",
+  "fingerindependence" = "Finger Independence",
   "other" = "Other",
 }
 
@@ -34,18 +36,18 @@ export const PracticeSessionModel = types
         types.enumeration(
           "activity",
           [
-            ActivityEnum.arpeggios,
-            ActivityEnum.chords,
-            ActivityEnum.composition,
-            ActivityEnum.eartraining,
-            ActivityEnum.improvisation,
-            ActivityEnum.other,
-            ActivityEnum.repertoire,
-            ActivityEnum.rhythm,
-            ActivityEnum.scales,
-            ActivityEnum.sightreading,
-            ActivityEnum.songlearning,
-            ActivityEnum.technique,
+            "arpeggios",
+            "chords",
+            "composition",
+            "eartraining",
+            "improvisation",
+            "other",
+            "repertoire",
+            "rhythm",
+            "scales",
+            "sightreading",
+            "songlearning",
+            "technique",
           ]
         )
       ),
@@ -53,20 +55,14 @@ export const PracticeSessionModel = types
     ),
   })
   .actions(withSetPropAction)
+  .actions((practiceSession) => ({
+    addActivity(activity: keyof typeof ActivityEnum) {
+      practiceSession.activities.push(activity)
+    }
+  }))
   .views((practiceSession) => ({
     get formattedDuration() {
-      const milliseconds = Number(practiceSession.duration)
-      const seconds = Math.floor(milliseconds / 1000)
-
-      const hours = Math.floor(seconds / 3600)
-      const minutes = Math.floor((seconds % 3600) / 60)
-      const secondsLeft = Math.floor((seconds % 3600) % 60)
-
-      const hoursFormatted = hours > 0 ? `${hours}h` : "00h"
-      const minutesFormatted = minutes > 0 ? `${minutes}m` : "00m"
-      const secondsFormatted = secondsLeft > 0 ? `${secondsLeft}s` : "00s"
-      
-      return { hours: hoursFormatted, minutes: minutesFormatted, seconds: secondsFormatted}
+      return formatDuration(practiceSession.duration)
     },
   }))
 

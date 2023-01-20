@@ -10,12 +10,18 @@ type RowProps = {
   wrap?: boolean
   flex?: boolean
   align?: "center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"
+  justify?: "center" | "flex-start" | "flex-end" | "stretch" | "baseline"
 } & OffsetProps
 
 type CellProps = {
   children: React.ReactNode
   flex?: boolean
   align?: "center" | "flex-start" | "flex-end" | "stretch" | "baseline"
+  justify?: "center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"
+} & OffsetProps
+
+type BottomContainerProps = {
+  children: React.ReactNode
 } & OffsetProps
 
 /**
@@ -24,19 +30,24 @@ type CellProps = {
  * @param {boolean} wrap - Whether to wrap the children if they don't fit in a row.
  * @param {boolean} flex - Whether to use flexbox to layout the children.
  * @param {"center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"} align - How to align the children in the row.
+ * @param {"center" | "flex-start" | "flex-end" | "stretch" | "baseline"} justify - How to align vertically the children in the row.
  * @param {OffsetProps} props - The offset props.
  * @example
  * <Row align="space-between">
  *   <Text>Text</Text>
  * </Row>
  */
-export const Row = ({ children, align, flex, wrap, ...offsetProps }: RowProps) => {
+export const Row = ({ children, align, justify, flex, wrap, ...offsetProps }: RowProps) => {
   let styles: ViewStyle[] = [{ flexDirection: "row", alignItems: "center" }]
 
   styles = useOffsetStyles(styles, offsetProps)
 
   if (align) {
     styles.push({ justifyContent: align })
+  }
+
+  if (justify) {
+    styles.push({ alignItems: justify })
   }
 
   if (flex) {
@@ -70,14 +81,15 @@ export const Spacer = ({ height }: { height?: number }) => <View style={{ height
  * Cell is a flexbox container lays out children in a stack
  * @param {React.ReactNode} children - The children to render.
  * @param {boolean} flex - Whether to use flexbox to layout the children.
- * @param {"center" | "flex-start" | "flex-end" | "stretch" | "baseline"} align - How to align the children in the row.
+ * @param {"center" | "flex-start" | "flex-end" | "stretch" | "baseline"} align - How to align the children in the column.
+ * @param {"center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"} justify - How to align the children in the column.
  * @param {OffsetProps} props - The offset props.
  * @example
- * <Row align="space-between">
+ * <Cell align="stretch">
  *   <Text>Text</Text>
- * </Row>
+ * </Cell>
  */
-export const Cell = ({ children, align, flex, ...offsetProps }: CellProps) => {
+export const Cell = ({ children, align, justify, flex, ...offsetProps }: CellProps) => {
   let styles: ViewStyle[] = [{ flexDirection: "column", justifyContent: "center" }]
 
   styles = useOffsetStyles(styles, offsetProps)
@@ -86,9 +98,29 @@ export const Cell = ({ children, align, flex, ...offsetProps }: CellProps) => {
     styles.push({ alignItems: align })
   }
 
+  if (justify) {
+    styles.push({ justifyContent: justify })
+  }
+
   if (flex) {
     styles.push({ flex: 1 })
   }
+
+  return <View style={styles}>{children}</View>
+}
+
+
+/**
+ * BottomContainer is a flexbox container that sticks content to the bottom.
+ */
+const $bottomContainer: ViewStyle = {
+  position: "absolute",
+  bottom: 0,
+}
+export const BottomContainer = ({ children, ...offsetProps }: BottomContainerProps) => {
+  let styles: ViewStyle[] = [$bottomContainer]
+
+  styles = useOffsetStyles(styles, offsetProps)
 
   return <View style={styles}>{children}</View>
 }

@@ -2,7 +2,7 @@
  * A collection of colors available across the app.
  */
 
-enum Palette {
+export enum Palette {
   transparent = "transparent",
   white = "#fff",
 
