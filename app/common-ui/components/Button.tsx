@@ -35,6 +35,8 @@ type BaseButtonProps = {
   textColor?: ColorValue
   backgroundColor?: ColorValue
   borderColor?: ColorValue
+  borderRadius?: number
+  paddingHorizontal?: number
   align?: "left" | "right"
   shadowOffset?: { width: number; height: number }
 } & TouchableOpacityProps &
@@ -60,6 +62,8 @@ function BaseButton(props: BaseButtonProps) {
     textColor,
     backgroundColor,
     borderColor,
+    borderRadius,
+    paddingHorizontal,
     fullWidth,
     large,
     small,
@@ -121,7 +125,15 @@ function BaseButton(props: BaseButtonProps) {
   }
 
   if (shadowOffset) {
-    buttonStyle.push({ shadowOffset: shadowOffset })
+    buttonStyle.push({ shadowOffset })
+  }
+
+  if (borderRadius) {
+    buttonStyle.push({ borderRadius })
+  }
+
+  if (paddingHorizontal) {
+    buttonStyle.push({ paddingHorizontal })
   }
 
   return (
@@ -173,7 +185,7 @@ export function SolidButton(props: ButtonProps) {
   const { type, ...rest } = props
 
   const backgroundColor = type ? Colors[type] : Colors.primary
-  const borderColor = adjustColor(backgroundColor, 20)
+  const borderColor = backgroundColor
 
   return <BaseButton backgroundColor={backgroundColor} borderColor={borderColor} textColor={Colors.white} {...rest} />
 }
@@ -244,12 +256,42 @@ export function LinkButton(props: ButtonProps) {
   return <BaseButton borderColor="transparent" backgroundColor="transparent" textColor={textColor} shadowOffset={{ width: 0, height: 0 }} {...rest} />
 }
 
+
+/**
+ * IconButton component - a button with no background color and no border, used as a clickable text
+ * @param {string} icon - the name of the icon to display on the button (from MaterialCommunityIcons)
+ * @param {number} iconSize - the size of the icon to display on the button
+ * @param {function} onPress - the function to call when the button is pressed
+ * @param {boolean} disabled - whether the button is disabled
+ * @param {boolean} isLoading - whether the button is loading
+ * @param {boolean} large - whether the button should be large (height 54px), default 44px
+ * @param {boolean} small - whether the button should be small (height 32px), default 44px
+ * @param {string} textColor - the color of the text on the button
+ * @param {string} backgroundColor - the background color of the button
+ * @param {string} borderColor - the border color of the button
+ * @param {OffsetProps} offsetProps - the offset props to apply to the button
+ * @example
+ * <IconButton icon="plus" onPress={pressHandler} />
+ */
+export function IconButton(props: ButtonProps) {
+  const { ...rest } = props
+
+  return <BaseButton
+    iconSize={Spacing.larger}
+    shadowOffset={{ width: 0, height: 2}}
+    borderRadius={Spacing.button/2}
+    paddingHorizontal={Spacing.tiny}
+    borderColor={Colors.dark}
+    {...rest}
+  />
+}
+
 const $button: ViewStyle = {
   alignItems: "center",
   backgroundColor: Colors.white,
   borderColor: Colors.lightGrey,
   borderRadius: Spacing.medium,
-  borderWidth: 1,
+  borderWidth: 2,
   flexDirection: "row",
   height: Spacing.button,
   justifyContent: "center",

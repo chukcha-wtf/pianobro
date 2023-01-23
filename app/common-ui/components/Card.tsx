@@ -74,7 +74,7 @@ const Base = (props: BaseProps): React.ReactElement => {
  *  <Text>Some content</Text>
  * </Card>
  */
-export default function Card({ children, ...props }: CardProps) {
+export function Card({ children, ...props }: CardProps) {
   return (
     <Base baseStyle={$card} {...props}>
       {children}

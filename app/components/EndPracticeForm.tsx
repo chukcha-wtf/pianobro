@@ -3,8 +3,7 @@ import { observer } from "mobx-react-lite"
 import Slider from '@react-native-community/slider';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
-import { useStores } from "@models/index"
-import { ActivityEnum } from "@models/PracticeSession"
+import { ActivityEnum, PracticeSessionModel } from "@models/PracticeSession"
 
 import { LabelText, LargeTitle, MediumTitle } from "@common-ui/components/Text"
 import { Cell, Row } from "@common-ui/components/Common"
@@ -19,22 +18,22 @@ import { formatDuration } from "@utils/formatDate"
 import { ViewStyle } from "react-native";
 import { StarPicker } from "./StarPicker";
 import { LargeInput } from "@common-ui/components/Input";
+import { Instance } from "mobx-state-tree";
+import { If } from "@common-ui/components/Conditional";
 
 type EndPracticeFormProps = {
-  closeModal: () => void
+  activeSession?: Instance<typeof PracticeSessionModel>
+  onSave: (practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<keyof typeof ActivityEnum>) => void
 }
 
 export const EndPracticeForm = observer(
   function EndPracticeForm(props: EndPracticeFormProps) {
-    const { closeModal } = props
-    const { practiceSessionStore } = useStores()
+    const { activeSession, onSave } = props
 
-    const activeSession = practiceSessionStore.activeSession
-
-    const [startTime, setStartTime] = useState(activeSession?.startTime)
+    const [startTime, setStartTime] = useState(activeSession?.startTime || new Date().toISOString())
     const [endTime, setEndTime] = useState(new Date().toISOString())
     const [duration, setDuration] = useState(Math.floor(
-      new Date().getTime() - new Date(activeSession?.startTime).getTime()
+      new Date(endTime).getTime() - new Date(startTime).getTime()
     ))
     const [intencity, setIntencity] = useState(0)
     const [satisfaction, setSatisfaction] = useState(0)
@@ -51,8 +50,7 @@ export const EndPracticeForm = observer(
       session.satisfaction = satisfaction
       session.notes = notes
             
-      closeModal()
-      practiceSessionStore.stop(session, selectedActivities)
+      onSave(session, selectedActivities)
     }
 
     const onTimeChange = (startTime: string, endTime: string) => {
@@ -81,7 +79,9 @@ export const EndPracticeForm = observer(
           <LargeTitle top={Spacing.medium}>
             <MediumTitle>You've played </MediumTitle>
             {formatDuration(duration).hours}:{formatDuration(duration).minutes}
-            <MediumTitle> today</MediumTitle>
+            <If condition={!!activeSession}>
+              <MediumTitle> today</MediumTitle>
+            </If>
           </LargeTitle>
           <DatePickerFormInput startTime={startTime} endTime={endTime} onChange={onTimeChange} />
           {/* Activities Selection */}

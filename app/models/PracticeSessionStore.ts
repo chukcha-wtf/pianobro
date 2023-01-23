@@ -1,4 +1,6 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import { v4 as uuidv4 } from 'uuid';
+
 import { ActivityEnum, PracticeSessionModel } from "./PracticeSession"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { calculateDuration } from "@utils/calculateDuration"
@@ -38,7 +40,7 @@ export const PracticeSessionStoreModel = types
         }
         
         const practiceSession = PracticeSessionModel.create({
-          uuid: Math.random().toString(36).substring(7),
+          uuid: uuidv4(),
           startTime: new Date().toISOString(),
           duration: 0,
         })
@@ -49,8 +51,6 @@ export const PracticeSessionStoreModel = types
         if (!store.isPracticing) {
           return
         }
-
-        console.log("STOP", practiceSession)
 
         const activeSession = store.activeSession
 
@@ -66,6 +66,23 @@ export const PracticeSessionStoreModel = types
         })
         
         store.isPracticing = false
+      },
+      addSession(practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<keyof typeof ActivityEnum>) {
+        const newPracticeSession = PracticeSessionModel.create({
+          uuid: uuidv4(),
+          startTime: practiceSession.startTime,
+          endTime: practiceSession.endTime,
+          duration: practiceSession.duration,
+          intencity: practiceSession.intencity,
+          notes: practiceSession.notes,
+          satisfaction: practiceSession.satisfaction,
+        })
+
+        activities.forEach(activity => {
+          newPracticeSession.addActivity(activity)
+        })
+
+        store.practiceSessions.push(newPracticeSession)
       },
       pause() {
         if (!store.isPracticing) {

@@ -30,7 +30,7 @@ const en = {
   },
   homeScreen: {
     title: "Let's Play!",
-    mainButtonTextActive: "Stop Practicing",
+    mainButtonTextActive: "Stop",
     mainButtonTextInactive: "Start Practicing",
   },
   statisticsScreen: {

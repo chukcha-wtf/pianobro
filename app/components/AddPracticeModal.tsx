@@ -13,14 +13,14 @@ import { useStores } from "@models/index";
 import { Instance } from "mobx-state-tree";
 import { ActivityEnum, PracticeSessionModel } from "@models/PracticeSession";
 
-export type EndPracticeModalHandle = {
+export type AddPracticeModalHandle = {
   open: () => void
   close: () => void
 }
 
 const HandleComponent = ({ closeModal }) => (
   <View style={$header}>
-    <ExtraLargeTitle>Record Session</ExtraLargeTitle>
+    <ExtraLargeTitle>Add Session</ExtraLargeTitle>
     <LinkButton
       icon="x"
       textColor={Colors.dark}
@@ -30,7 +30,7 @@ const HandleComponent = ({ closeModal }) => (
   </View>
 )
 
-export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(function EndPracticeModal(_props: unknown, ref: ForwardedRef<EndPracticeModalHandle>) {
+export const AddPracticeModal = forwardRef<AddPracticeModalHandle, unknown>(function AddPracticeModal(_props: unknown, ref: ForwardedRef<EndPracticeModalHandle>) {
   const { bottom } = useSafeAreaInsets()
   const { practiceSessionStore } = useStores()
 
@@ -49,7 +49,7 @@ export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(func
   const onSave = (practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<keyof typeof ActivityEnum>) => {
     // Save session
     closeModal()
-    practiceSessionStore.stop(practiceSession, activities)
+    practiceSessionStore.addSession(practiceSession, activities)
   }
 
   return (
@@ -68,7 +68,7 @@ export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(func
         innerHorizontal={Spacing.medium}
         bottom={bottom + Spacing.medium}
       >
-        <EndPracticeForm activeSession={practiceSessionStore.activeSession} onSave={onSave} />
+        <EndPracticeForm onSave={onSave} />
       </Cell>
     </BottomSheetModal>
   )

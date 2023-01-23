@@ -1,21 +1,24 @@
-import React, { FC, useRef } from "react"
-
-import { Content, Screen } from "@common-ui/components/Screen"
+import React, { FC, useMemo, useRef } from "react"
+import { observer } from "mobx-react-lite"
 
 import { MainTabScreenProps } from "@navigators/MainNavigator"
-import { HugeTitle, LabelText, LargeTitle, RegularText, SmallTitle } from "@common-ui/components/Text"
 import { translate } from "@i18n/translate"
-import { Spacing } from "@common-ui/constants/spacing"
-import { SolidButton } from "@common-ui/components/Button"
-import { observer } from "mobx-react-lite"
 import { useStores } from "@models/index"
-import Card from "@common-ui/components/Card"
-import { formatDate, formatDateTime } from "@utils/formatDate"
+import { ActivityEnum } from "@models/PracticeSession"
+
+import { Content, Screen } from "@common-ui/components/Screen"
+import { HugeTitle, LabelText, LargeTitle, RegularText, SmallText, SmallTitle } from "@common-ui/components/Text"
+import { IconButton, SolidButton } from "@common-ui/components/Button"
+import { Card } from "@common-ui/components/Card"
 import { If } from "@common-ui/components/Conditional"
-import { useInterval } from "@utils/useInterval"
 import { Cell, Row } from "@common-ui/components/Common"
 import { EndPracticeModal, EndPracticeModalHandle } from "@components/EndPraticeModal"
-import { ActivityEnum } from "@models/PracticeSession"
+
+import { Spacing } from "@common-ui/constants/spacing"
+import { useInterval } from "@utils/useInterval"
+import { formatDate, formatDateTime } from "@utils/formatDate"
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import { AddPracticeModal, AddPracticeModalHandle } from "@components/AddPracticeModal"
 
 const ActiveSession = observer(
   function ActiveSession(_props) {
@@ -30,14 +33,14 @@ const ActiveSession = observer(
 
 
     return (
-      <Card bottom={Spacing.medium} key={practiceSessionStore.activeSession.uuid}>
-        <LargeTitle>
-          {practiceSessionStore.activeSession?.formattedDuration.hours}:{practiceSessionStore.activeSession?.formattedDuration.minutes}
-          <SmallTitle> {practiceSessionStore.activeSession?.formattedDuration.seconds}</SmallTitle>
+      <Card type="info" bottom={Spacing.medium} innerVertical={Spacing.large}>
+        <LargeTitle align="center" bottom={Spacing.medium}>
+          Practice in Progress
         </LargeTitle>
-        <RegularText>
-          {formatDateTime(practiceSessionStore.activeSession?.startTime)}
-        </RegularText>
+        <HugeTitle align="center">
+          {practiceSessionStore.activeSession?.formattedDuration.hours}:{practiceSessionStore.activeSession?.formattedDuration.minutes}
+          <LargeTitle> {practiceSessionStore.activeSession?.formattedDuration.seconds}</LargeTitle>
+        </HugeTitle>
       </Card>
     )
   }
@@ -45,13 +48,16 @@ const ActiveSession = observer(
 
 export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
   function HomeScreen(_props) {
-    const { practiceSessionStore } = useStores()
+    const { practiceSessionStore, quotesStore } = useStores()
+    const bottomOffset = useBottomTabBarHeight()
 
     const editPracticeModalRef = useRef<EndPracticeModalHandle>(null)
+    const addPracticeModalRef = useRef<AddPracticeModalHandle>(null)
+
+    const quoteOfTheDay = useMemo(() => quotesStore.randomQuote, [])
 
     const handleStartStop = () => {
       if (practiceSessionStore.isPracticing) {
-        // Pause the current session and show the modal
         editPracticeModalRef.current?.open()
         return
       }
@@ -59,21 +65,24 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
       // Start a new session
       practiceSessionStore.start()
     }
+
+    const addSession = () => {
+      addPracticeModalRef.current?.open()
+    }
     
     const buttonTitle = practiceSessionStore.isPracticing ? translate("homeScreen.mainButtonTextActive") : translate("homeScreen.mainButtonTextInactive")
     const buttonIcon = practiceSessionStore.isPracticing ? "pause" : "play"
     
     return (
       <Screen>
-        <Row top={Spacing.large}>
-          <Cell>
-            <HugeTitle left={Spacing.small} top={Spacing.large} text={translate("homeScreen.title")} />
-          </Cell>
+        <Row horizontal={Spacing.medium} top={Spacing.large} align="space-between">
+          <HugeTitle top={Spacing.large} text={translate("homeScreen.title")} />
+          <IconButton icon="plus" onPress={addSession} />
         </Row>
         <Cell left={Spacing.medium} right={Spacing.medium} top={Spacing.large} bottom={Spacing.large} >
           <SolidButton large type="primary" title={buttonTitle} onPress={handleStartStop} rightIcon={buttonIcon} rightIconSize={Spacing.large} />
         </Cell>
-        <Content scrollable>
+        <Content scrollable innerBottom={bottomOffset}>
           <If condition={!!practiceSessionStore.activeSession}>
             <ActiveSession />
           </If>
@@ -84,7 +93,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
                 <LargeTitle>
                   {practiceSession?.formattedDuration.hours}:{practiceSession?.formattedDuration.minutes}
                   <RegularText>
-                    {" "}{formatDate(practiceSession.startTime, "dd MMM")}
+                    {" "}{formatDate(practiceSession.endTime, "dd MMM")}
                   </RegularText>
                 </LargeTitle>
                 <Row top={Spacing.extraSmall}>
@@ -97,10 +106,22 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
               </Card>
             )
           })}
+          
+          <If condition={!!quoteOfTheDay}>
+            <Cell innerHorizontal={Spacing.large} vertical={Spacing.medium}>
+              <LabelText align="center">
+                "{quoteOfTheDay?.quote}"
+              </LabelText>
+              <SmallText align="center" top={Spacing.small}>{quoteOfTheDay?.author}</SmallText>
+            </Cell>
+          </If>
         </Content>
         <If condition={!!practiceSessionStore.activeSession}>
+          {/* Modal shown when stopping active practice */}
           <EndPracticeModal ref={editPracticeModalRef} />
         </If>
+        {/* Modal shown when manually logging practice */}
+        <AddPracticeModal ref={addPracticeModalRef} />
       </Screen>
     )
   }

@@ -1,11 +1,16 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
-import { PracticeSessionStoreModel } from "./PracticeSessionStore" // @demo remove-current-line
+import { PianoQuoteStoreModel } from "./PianoQuoteStore"
+import { QUOTES } from "./PianoQuote"
+import { PracticeSessionStoreModel } from "./PracticeSessionStore"
 
 /**
  * A RootStore model.
  */
 export const RootStoreModel = types.model("RootStore").props({
-  practiceSessionStore: types.optional(PracticeSessionStoreModel, {}), // @demo remove-current-line
+  practiceSessionStore: types.optional(PracticeSessionStoreModel, {}),
+  quotesStore: types.optional(PianoQuoteStoreModel, {
+    quotes: QUOTES
+  }),
 })
 
 /**

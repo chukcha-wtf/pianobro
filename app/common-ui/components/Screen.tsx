@@ -3,6 +3,7 @@ import { View, ScrollView, ViewProps, ScrollViewProps, ViewStyle, SafeAreaView }
 import { Colors } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
 
 export type ContentProps = {
   children: React.ReactNode
@@ -13,7 +14,7 @@ export type ContentProps = {
   style?: ViewStyle
   scrollViewStyle?: ScrollViewProps
   scrollable?: boolean
-} & ViewProps &
+} & OffsetProps & ViewProps &
   ScrollViewProps
 
 /**
@@ -35,7 +36,7 @@ export const Content = (props: ContentProps) => {
     props
   const Container = scrollable ? ScrollView : View
 
-  const holderStyles: ViewStyle[] = [$content]
+  const holderStyles: ViewStyle[] = useOffsetStyles([$content], rest)
   const scrollStyles: ViewStyle[] = [$scrollView]
 
   if (noBackground) {
