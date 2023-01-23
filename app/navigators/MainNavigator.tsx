@@ -47,39 +47,41 @@ function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBarProps)
   const { bottom } = useSafeAreaInsets()
 
   return (
-    <View style={[$floatingTabBar, { marginBottom: bottom ?? Spacing.large }]}>
-      {state.routes.map((route: any, index: number) => {
-        const { options } = descriptors[route.key]
-        const isFocused = state.index === index
+    <View style={[$tabBarHolder, { marginBottom: bottom ?? Spacing.large }]}>
+      <View style={$floatingTabBar}>
+        {state.routes.map((route: any, index: number) => {
+          const { options } = descriptors[route.key]
+          const isFocused = state.index === index
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-            canPreventDefault: true,
-          })
+          const onPress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            })
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate({ name: route.name, merge: true, params: {} })
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate({ name: route.name, merge: true, params: {} })
+            }
           }
-        }
 
-        const iconColor = isFocused ? Colors.text : Colors.tint
+          const iconColor = isFocused ? Colors.text : Colors.tint
 
-        return (
-          <TouchableOpacity
-            key={route.key}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            style={$floatingTabBarItem}
-          >
-            <Icon name={ICONS_MAP[route.name]} color={iconColor} />
-          </TouchableOpacity>
-        )
-      })}
+          return (
+            <TouchableOpacity
+              key={route.key}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
+              testID={options.tabBarTestID}
+              onPress={onPress}
+              style={$floatingTabBarItem}
+            >
+              <Icon name={ICONS_MAP[route.name]} color={iconColor} />
+            </TouchableOpacity>
+          )
+        })}
+      </View>
     </View>
   )
 }
@@ -90,7 +92,6 @@ export function MainNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        tabBarStyle: { position: 'absolute', paddingHorizontal: Spacing.large }
       }}
       tabBar={(props) => <FloatingTabBar {...props} />}
     >
@@ -99,6 +100,14 @@ export function MainNavigator() {
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   )
+}
+
+const $tabBarHolder: ViewStyle = {
+  position: "absolute",
+  backgroundColor: Colors.transparent,
+  bottom: 0,
+  left: 0,
+  right: 0,
 }
 
 const $floatingTabBar: ViewStyle = {

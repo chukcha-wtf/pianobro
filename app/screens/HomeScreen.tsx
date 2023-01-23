@@ -7,7 +7,7 @@ import { useStores } from "@models/index"
 import { ActivityEnum } from "@models/PracticeSession"
 
 import { Content, Screen } from "@common-ui/components/Screen"
-import { HugeTitle, LabelText, LargeTitle, RegularText, SmallText, SmallTitle } from "@common-ui/components/Text"
+import { HugeTitle, LabelText, LargeTitle, MediumTitle, RegularText, SmallText } from "@common-ui/components/Text"
 import { IconButton, SolidButton } from "@common-ui/components/Button"
 import { Card } from "@common-ui/components/Card"
 import { If } from "@common-ui/components/Conditional"
@@ -16,7 +16,7 @@ import { EndPracticeModal, EndPracticeModalHandle } from "@components/EndPratice
 
 import { Spacing } from "@common-ui/constants/spacing"
 import { useInterval } from "@utils/useInterval"
-import { formatDate, formatDateTime } from "@utils/formatDate"
+import { formatDate } from "@utils/formatDate"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { AddPracticeModal, AddPracticeModalHandle } from "@components/AddPracticeModal"
 
@@ -37,14 +37,35 @@ const ActiveSession = observer(
         <LargeTitle align="center" bottom={Spacing.medium}>
           Practice in Progress
         </LargeTitle>
-        <HugeTitle align="center">
+        <HugeTitle align="center" bottom={Spacing.small}>
           {practiceSessionStore.activeSession?.formattedDuration.hours}:{practiceSessionStore.activeSession?.formattedDuration.minutes}
           <LargeTitle> {practiceSessionStore.activeSession?.formattedDuration.seconds}</LargeTitle>
         </HugeTitle>
+        <LabelText align="center">Shhh, let the music flow...</LabelText>
       </Card>
     )
   }
 )
+
+const PracticeItem = function PracticeItem({ item }) {
+  return (
+    <Card bottom={Spacing.medium} key={item.uuid}>
+      <LargeTitle>
+        {item.formattedDuration.hours}:{item.formattedDuration.minutes}
+        <RegularText>
+          {" "}{formatDate(item.endTime, "dd MMM")}
+        </RegularText>
+      </LargeTitle>
+      <Row top={Spacing.extraSmall}>
+        {item.activities.map((activity) => {
+          return (
+            <LabelText left={Spacing.tiny} key={activity} text={ActivityEnum[activity]} />
+          )
+        })}
+      </Row>
+    </Card>
+  )
+}
 
 export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
   function HomeScreen(_props) {
@@ -76,36 +97,39 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
     return (
       <Screen>
         <Row horizontal={Spacing.medium} top={Spacing.large} align="space-between">
-          <HugeTitle top={Spacing.large} text={translate("homeScreen.title")} />
+          <HugeTitle text={translate("homeScreen.title")} />
           <IconButton icon="plus" onPress={addSession} />
         </Row>
         <Cell left={Spacing.medium} right={Spacing.medium} top={Spacing.large} bottom={Spacing.large} >
-          <SolidButton large type="primary" title={buttonTitle} onPress={handleStartStop} rightIcon={buttonIcon} rightIconSize={Spacing.large} />
+          <SolidButton
+            large
+            type="primary"
+            title={buttonTitle}
+            onPress={handleStartStop}
+            rightIcon={buttonIcon}
+            rightIconSize={Spacing.large}
+          />
         </Cell>
-        <Content scrollable innerBottom={bottomOffset}>
+        <Content scrollable>
           <If condition={!!practiceSessionStore.activeSession}>
             <ActiveSession />
           </If>
 
-          {practiceSessionStore.sessionsCompletedToday.map((practiceSession) => {
-            return (
-              <Card bottom={Spacing.medium} key={practiceSession.uuid}>
-                <LargeTitle>
-                  {practiceSession?.formattedDuration.hours}:{practiceSession?.formattedDuration.minutes}
-                  <RegularText>
-                    {" "}{formatDate(practiceSession.endTime, "dd MMM")}
-                  </RegularText>
-                </LargeTitle>
-                <Row top={Spacing.extraSmall}>
-                  {practiceSession?.activities.map((activity) => {
-                    return (
-                      <LabelText left={Spacing.tiny} key={activity} text={ActivityEnum[activity]} />
-                    )
-                  })}
-                </Row>
-              </Card>
-            )
-          })}
+          <If condition={!!practiceSessionStore.sessionsCompletedToday.length && !practiceSessionStore.activeSession}>
+            <Card type="success" bottom={Spacing.medium} innerVertical={Spacing.large}>
+              <MediumTitle align="center" bottom={Spacing.small}>You practiced today for</MediumTitle>
+              <HugeTitle align="center" bottom={Spacing.small}>
+                {practiceSessionStore.totalPracticeTimeToday.hours} {practiceSessionStore.totalPracticeTimeToday.minutes}
+              </HugeTitle>
+              <LabelText align="center">Keep up the good work!</LabelText>
+            </Card>
+          </If>
+
+          {/* We could've used FlashList here but since the number of practices per day is small
+          it doesn't really make sense for now */}
+          {practiceSessionStore.sessionsCompletedToday.map((item) => (
+            <PracticeItem item={item} key={item.uuid} />
+          ))}
           
           <If condition={!!quoteOfTheDay}>
             <Cell innerHorizontal={Spacing.large} vertical={Spacing.medium}>

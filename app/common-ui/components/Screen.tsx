@@ -1,9 +1,10 @@
 import React from "react"
-import { View, ScrollView, ViewProps, ScrollViewProps, ViewStyle, SafeAreaView } from "react-native"
+import { View, ScrollView, ViewProps, ScrollViewProps, ViewStyle } from "react-native"
 import { Colors } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 
 export type ContentProps = {
   children: React.ReactNode
@@ -34,9 +35,14 @@ export type ContentProps = {
 export const Content = (props: ContentProps) => {
   const { children, noPadding, noBackground, backgroundColor, style, scrollViewStyle, scrollable, ...rest } =
     props
+  const tabBarHeight = useBottomTabBarHeight()
+  const { bottom } = useSafeAreaInsets()
+
+  const paddingBottom = tabBarHeight + bottom
+
   const Container = scrollable ? ScrollView : View
 
-  const holderStyles: ViewStyle[] = useOffsetStyles([$content], rest)
+  const holderStyles: ViewStyle[] = useOffsetStyles([$content, { paddingBottom }], rest)
   const scrollStyles: ViewStyle[] = [$scrollView]
 
   if (noBackground) {
@@ -82,16 +88,17 @@ export const Content = (props: ContentProps) => {
  * </Screen>
  */
 export const Screen = ({ children }: { children: React.ReactNode }) => {
-  const tabBarHeight = useBottomTabBarHeight()
-
   return (
-    <SafeAreaView style={[$container, { paddingBottom: tabBarHeight + Spacing.larger }]}>
+    <SafeAreaView edges={["top", "right", "left"]} style={$container}>
       {children}
     </SafeAreaView>
   )
 }
 
-const $container: ViewStyle = { flex: 1, backgroundColor: Colors.lightGrey, }
+const $container: ViewStyle = {
+  flex: 1,
+  backgroundColor: Colors.lightGrey,
+}
 
 const $content: ViewStyle = {
   padding: Spacing.small,

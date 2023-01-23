@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ActivityEnum, PracticeSessionModel } from "./PracticeSession"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { calculateDuration } from "@utils/calculateDuration"
+import { formatDuration } from "@utils/formatDate";
 
 export const PracticeSessionStoreModel = types
   .model("PracticeSessionStore")
@@ -110,6 +111,13 @@ export const PracticeSessionStoreModel = types
         return session.endTime && session.duration &&
           new Date(session.endTime).toDateString() === new Date().toDateString()
       }).sort((a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime())
+    },
+  }))
+  .views((store) => ({
+    get totalPracticeTimeToday() {
+      const totalDuration = store.sessionsCompletedToday.reduce((acc, session) => acc + session.duration, 0)
+
+      return formatDuration(totalDuration)
     }
   }))
 
