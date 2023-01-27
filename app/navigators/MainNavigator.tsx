@@ -8,10 +8,11 @@ import { CompositeScreenProps, NavigationHelpers, ParamListBase, TabNavigationSt
 
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import { HomeScreen, StatisticsScreen, ProfileScreen } from "../screens"
-import { Colors } from "@common-ui/constants/colors"
+import { Colors, Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import Icon from "@common-ui/components/Icon"
 import { BottomTabDescriptorMap, BottomTabNavigationEventMap } from "@react-navigation/bottom-tabs/lib/typescript/src/types"
+import { Feather } from "@expo/vector-icons"
 
 export type MainTabParamList = {
   Home: undefined
@@ -65,19 +66,20 @@ function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBarProps)
             }
           }
 
-          const iconColor = isFocused ? Colors.text : Colors.tint
+          const iconColor = isFocused ? Palette.black : Palette.black300
 
+          // TODO: figure out why icon color isn't changing
           return (
             <TouchableOpacity
               key={route.key}
               accessibilityRole="button"
               accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
+              accessibilityLabel={route.name}
               testID={options.tabBarTestID}
               onPress={onPress}
               style={$floatingTabBarItem}
             >
-              <Icon name={ICONS_MAP[route.name]} color={iconColor} />
+              <Icon size={Spacing.large} name={ICONS_MAP[route.name]} color={iconColor} />
             </TouchableOpacity>
           )
         })}
@@ -117,7 +119,7 @@ const $floatingTabBar: ViewStyle = {
   borderWidth: 2,
   borderRadius: 30,
   borderColor: Colors.dark,
-  backgroundColor: Colors.background,
+  backgroundColor: Colors.tabBackground,
 }
 
 const $floatingTabBarItem: ViewStyle = {

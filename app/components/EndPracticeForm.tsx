@@ -31,7 +31,7 @@ export const EndPracticeForm = observer(
     const { activeSession, onSave } = props
 
     const [startTime, setStartTime] = useState(activeSession?.startTime || new Date().toISOString())
-    const [endTime, setEndTime] = useState(new Date().toISOString())
+    const [endTime, setEndTime] = useState(activeSession?.endTime || new Date().toISOString())
     const [duration, setDuration] = useState(Math.floor(
       new Date(endTime).getTime() - new Date(startTime).getTime()
     ))
@@ -86,7 +86,7 @@ export const EndPracticeForm = observer(
           <DatePickerFormInput startTime={startTime} endTime={endTime} onChange={onTimeChange} />
           {/* Activities Selection */}
           <LabelText bottom={Spacing.extraSmall} color={Colors.midGrey}>What have you practiced?</LabelText>
-          <Row bottom={Spacing.small} wrap>
+          <Row bottom={Spacing.small} wrap align="center">
             {tags.map((tag) => (
               <Tag
                 key={tag}

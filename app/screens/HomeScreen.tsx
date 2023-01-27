@@ -8,7 +8,7 @@ import { ActivityEnum } from "@models/PracticeSession"
 
 import { Content, Screen } from "@common-ui/components/Screen"
 import { HugeTitle, LabelText, LargeTitle, MediumTitle, RegularText, SmallText } from "@common-ui/components/Text"
-import { IconButton, SolidButton } from "@common-ui/components/Button"
+import { IconButton, LinkButton, SolidButton } from "@common-ui/components/Button"
 import { Card } from "@common-ui/components/Card"
 import { If } from "@common-ui/components/Conditional"
 import { Cell, Row } from "@common-ui/components/Common"
@@ -17,8 +17,10 @@ import { EndPracticeModal, EndPracticeModalHandle } from "@components/EndPratice
 import { Spacing } from "@common-ui/constants/spacing"
 import { useInterval } from "@utils/useInterval"
 import { formatDate } from "@utils/formatDate"
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { AddPracticeModal, AddPracticeModalHandle } from "@components/AddPracticeModal"
+import { Colors } from "react-native/Libraries/NewAppScreen"
+import Icon from "@common-ui/components/Icon"
+import { Palette } from "@common-ui/constants/colors"
 
 const ActiveSession = observer(
   function ActiveSession(_props) {
@@ -30,7 +32,6 @@ const ActiveSession = observer(
       },
       practiceSessionStore.isPracticing ? 1000 : null
     )
-
 
     return (
       <Card type="info" bottom={Spacing.medium} innerVertical={Spacing.large}>
@@ -48,20 +49,28 @@ const ActiveSession = observer(
 )
 
 const PracticeItem = function PracticeItem({ item }) {
+  const activitiesText = item.activities.map((activity) => ActivityEnum[activity]).join(", ")
+  const satisfactionStars = Array.from({ length: item.satisfaction }, (_, i) => i)
+
   return (
     <Card bottom={Spacing.medium} key={item.uuid}>
-      <LargeTitle>
-        {item.formattedDuration.hours}:{item.formattedDuration.minutes}
-        <RegularText>
-          {" "}{formatDate(item.endTime, "dd MMM")}
-        </RegularText>
-      </LargeTitle>
+      <Row align="space-between">
+        <LargeTitle>
+          {item.formattedDuration.hours}:{item.formattedDuration.minutes}
+          <RegularText>
+            {" "}{formatDate(item.endTime, "dd MMM")}
+          </RegularText>
+        </LargeTitle>
+        <Cell>
+          <Row>
+            {satisfactionStars.map((_, i) => (
+              <Icon key={i} color={Palette.yellow} name="star" size={Spacing.small} />
+            ))}
+          </Row>
+        </Cell>
+      </Row>
       <Row top={Spacing.extraSmall}>
-        {item.activities.map((activity) => {
-          return (
-            <LabelText left={Spacing.tiny} key={activity} text={ActivityEnum[activity]} />
-          )
-        })}
+        <LabelText text={activitiesText} />
       </Row>
     </Card>
   )
@@ -70,7 +79,6 @@ const PracticeItem = function PracticeItem({ item }) {
 export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
   function HomeScreen(_props) {
     const { practiceSessionStore, quotesStore } = useStores()
-    const bottomOffset = useBottomTabBarHeight()
 
     const editPracticeModalRef = useRef<EndPracticeModalHandle>(null)
     const addPracticeModalRef = useRef<AddPracticeModalHandle>(null)
@@ -100,7 +108,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
           <HugeTitle text={translate("homeScreen.title")} />
           <IconButton icon="plus" onPress={addSession} />
         </Row>
-        <Cell left={Spacing.medium} right={Spacing.medium} top={Spacing.large} bottom={Spacing.large} >
+        <Cell horizontal={Spacing.medium} vertical={Spacing.large} >
           <SolidButton
             large
             type="primary"
@@ -123,6 +131,21 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
               </HugeTitle>
               <LabelText align="center">Keep up the good work!</LabelText>
             </Card>
+          </If>
+
+          <If condition={!practiceSessionStore.sessionsCompletedToday.length && !practiceSessionStore.activeSession}>
+            <RegularText align="center">
+              You haven't logged any practice sessions{'\n'}today yet.
+            </RegularText>
+
+            <LinkButton
+              large
+              title="Add practice session"
+              leftIcon="plus-circle"
+              leftIconSize={Spacing.large}
+              textColor={Colors.dark}
+              onPress={addSession}
+            />
           </If>
 
           {/* We could've used FlashList here but since the number of practices per day is small

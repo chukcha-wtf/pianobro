@@ -5,14 +5,20 @@ import uk from "date-fns/locale/uk"
 import en from "date-fns/locale/en-US"
 
 type Options = Parameters<typeof format>[2]
+export type DurationObject = {
+  hours: string
+  minutes: string
+  seconds: string
+}
 
-const getLocale = (): Locale => {
+export const getDateLocale = (): Locale => {
   const locale = I18n.currentLocale().split("-")[0]
   return locale === "uk" ? uk : en
 }
 
 export const formatDate = (date: string, dateFormat?: string, options?: Options) => {
-  const locale = getLocale()
+  const locale = getDateLocale()
+
   const dateOptions = {
     ...options,
     locale,
@@ -21,7 +27,7 @@ export const formatDate = (date: string, dateFormat?: string, options?: Options)
 }
 
 export const formatTime = (date: string, dateFormat?: string, options?: Options) => {
-  const locale = getLocale()
+  const locale = getDateLocale()
   const dateOptions = {
     ...options,
     locale,
@@ -30,7 +36,7 @@ export const formatTime = (date: string, dateFormat?: string, options?: Options)
 }
 
 export const formatDateTime = (date: string, dateFormat?: string, options?: Options) => {
-  const locale = getLocale()
+  const locale = getDateLocale()
   const dateOptions = {
     ...options,
     locale,
@@ -38,7 +44,11 @@ export const formatDateTime = (date: string, dateFormat?: string, options?: Opti
   return format(parseISO(date), dateFormat ?? "hh:mm a MMM dd, yyyy", dateOptions)
 }
 
-export const formatDuration = (duration: number) => {
+export function convertMilisecondsToHours(miliseconds: number): number {
+  return miliseconds / 1000 / 60 / 60
+}
+
+export const formatDuration = (duration: number): DurationObject => {
   const milliseconds = Number(duration)
   const seconds = Math.floor(milliseconds / 1000)
 
@@ -50,5 +60,11 @@ export const formatDuration = (duration: number) => {
   const minutesFormatted = minutes > 0 ? `${minutes}m` : "00m"
   const secondsFormatted = secondsLeft > 0 ? `${secondsLeft}s` : "00s"
 
-  return { hours: hoursFormatted, minutes: minutesFormatted, seconds: secondsFormatted }
+  const durationObject: DurationObject = {
+    hours: hoursFormatted,
+    minutes: minutesFormatted,
+    seconds: secondsFormatted
+  }
+
+  return durationObject
 }

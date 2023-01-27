@@ -97,17 +97,17 @@ export const Screen = ({ children }: { children: React.ReactNode }) => {
 
 const $container: ViewStyle = {
   flex: 1,
-  backgroundColor: Colors.lightGrey,
+  backgroundColor: Colors.background,
 }
 
 const $content: ViewStyle = {
-  padding: Spacing.small,
-  backgroundColor: Colors.lightGrey,
+  padding: Spacing.medium,
+  backgroundColor: Colors.background,
 }
 
 const $scrollView: ViewStyle = {
   flex: 1,
-  backgroundColor: Colors.lightGrey,
+  backgroundColor: Colors.background,
 }
 
 const $noBackground: ViewStyle = {

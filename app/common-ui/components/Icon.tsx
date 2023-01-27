@@ -1,6 +1,6 @@
 import React from "react"
 
-import { ColorValue } from "react-native"
+import { ColorValue, TextStyle } from "react-native"
 
 import { Feather } from "@expo/vector-icons"
 
@@ -11,6 +11,7 @@ type IconProps = {
   name: keyof typeof Feather.glyphMap
   size?: number
   color?: ColorValue
+  style?: TextStyle
 } & OffsetProps
 
 /**
@@ -21,8 +22,12 @@ type IconProps = {
  * @example
  * <Icon name="alien-outline" size={24} />
  */
-export default function Icon({ name, size, color, ...props }: IconProps) {
-  const styles = useOffsetStyles([], props)
+export default function Icon({ name, size, color, style, ...props }: IconProps) {
+  const styles = useOffsetStyles([style], props)
 
-  return <Feather style={styles} name={name} size={size || Spacing.large} color={color} />
+  return <Feather
+    name={name}
+    size={size || Spacing.large}
+    color={color}
+    style={styles} />
 }

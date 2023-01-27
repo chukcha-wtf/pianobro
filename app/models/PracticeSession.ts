@@ -10,6 +10,7 @@ export enum ActivityEnum {
   "sightreading" = "Sight Reading",
   "eartraining" = "Ear Training",
   "rhythm" = "Rhythm",
+  "hanon" = "Hanon",
   "technique" = "Technique",
   "repertoire" = "Repertoire",
   "composition" = "Composition",
@@ -31,6 +32,7 @@ export const PracticeSessionModel = types
     intencity: 0, // 0 - 10
     satisfaction: 0, // 0 - 5
     notes: "",
+    isActive: false,
     activities: types.optional(
       types.array(
         types.enumeration(
@@ -40,6 +42,8 @@ export const PracticeSessionModel = types
             "chords",
             "composition",
             "eartraining",
+            "fingerindependence",
+            "hanon",
             "improvisation",
             "other",
             "repertoire",

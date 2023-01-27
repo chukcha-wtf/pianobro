@@ -6,7 +6,7 @@ export enum Palette {
   transparent = "transparent",
   white = "#fff",
 
-  black = "#318191F",
+  black = "#18191F",
   black800 = "#474A57",
   black700 = "#969BAB",
   black300 = "#9FA4B4",
@@ -52,6 +52,7 @@ export const Colors = {
   background: Palette.white,
 
   tagBackground: Palette.red800, // tag background color
+  tabBackground: Palette.white, // tab background color
   
   // colors
   transparent: Palette.transparent,
@@ -67,5 +68,4 @@ export enum ColorTypes {
   warning = "warning",
   success = "success",
   info = "info",
-  support = "support",
 }

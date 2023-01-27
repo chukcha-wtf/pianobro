@@ -137,7 +137,13 @@ function BaseButton(props: BaseButtonProps) {
   }
 
   return (
-    <TouchableOpacity style={buttonStyle} disabled={isButtonDisabled} onPress={onPress}>
+    <TouchableOpacity
+      style={buttonStyle}
+      disabled={isButtonDisabled}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={buttonText}
+    >
       <If condition={!!leftIcon}>
         <Feather size={leftIconSize} name={leftIcon} color={textColor} style={$leftIcon} />
       </If>
@@ -187,7 +193,12 @@ export function SolidButton(props: ButtonProps) {
   const backgroundColor = type ? Colors[type] : Colors.primary
   const borderColor = backgroundColor
 
-  return <BaseButton backgroundColor={backgroundColor} borderColor={borderColor} textColor={Colors.white} {...rest} />
+  return <BaseButton
+    backgroundColor={backgroundColor}
+    borderColor={borderColor}
+    textColor={Colors.white}
+    {...rest}
+  />
 }
 
 /**
@@ -221,7 +232,12 @@ export function OutlinedButton(props: ButtonProps) {
   const borderColor = type ? Colors[type] : Colors.midGrey
   const textColor = type ? Colors[type] : Colors.dark
 
-  return <BaseButton backgroundColor={backgroundColor} borderColor={borderColor} textColor={textColor} {...props} />
+  return <BaseButton
+    backgroundColor={backgroundColor}
+    borderColor={borderColor}
+    textColor={textColor}
+    {...props}
+  />
 }
 
 /**
@@ -253,7 +269,13 @@ export function LinkButton(props: ButtonProps) {
 
   const textColor = type ? Colors[type] : Colors.primary
 
-  return <BaseButton borderColor="transparent" backgroundColor="transparent" textColor={textColor} shadowOffset={{ width: 0, height: 0 }} {...rest} />
+  return <BaseButton
+    borderColor="transparent"
+    backgroundColor="transparent"
+    textColor={textColor}
+    shadowOffset={{ width: 0, height: 0 }}
+    {...rest}
+  />
 }
 
 
