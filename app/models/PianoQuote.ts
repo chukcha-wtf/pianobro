@@ -86,6 +86,24 @@ export const PianoQuoteModel = types
     author: "",
   })
 
-export interface PracticeSession extends Instance<typeof PianoQuoteModel> {}
-export interface PracticeSessionSnapshotOut extends SnapshotOut<typeof PianoQuoteModel> {}
-export interface PracticeSessionSnapshotIn extends SnapshotIn<typeof PianoQuoteModel> {}
+
+export const PianoQuoteStoreModel = types
+  .model("PianoQuoteStore")
+  .props({
+    quotes: types.array(PianoQuoteModel),
+  })
+  .views((store) => ({
+    get randomQuote() {
+      return store.quotes.length ? store.quotes[Math.floor(Math.random() * store.quotes.length)] : undefined
+    },
+  }))
+
+// Populate the store with quotes data
+PianoQuoteStoreModel.create({ quotes: QUOTES })
+
+export interface PianoQuoteStore extends Instance<typeof PianoQuoteStoreModel> {}
+export interface PianoQuoteStoreSnapshot extends SnapshotOut<typeof PianoQuoteStoreModel> {}
+
+export interface PianoQuote extends Instance<typeof PianoQuoteModel> {}
+export interface PianoQuoteSnapshotOut extends SnapshotOut<typeof PianoQuoteModel> {}
+export interface PianoQuoteSnapshotIn extends SnapshotIn<typeof PianoQuoteModel> {}

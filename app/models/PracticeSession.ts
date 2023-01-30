@@ -1,23 +1,7 @@
 import { formatDuration } from "@utils/formatDate"
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
+import { Activity, ActivityModel } from "./Activity"
 import { withSetPropAction } from "./helpers/withSetPropAction"
-
-export enum ActivityEnum {
-  "songlearning" = "Song Learning",
-  "scales" = "Scales",
-  "arpeggios" = "Arpeggios",
-  "chords" = "Chords",
-  "sightreading" = "Sight Reading",
-  "eartraining" = "Ear Training",
-  "rhythm" = "Rhythm",
-  "hanon" = "Hanon",
-  "technique" = "Technique",
-  "repertoire" = "Repertoire",
-  "composition" = "Composition",
-  "improvisation" = "Improvisation",
-  "fingerindependence" = "Finger Independence",
-  "other" = "Other",
-}
 
 /**
  * This represents an PracticeSession model.
@@ -33,35 +17,12 @@ export const PracticeSessionModel = types
     satisfaction: 0, // 0 - 5
     notes: "",
     isActive: false,
-    activities: types.optional(
-      types.array(
-        types.enumeration(
-          "activity",
-          [
-            "arpeggios",
-            "chords",
-            "composition",
-            "eartraining",
-            "fingerindependence",
-            "hanon",
-            "improvisation",
-            "other",
-            "repertoire",
-            "rhythm",
-            "scales",
-            "sightreading",
-            "songlearning",
-            "technique",
-          ]
-        )
-      ),
-      []
-    ),
+    activities: types.optional(types.array(types.reference(ActivityModel)), []),
   })
   .actions(withSetPropAction)
   .actions((practiceSession) => ({
-    addActivity(activity: keyof typeof ActivityEnum) {
-      practiceSession.activities.push(activity)
+    addActivity(activity: Activity) {
+      practiceSession.activities.push(activity.uuid)
     }
   }))
   .views((practiceSession) => ({

@@ -1,11 +1,11 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { v4 as uuidv4 } from 'uuid';
-import { startOfWeek, endOfWeek } from "date-fns"
 
-import { ActivityEnum, PracticeSessionModel } from "./PracticeSession"
+import { PracticeSession, PracticeSessionModel } from "./PracticeSession"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { calculateDuration } from "@utils/calculateDuration"
-import { DurationObject, formatDuration, getDateLocale } from "@utils/formatDate";
+import { DurationObject, formatDuration } from "@utils/formatDate";
+import { Activity } from "./Activity";
 
 export const PracticeSessionStoreModel = types
   .model("PracticeSessionStore")
@@ -40,6 +40,7 @@ export const PracticeSessionStoreModel = types
 
         store.isPracticing = true
 
+        // Do not create a new session if there is an active one
         if (store.activeSession) {
           return
         }
@@ -53,7 +54,7 @@ export const PracticeSessionStoreModel = types
 
         store.practiceSessions.push(practiceSession)
       },
-      stop(practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<keyof typeof ActivityEnum>) {
+      stop(practiceSession: PracticeSession, activities: Array<Activity>) {
         if (!store.isPracticing) {
           return
         }
@@ -74,7 +75,7 @@ export const PracticeSessionStoreModel = types
         
         store.isPracticing = false
       },
-      addSession(practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<keyof typeof ActivityEnum>) {
+      addSession(practiceSession: PracticeSession, activities: Array<Activity>) {
         const newPracticeSession = PracticeSessionModel.create({
           uuid: uuidv4(),
           startTime: practiceSession.startTime,
@@ -129,7 +130,7 @@ export const PracticeSessionStoreModel = types
       }).sort(sortByDateAsc)
     },
 
-    getActivitiesFromSessions(sessions: Array<Instance<typeof PracticeSessionModel>>) {
+    getActivitiesFromSessions(sessions: Array<PracticeSession>) {
       const allActivities = sessions.reduce((acc, session) => {
         return acc.concat(session.activities)
       }, [])
@@ -137,19 +138,19 @@ export const PracticeSessionStoreModel = types
       const uniqueActivities = [...new Set(allActivities)]
 
       const sessionsByActivity: {
-        key: keyof typeof ActivityEnum,
+        key: string,
         humanTitle: string,
-        sessions: Array<Instance<typeof PracticeSessionModel>>,
+        sessions: Array<PracticeSession>,
         duration: DurationObject,
       }[] = []
       
-      uniqueActivities.forEach((activity) => {
+      uniqueActivities.forEach((activity: Activity) => {
         const sessionsWithActivity = sessions.filter(session => session.activities.includes(activity))
         const totalDuration = sessionsWithActivity.reduce((acc, session) => acc + session.duration, 0)
 
         sessionsByActivity.push({
-          key: activity,
-          humanTitle: ActivityEnum[activity],
+          key: activity.uuid,
+          humanTitle: activity.name,
           sessions: sessionsWithActivity,
           duration: formatDuration(totalDuration),
         })

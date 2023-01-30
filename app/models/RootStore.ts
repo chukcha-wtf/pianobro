@@ -1,6 +1,6 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
-import { PianoQuoteStoreModel } from "./PianoQuoteStore"
-import { QUOTES } from "./PianoQuote"
+import { ActivityStoreModel } from "./Activity"
+import { PianoQuoteStoreModel } from "./PianoQuote"
 import { PracticeSessionStoreModel } from "./PracticeSessionStore"
 
 /**
@@ -8,9 +8,8 @@ import { PracticeSessionStoreModel } from "./PracticeSessionStore"
  */
 export const RootStoreModel = types.model("RootStore").props({
   practiceSessionStore: types.optional(PracticeSessionStoreModel, {}),
-  quotesStore: types.optional(PianoQuoteStoreModel, {
-    quotes: QUOTES
-  }),
+  quotesStore: types.optional(PianoQuoteStoreModel, {}),
+  activitiesStore: types.optional(ActivityStoreModel, {})
 })
 
 /**

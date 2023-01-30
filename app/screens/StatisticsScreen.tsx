@@ -43,22 +43,25 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
             </LargeTitle>
           </If>
           <If condition={practiceSessionStore.hasCompletedSessions}>
+            <MediumText vertical={Spacing.large} bottom={Spacing.extraSmall}>
+              This Week
+            </MediumText>
             <Row align="space-between">
-              <Card>
-                <LargeTitle align="center" bottom={Spacing.medium}>
-                  Practice Time
-                </LargeTitle>
-                <HugeTitle align="center">
+              <Card flex>
+                <MediumTitle align="center" bottom={Spacing.small}>
+                  Time
+                </MediumTitle>
+                <LargeTitle align="center">
                   {totalPracticeTime.hours} {totalPracticeTime.minutes}
-                </HugeTitle>
-              </Card>
-              <Card>
-                <LargeTitle align="center" bottom={Spacing.medium}>
-                  Practice Days
                 </LargeTitle>
-                <HugeTitle align="center">
+              </Card>
+              <Card flex left={Spacing.medium}>
+                <MediumTitle align="center" bottom={Spacing.small}>
+                  Days
+                </MediumTitle>
+                <LargeTitle align="center">
                   {daysPracticedThisWeek.length}
-                </HugeTitle>
+                </LargeTitle>
               </Card>
             </Row>
             <Card top={Spacing.large}>

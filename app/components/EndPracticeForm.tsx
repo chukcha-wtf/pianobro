@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite"
 import Slider from '@react-native-community/slider';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
-import { ActivityEnum, PracticeSessionModel } from "@models/PracticeSession"
+import { PracticeSession } from "@models/PracticeSession"
 
 import { LabelText, LargeTitle, MediumTitle } from "@common-ui/components/Text"
 import { Cell, Row } from "@common-ui/components/Common"
@@ -18,12 +18,12 @@ import { formatDuration } from "@utils/formatDate"
 import { ViewStyle } from "react-native";
 import { StarPicker } from "./StarPicker";
 import { LargeInput } from "@common-ui/components/Input";
-import { Instance } from "mobx-state-tree";
 import { If } from "@common-ui/components/Conditional";
+import { ACTIVITIES, Activity } from "@models/Activity";
 
 type EndPracticeFormProps = {
-  activeSession?: Instance<typeof PracticeSessionModel>
-  onSave: (practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<keyof typeof ActivityEnum>) => void
+  activeSession?: PracticeSession
+  onSave: (practiceSession: PracticeSession, activities: Array<Activity>) => void
 }
 
 export const EndPracticeForm = observer(
@@ -38,7 +38,7 @@ export const EndPracticeForm = observer(
     const [intencity, setIntencity] = useState(0)
     const [satisfaction, setSatisfaction] = useState(0)
     const [notes, setNotes] = useState('')
-    const [selectedActivities, setSelectedActivities] = useState<Array<keyof typeof ActivityEnum>>([])
+    const [selectedActivities, setSelectedActivities] = useState<Array<Activity>>([])
 
     const saveSession = () => {
       const session = { ...activeSession }
@@ -63,15 +63,15 @@ export const EndPracticeForm = observer(
     const handleTagPress = (key: string, isSelected: boolean) => {
       setSelectedActivities((prev) => {
         if (isSelected) {
-          return [...prev, key as keyof typeof ActivityEnum]
+          const activity = ACTIVITIES.find((activity) => activity.uuid === key)
+
+          return [...prev, activity]
         }
         
-        return prev.filter((activity) => activity !== key)
+        return prev.filter((activity) => activity.uuid !== key)
       })
     }
-  
-    const tags = Object.keys(ActivityEnum) as Array<keyof typeof ActivityEnum>
-  
+    
     return (
       <>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false} contentContainerStyle={$scrollView}>
@@ -87,12 +87,12 @@ export const EndPracticeForm = observer(
           {/* Activities Selection */}
           <LabelText bottom={Spacing.extraSmall} color={Colors.midGrey}>What have you practiced?</LabelText>
           <Row bottom={Spacing.small} wrap align="center">
-            {tags.map((tag) => (
+            {ACTIVITIES.map((activity) => (
               <Tag
-                key={tag}
-                tag={tag}
+                key={activity.uuid}
+                tag={activity.uuid}
                 randomBgColor
-                text={ActivityEnum[tag]}
+                text={activity.name}
                 onPress={handleTagPress}
                 bottom={Spacing.extraSmall}
                 left={Spacing.tiny}

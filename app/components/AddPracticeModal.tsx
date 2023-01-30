@@ -11,7 +11,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { EndPracticeForm } from "./EndPracticeForm";
 import { useStores } from "@models/index";
 import { Instance } from "mobx-state-tree";
-import { ActivityEnum, PracticeSessionModel } from "@models/PracticeSession";
+import { PracticeSessionModel } from "@models/PracticeSession";
+import { Activity } from "@models/Activity";
 
 export type AddPracticeModalHandle = {
   open: () => void
@@ -46,7 +47,7 @@ export const AddPracticeModal = forwardRef<AddPracticeModalHandle, unknown>(func
     close: closeModal
   }))
 
-  const onSave = (practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<keyof typeof ActivityEnum>) => {
+  const onSave = (practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<Activity>) => {
     // Save session
     closeModal()
     practiceSessionStore.addSession(practiceSession, activities)

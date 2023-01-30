@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite"
 import { MainTabScreenProps } from "@navigators/MainNavigator"
 import { translate } from "@i18n/translate"
 import { useStores } from "@models/index"
-import { ActivityEnum } from "@models/PracticeSession"
+import { PracticeSession } from "@models/PracticeSession"
 
 import { Content, Screen } from "@common-ui/components/Screen"
 import { HugeTitle, LabelText, LargeTitle, MediumTitle, RegularText, SmallText } from "@common-ui/components/Text"
@@ -48,8 +48,8 @@ const ActiveSession = observer(
   }
 )
 
-const PracticeItem = function PracticeItem({ item }) {
-  const activitiesText = item.activities.map((activity) => ActivityEnum[activity]).join(", ")
+const PracticeItem = function PracticeItem({ item }: { item: PracticeSession }) {
+  const activitiesText = item.activities.map((activity) => activity.name).join(", ")
   const satisfactionStars = Array.from({ length: item.satisfaction }, (_, i) => i)
 
   return (
@@ -85,8 +85,10 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
 
     const quoteOfTheDay = useMemo(() => quotesStore.randomQuote, [])
 
+    const isPracticing = practiceSessionStore.isPracticing && !!practiceSessionStore.activeSession
+
     const handleStartStop = () => {
-      if (practiceSessionStore.isPracticing) {
+      if (isPracticing) {
         editPracticeModalRef.current?.open()
         return
       }
@@ -99,8 +101,8 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
       addPracticeModalRef.current?.open()
     }
     
-    const buttonTitle = practiceSessionStore.isPracticing ? translate("homeScreen.mainButtonTextActive") : translate("homeScreen.mainButtonTextInactive")
-    const buttonIcon = practiceSessionStore.isPracticing ? "pause" : "play"
+    const buttonTitle = isPracticing ? translate("homeScreen.mainButtonTextActive") : translate("homeScreen.mainButtonTextInactive")
+    const buttonIcon = isPracticing ? "pause" : "play"
     
     return (
       <Screen>
