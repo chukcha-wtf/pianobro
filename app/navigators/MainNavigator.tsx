@@ -1,7 +1,9 @@
 import React from "react"
 import { TouchableOpacity, View, ViewStyle } from "react-native"
-
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { LinearGradient } from "expo-linear-gradient"
+
+import { BottomTabDescriptorMap, BottomTabNavigationEventMap } from "@react-navigation/bottom-tabs/lib/typescript/src/types"
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CompositeScreenProps, NavigationHelpers, ParamListBase, TabNavigationState } from "@react-navigation/native"
 
@@ -11,8 +13,7 @@ import { HomeScreen, StatisticsScreen, ProfileScreen } from "../screens"
 import { Colors, Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import Icon from "@common-ui/components/Icon"
-import { BottomTabDescriptorMap, BottomTabNavigationEventMap } from "@react-navigation/bottom-tabs/lib/typescript/src/types"
-import { Feather } from "@expo/vector-icons"
+
 
 export type MainTabParamList = {
   Home: undefined
@@ -44,11 +45,21 @@ const ICONS_MAP = {
   Profile: "user",
 }
 
+const TABBAR_HEIGHT = 70
+
 function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBarProps) {
   const { bottom } = useSafeAreaInsets()
 
   return (
-    <View style={[$tabBarHolder, { marginBottom: bottom ?? Spacing.large }]}>
+    <View style={[$tabBarHolder, { paddingBottom: bottom ?? Spacing.large }]}>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={['rgba(255,255,255,1)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0)']}
+        style={$linearBackground}
+        locations={[0, 0.3, 0.5, 0.8, 1]}
+        start={{ x: 0, y: 1 }}
+        end={{ x: 0, y: 0 }}
+      />
       <View style={$floatingTabBar}>
         {state.routes.map((route: any, index: number) => {
           const { options } = descriptors[route.key]
@@ -68,7 +79,6 @@ function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBarProps)
 
           const iconColor = isFocused ? Palette.black : Palette.black300
 
-          // TODO: figure out why icon color isn't changing
           return (
             <TouchableOpacity
               key={route.key}
@@ -113,7 +123,7 @@ const $tabBarHolder: ViewStyle = {
 }
 
 const $floatingTabBar: ViewStyle = {
-  height: 70,
+  height: TABBAR_HEIGHT,
   flexDirection: "row",
   marginHorizontal: Spacing.large,
   borderWidth: 2,
@@ -126,4 +136,13 @@ const $floatingTabBarItem: ViewStyle = {
   flex: 1,
   alignItems: "center",
   justifyContent: "center",
+}
+
+const $linearBackground: ViewStyle = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  // height: TABBAR_HEIGHT,
 }

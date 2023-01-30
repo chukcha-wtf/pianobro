@@ -117,7 +117,7 @@ export const PracticeSessionStoreModel = types
 
     get sessionsCompletedToday() {
       return store.practiceSessions.filter(session => {
-        return session.endTime && session.duration &&
+        return session.endTime && session.duration && !session.isActive &&
           new Date(session.endTime).toDateString() === new Date().toDateString()
       }).sort(sortByDateAsc)
     },
