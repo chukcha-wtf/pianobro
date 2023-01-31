@@ -3,8 +3,8 @@ import { View, ScrollView, ViewProps, ScrollViewProps, ViewStyle } from "react-n
 import { Colors } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 
 export type ContentProps = {
   children: React.ReactNode
@@ -35,10 +35,8 @@ export type ContentProps = {
 export const Content = (props: ContentProps) => {
   const { children, noPadding, noBackground, backgroundColor, style, scrollViewStyle, scrollable, ...rest } =
     props
-  const tabBarHeight = useBottomTabBarHeight()
-  const { bottom } = useSafeAreaInsets()
 
-  const paddingBottom = tabBarHeight + bottom
+  const paddingBottom = useBottomPadding()
 
   const Container = scrollable ? ScrollView : View
 
@@ -101,6 +99,7 @@ const $container: ViewStyle = {
 }
 
 const $content: ViewStyle = {
+  flex: 1,
   padding: Spacing.medium,
   backgroundColor: Colors.background,
 }

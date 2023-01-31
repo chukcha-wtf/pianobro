@@ -149,7 +149,7 @@ export const Typography: TypographyType = {
     fontWeight: "700",
     fontSize: 12,
     lineHeight: 14,
-    color: Colors.lightDark,
+    color: Colors.darkGrey,
   },
 
   noLineHeight: {
@@ -169,11 +169,11 @@ export const Typography: TypographyType = {
   },
 
   mutedText: {
-    color: Colors.lightDark,
+    color: Colors.darkGrey,
   },
 
   disabledText: {
-    color: Colors.lightDark,
+    color: Colors.darkGrey,
     opacity: 0.5,
   },
 }

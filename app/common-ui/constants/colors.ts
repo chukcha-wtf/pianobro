@@ -44,7 +44,7 @@ export const Colors = {
   info: Palette.pink, // light blue
   darkGrey: Palette.black700, // dark grey
   midGrey: Palette.black300, // mid grey
-  lightGrey: Palette.black200, // light grey used for muted text
+  lightGrey: Palette.black100, // light grey
 
   separator: Palette.black300, // separator color
   text: Palette.black, // text color

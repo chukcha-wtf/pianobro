@@ -77,7 +77,7 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
             </MediumText>
             {activities.map((activity) => {
               return (
-                <Card key={activity.key} bottom={Spacing.large}>
+                <Card nonElevated key={activity.key} bottom={Spacing.large}>
                   <Row align="space-between">
                     <MediumTitle align="center">
                       {activity.humanTitle}

@@ -13,6 +13,7 @@ import "./i18n"
 import "./utils/ignoreWarnings"
 
 import React from "react"
+import { NativeModules } from "react-native"
 
 import { useFonts } from "expo-font"
 import * as Linking from "expo-linking"
@@ -29,13 +30,18 @@ import { Timing } from "@common-ui/constants/timing"
 import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
 
+const hostname = NativeModules.SourceCode.scriptURL
+  .split('://')[1] // Remove the scheme
+  .split('/')[0] // Remove the path
+  .split(':')[0]; // Remove the port
+
 // Set up Reactotron, which is a free desktop app for inspecting and debugging
 // React Native apps. Learn more here: https://github.com/infinitered/reactotron
 setupReactotron({
   // clear the Reactotron window when the app loads/reloads
   clearOnLoad: true,
   // generally going to be localhost
-  host: "localhost",
+  host: hostname,
   // Reactotron can monitor AsyncStorage for you
   useAsyncStorage: true,
   // log the initial restored state from AsyncStorage

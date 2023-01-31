@@ -115,8 +115,11 @@ export const Cell = ({ children, align, justify, flex, ...offsetProps }: CellPro
  */
 const $bottomContainer: ViewStyle = {
   position: "absolute",
+  left: 0,
+  right: 0,
   bottom: 0,
 }
+
 export const BottomContainer = ({ children, ...offsetProps }: BottomContainerProps) => {
   let styles: ViewStyle[] = [$bottomContainer]
 
