@@ -33,6 +33,7 @@ export async function registerForPushNotificationsAsync(): Promise<string> {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
+      // TODO: Add modal dialog to ask user to enable push notifications from settings
       alert('Failed to get push token for push notification!');
       return "";
     }

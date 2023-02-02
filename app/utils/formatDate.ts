@@ -56,9 +56,9 @@ export const formatDuration = (duration: number): DurationObject => {
   const minutes = Math.floor((seconds % 3600) / 60)
   const secondsLeft = Math.floor((seconds % 3600) % 60)
 
-  const hoursFormatted = hours > 0 ? `${hours}h` : "00h"
-  const minutesFormatted = minutes > 0 ? `${minutes}m` : "00m"
-  const secondsFormatted = secondsLeft > 0 ? `${secondsLeft}s` : "00s"
+  const hoursFormatted = hours > 0 ? `${hours}` : "00"
+  const minutesFormatted = minutes > 0 ? `${minutes}` : "00"
+  const secondsFormatted = secondsLeft > 0 ? `${secondsLeft}` : "00"
 
   const durationObject: DurationObject = {
     hours: hoursFormatted,

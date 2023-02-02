@@ -57,7 +57,9 @@ const prefix = Linking.createURL("/")
 const config = {
   screens: {
     Home: "home",
+    SessionDetails: "session-details",
     Statistics: "statistics",
+    ActivityDetails: "activity-details",
     Profile: "profile",
   },
 }

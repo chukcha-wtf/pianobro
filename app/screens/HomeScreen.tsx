@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite"
 import { MainTabScreenProps } from "@navigators/MainNavigator"
 import { translate } from "@i18n/translate"
 import { useStores } from "@models/index"
-import { PracticeSession } from "@models/PracticeSession"
 
 import { Content, Screen } from "@common-ui/components/Screen"
 import { HugeTitle, LabelText, LargeTitle, MediumTitle, RegularText, SmallText } from "@common-ui/components/Text"
@@ -16,11 +15,9 @@ import { EndPracticeModal, EndPracticeModalHandle } from "@components/EndPratice
 
 import { Spacing } from "@common-ui/constants/spacing"
 import { useInterval } from "@utils/useInterval"
-import { formatDate } from "@utils/formatDate"
 import { AddPracticeModal, AddPracticeModalHandle } from "@components/AddPracticeModal"
 import { Colors } from "react-native/Libraries/NewAppScreen"
-import Icon from "@common-ui/components/Icon"
-import { Palette } from "@common-ui/constants/colors"
+import { PracticeItem } from "@components/PracticeItem"
 
 const ActiveSession = observer(
   function ActiveSession(_props) {
@@ -47,34 +44,6 @@ const ActiveSession = observer(
     )
   }
 )
-
-const PracticeItem = function PracticeItem({ item }: { item: PracticeSession }) {
-  const activitiesText = item.activities.map((activity) => activity.name).join(", ")
-  const satisfactionStars = Array.from({ length: item.satisfaction }, (_, i) => i)
-
-  return (
-    <Card bottom={Spacing.medium} key={item.uuid}>
-      <Row align="space-between">
-        <LargeTitle>
-          {item.formattedDuration.hours}:{item.formattedDuration.minutes}
-          <RegularText>
-            {" "}{formatDate(item.endTime, "dd MMM")}
-          </RegularText>
-        </LargeTitle>
-        <Cell>
-          <Row>
-            {satisfactionStars.map((_, i) => (
-              <Icon key={i} color={Palette.yellow} name="star" size={Spacing.small} />
-            ))}
-          </Row>
-        </Cell>
-      </Row>
-      <Row top={Spacing.extraSmall}>
-        <LabelText text={activitiesText} />
-      </Row>
-    </Card>
-  )
-}
 
 export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
   function HomeScreen(_props) {
@@ -129,7 +98,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
             <Card type="success" bottom={Spacing.medium} innerVertical={Spacing.large}>
               <MediumTitle align="center" bottom={Spacing.small}>You practiced today for</MediumTitle>
               <HugeTitle align="center" bottom={Spacing.small}>
-                {practiceSessionStore.totalPracticeTimeToday.hours} {practiceSessionStore.totalPracticeTimeToday.minutes}
+                {practiceSessionStore.totalPracticeTimeToday.hours}hr {practiceSessionStore.totalPracticeTimeToday.minutes}min
               </HugeTitle>
               <LabelText align="center">Keep up the good work!</LabelText>
             </Card>

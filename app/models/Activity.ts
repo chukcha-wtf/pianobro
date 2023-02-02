@@ -90,6 +90,13 @@ export const ActivityStoreModel = types
   .props({
     activities: types.array(ActivityModel),
   })
+  .views((store) => {
+    return {
+      getActivityById(uuid: string) {
+        return store.activities.find((activity) => activity.uuid === uuid)
+      },
+    }
+  })
 
 // Populate the store with the activities
 ActivityStoreModel.create({ activities: ACTIVITIES })

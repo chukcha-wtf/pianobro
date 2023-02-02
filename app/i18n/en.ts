@@ -36,6 +36,12 @@ const en = {
   statisticsScreen: {
     title: "Statistics",
   },
+  sessionDetailsScreen: {
+    title: "Session Details",
+  },
+  activityDetailsScreen: {
+    title: "Activity Details",
+  },
 }
 
 export default en

@@ -109,6 +109,10 @@ export const PracticeSessionStoreModel = types
     }
   })
   .views((store) => ({
+    getSessionById(sessionId: string) {
+      return store.practiceSessions.find(session => session.uuid === sessionId)
+    },
+
     get completedSessions() {
       return store.practiceSessions.filter(
         session => session.endTime && session.duration
@@ -122,11 +126,12 @@ export const PracticeSessionStoreModel = types
       }).sort(sortByDateAsc)
     },
 
-    getSessionsCompletedBetweenDates(startDate: Date, endDate: Date) {
+    getSessionsCompletedBetweenDates(startDate: Date, endDate: Date, activityId?: string) {
       return store.practiceSessions.filter(session => {
         return session.endTime && session.duration &&
           new Date(session.endTime).getTime() >= startDate.getTime() &&
-          new Date(session.endTime).getTime() <= endDate.getTime()
+          new Date(session.endTime).getTime() <= endDate.getTime() &&
+          (!activityId || !!session.activities.find(activity => activity.uuid === activityId))
       }).sort(sortByDateAsc)
     },
 
@@ -176,16 +181,13 @@ export const PracticeSessionStoreModel = types
       return formatDuration(totalDuration)
     },
 
-    getTotalPracticeTimeBetweenDates(startDate: Date, endDate: Date) {
-      const sessions = store.getSessionsCompletedBetweenDates(startDate, endDate)
+    getTotalPracticeTimeFromSessions(sessions: Array<PracticeSession>) {
       const totalDuration = sessions.reduce((acc, session) => acc + session.duration, 0)
 
       return formatDuration(totalDuration)
     },
 
-    getDaysWithCompletedSessionsBetweenDates(startDate: Date, endDate: Date) {
-      const sessions = store.getSessionsCompletedBetweenDates(startDate, endDate)
-
+    getDaysWithCompletedSessions(sessions: Array<PracticeSession>) {
       const days = sessions.reduce((acc, session) => {
         const day = new Date(session.endTime).toDateString()
 

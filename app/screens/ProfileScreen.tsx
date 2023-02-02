@@ -10,7 +10,6 @@ import { LinkButton } from "@common-ui/components/Button"
 import { Content, Screen } from "@common-ui/components/Screen"
 
 import { MainTabScreenProps } from "../navigators/MainNavigator"
-import { openLinkInBrowser } from "../utils/openLinkInBrowser"
 import { observer } from "mobx-react-lite"
 import { useStores } from "@models/index"
 import { If } from "@common-ui/components/Conditional"
@@ -21,20 +20,25 @@ import { REMINDER_DATES } from "@models/Reminder"
 import { Colors } from "@common-ui/constants/colors"
 import { ViewStyle } from "react-native"
 
-const $dateCell: ViewStyle = {
-  width: 40,
-  height: 40,
-  borderRadius: 20,
-  paddingTop: Spacing.micro,
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: Colors.white,
-  borderWidth: 2,
-  borderColor: Colors.dark,
-}
+function DateCell({ date, isSelected, onPress }) {
+  const text = date.slice(0, 1).toUpperCase()
 
-const $selectedDateCell: ViewStyle = {
-  backgroundColor: Colors.warning,
+  const $style: ViewStyle[] = [$dateCell]
+
+  if (isSelected) {
+    $style.push($selectedDateCell)
+  }
+
+  const handlePress = () => {
+    onPress(date)
+  }
+
+
+  return (
+    <TouchableOpacity onPress={handlePress} style={[$dateCell, isSelected && $selectedDateCell]}>
+      <RegularText>{text}</RegularText>
+    </TouchableOpacity>
+  )
 }
 
 export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
@@ -42,7 +46,9 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
     const { practiceSessionStore, remindersStore } = useStores()
     const bottomPadding = useBottomPadding()
 
-    const handleButton = () => {
+    const handleButton = () => undefined
+    const onDatePress = (date) => {
+      remindersStore.toggleDate(date)
     }
 
     console.log("scheduled", remindersStore.scheduledNotifications)
@@ -57,7 +63,7 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
                 Total Practice Time
               </LargeTitle>
               <HugeTitle align="center">
-                {practiceSessionStore.totalPracticeTime.hours} {practiceSessionStore.totalPracticeTime.minutes}
+                {practiceSessionStore.totalPracticeTime.hours}hr {practiceSessionStore.totalPracticeTime.minutes}min
               </HugeTitle>
             </Card>
           </If>
@@ -68,25 +74,16 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
               onValueChange={remindersStore.toggleEnabled}
             />
           </Row>
-          <Row vertical={Spacing.large} align="space-between">
+          <Row bottom={Spacing.large} align="space-between">
             {REMINDER_DATES.map((date) => {
-              const text = date.slice(0, 1).toUpperCase()
               const isSelected = remindersStore.scheduledNotifications.has(date)
-
-              const $style: ViewStyle[] = [$dateCell]
-
-              if (isSelected) {
-                $style.push($selectedDateCell)
-              }
-
-              const onPress = () => {
-                remindersStore.toggleDate(date)
-              }
-
+              
               return (
-                <TouchableOpacity onPress={onPress} style={$style} key={date}>
-                  <MediumText muted>{text}</MediumText>
-                </TouchableOpacity>
+                <DateCell isSelected={isSelected}
+                  key={date}
+                  date={date}
+                  onPress={onDatePress}
+                />
               )
             })}
           </Row>
@@ -103,3 +100,20 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
     )
   }
 )
+
+
+const $dateCell: ViewStyle = {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  paddingTop: Spacing.micro,
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: Colors.lightGrey,
+}
+
+const $selectedDateCell: ViewStyle = {
+  borderWidth: 2,
+  borderColor: Colors.dark,
+  backgroundColor: Colors.warning,
+}

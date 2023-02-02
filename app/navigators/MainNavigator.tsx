@@ -3,6 +3,9 @@ import { TouchableOpacity, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
 
+import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { BottomTabDescriptorMap, BottomTabNavigationEventMap } from "@react-navigation/bottom-tabs/lib/typescript/src/types"
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CompositeScreenProps, NavigationHelpers, ParamListBase, TabNavigationState } from "@react-navigation/native"
@@ -13,13 +16,28 @@ import { HomeScreen, StatisticsScreen, ProfileScreen } from "../screens"
 import { Colors, Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import Icon from "@common-ui/components/Icon"
+import { SessionDetailsScreen } from "@screens/SessionDetailsScreen"
+import { ActivityDetailsScreen } from "@screens/ActivityDetailsScreen"
 
 
-export type MainTabParamList = {
-  Home: undefined
-  Statistics: undefined
+type TabParamList = {
+  HomeStack: undefined
+  StatisticsStack: undefined
   Profile: undefined
 }
+
+type StatisticsStackParamList = {
+  Statistics: undefined
+  ActivityDetails: { activityId: string }
+  SessionDetails: { activitySessionId: string }
+}
+
+type HomeStackParamList = {
+  Home: undefined
+  SessionDetails: { activitySessionId: string }
+}
+
+export type MainTabParamList = TabParamList & StatisticsStackParamList & HomeStackParamList
 
 /**
  * Helper for automatically generating navigation prop types for each route.
@@ -37,13 +55,19 @@ type FloatingTabBarProps = {
   navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>
 }
 
+const HomeStack = createNativeStackNavigator<HomeStackParamList>()
+const StatisticsStack = createNativeStackNavigator<StatisticsStackParamList>()
+
 const Tab = createBottomTabNavigator<MainTabParamList>()
 
-const ICONS_MAP = {
-  Home: "home",
-  Statistics: "activity",
-  Profile: "user",
+export enum ROUTES {
+  Home = "Home",
+  Statistics = "Statistics",
+  Profile = "Profile",
+  SessionDetails = "SessionDetails",
+  ActivityDetails = "ActivityDetails",
 }
+
 
 const TABBAR_HEIGHT = 70
 
@@ -98,6 +122,58 @@ function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBarProps)
   )
 }
 
+function HomeNavigator() {
+  return (
+    <HomeStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName={ROUTES.Home}
+    >
+      <HomeStack.Screen name={ROUTES.Home} component={HomeScreen} />
+      <HomeStack.Screen
+        options={{
+          headerShown: false,
+          presentation: 'modal',
+        }}
+        name={ROUTES.SessionDetails}
+        component={SessionDetailsScreen} />
+    </HomeStack.Navigator>
+  )
+}
+
+function StatsticsNavigator() {
+  return (
+    <StatisticsStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        headerTitleAlign: "left",
+      }}
+      initialRouteName={ROUTES.Statistics}
+    >
+      <StatisticsStack.Screen
+        name={ROUTES.Statistics}
+        component={StatisticsScreen} />
+      <StatisticsStack.Screen
+        name={ROUTES.ActivityDetails}
+        component={ActivityDetailsScreen} />
+      <StatisticsStack.Screen
+        options={{
+          presentation: 'modal',
+        }}
+        name={ROUTES.SessionDetails}
+        component={SessionDetailsScreen} />
+    </StatisticsStack.Navigator>
+  )
+}
+
+// Icons map for tabbar
+const ICONS_MAP = {
+  HomeStack: "home",
+  StatisticsStack: "activity",
+  Profile: "user",
+}
+
 export function MainNavigator() {
   return (
     <Tab.Navigator
@@ -107,8 +183,8 @@ export function MainNavigator() {
       }}
       tabBar={(props) => <FloatingTabBar {...props} />}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Statistics" component={StatisticsScreen} />
+      <Tab.Screen name="HomeStack" component={HomeNavigator} />
+      <Tab.Screen name="StatisticsStack" component={StatsticsNavigator} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   )
@@ -144,5 +220,4 @@ const $linearBackground: ViewStyle = {
   left: 0,
   right: 0,
   bottom: 0,
-  // height: TABBAR_HEIGHT,
 }

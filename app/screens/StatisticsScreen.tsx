@@ -4,7 +4,7 @@ import { startOfWeek, endOfWeek } from "date-fns"
 
 import { Content, Screen } from "@common-ui/components/Screen"
 
-import { MainTabScreenProps } from "../navigators/MainNavigator"
+import { MainTabScreenProps, ROUTES } from "../navigators/MainNavigator"
 import { HugeTitle, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
 import { translate } from "@i18n/translate"
 import { Spacing } from "@common-ui/constants/spacing"
@@ -14,9 +14,11 @@ import { Card } from "@common-ui/components/Card"
 import { Row } from "@common-ui/components/Common"
 import { ProgressChart } from "@components/ProgressChart"
 import { getDateLocale } from "@utils/formatDate"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
-  function StatisticsScreen(_props) {
+  function StatisticsScreen(props) {
+    const { navigation } = props
     const { practiceSessionStore } = useStores()
 
     const startDay = startOfWeek(new Date(), {
@@ -30,8 +32,8 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
 
     const sessionsCompletedThisWeek = practiceSessionStore.getSessionsCompletedBetweenDates(startDay, endDay)
     const activities = practiceSessionStore.getActivitiesFromSessions(sessionsCompletedThisWeek)
-    const daysPracticedThisWeek = practiceSessionStore.getDaysWithCompletedSessionsBetweenDates(startDay, endDay)
-    const totalPracticeTime = practiceSessionStore.getTotalPracticeTimeBetweenDates(startDay, endDay)
+    const daysPracticed = practiceSessionStore.getDaysWithCompletedSessions(sessionsCompletedThisWeek)
+    const totalPracticeTime = practiceSessionStore.getTotalPracticeTimeFromSessions(sessionsCompletedThisWeek)
 
     return (
       <Screen>
@@ -52,7 +54,7 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
                   Time
                 </MediumTitle>
                 <LargeTitle align="center">
-                  {totalPracticeTime.hours} {totalPracticeTime.minutes}
+                  {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min
                 </LargeTitle>
               </Card>
               <Card flex left={Spacing.medium}>
@@ -60,7 +62,7 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
                   Days
                 </MediumTitle>
                 <LargeTitle align="center">
-                  {daysPracticedThisWeek.length}
+                  {daysPracticed.length}
                 </LargeTitle>
               </Card>
             </Row>
@@ -76,16 +78,24 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
               Activities
             </MediumText>
             {activities.map((activity) => {
+              const openActivityScreen = () => {
+                navigation.navigate(ROUTES.ActivityDetails, {
+                  activityId: activity.key
+                })
+              }
+
               return (
                 <Card nonElevated key={activity.key} bottom={Spacing.large}>
-                  <Row align="space-between">
-                    <MediumTitle align="center">
-                      {activity.humanTitle}
-                    </MediumTitle>
-                    <LargeTitle align="center">
-                      {activity.duration.hours} {activity.duration.minutes}
-                    </LargeTitle>
-                  </Row>
+                  <TouchableOpacity onPress={openActivityScreen}>
+                    <Row align="space-between">
+                      <MediumTitle align="center">
+                        {activity.humanTitle}
+                      </MediumTitle>
+                      <LargeTitle align="center">
+                        {activity.duration.hours}hr {activity.duration.minutes}min
+                      </LargeTitle>
+                    </Row>
+                  </TouchableOpacity>
                 </Card>
               )
             })}
