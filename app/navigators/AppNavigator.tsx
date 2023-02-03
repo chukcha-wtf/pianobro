@@ -33,6 +33,9 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
  */
 export type AppStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList>
+  Modal:{
+    content: React.ReactNode
+  }
 }
 
 /**
@@ -40,6 +43,15 @@ export type AppStackParamList = {
  * is pressed while in that screen. Only affects Android.
  */
 const exitRoutes = Config.exitRoutes
+
+export enum ROUTES {
+  Home = "Home",
+  Statistics = "Statistics",
+  Profile = "Profile",
+  SessionDetails = "SessionDetails",
+  ActivityDetails = "ActivityDetails",
+  Main = "Main",
+}
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = StackScreenProps<
   AppStackParamList,
@@ -53,9 +65,9 @@ const AppStack = observer(function AppStack() {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName={"Main"}
+      initialRouteName={ROUTES.Main}
     >
-      <Stack.Screen name="Main" component={MainNavigator} />
+      <Stack.Screen name={ROUTES.Main} component={MainNavigator} />
     </Stack.Navigator>
   )
 })

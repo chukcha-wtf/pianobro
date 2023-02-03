@@ -3,7 +3,7 @@ import { BarChart } from "react-native-chart-kit"
 import { PracticeSession } from "@models/PracticeSession"
 import { Dimensions } from "react-native"
 import { Spacing } from "@common-ui/constants/spacing"
-import { Colors, Palette } from "@common-ui/constants/colors"
+import { Colors } from "@common-ui/constants/colors"
 import { convertMilisecondsToHours, formatDate } from "@utils/formatDate"
 
 type ProgressChartProps = {
@@ -72,8 +72,8 @@ export function ProgressChart(props: ProgressChartProps) {
     backgroundColor: Colors.white,
     backgroundGradientFrom: Colors.white,
     backgroundGradientTo: Colors.white,
-    fillShadowGradientFrom: Palette.pink,
-    fillShadowGradientTo: Palette.pink,
+    fillShadowGradientFrom: Colors.warning,
+    fillShadowGradientTo: Colors.warning,
     fillShadowGradientOpacity: 1,
     backgroundGradientFromOpacity: 1,
     backgroundGradientToOpacity: 1,

@@ -34,7 +34,18 @@ export const PracticeItem = function PracticeItem({ item }: { item: PracticeSess
     navigation.navigate(ROUTES.SessionDetails, { activitySessionId: item.uuid })
   }
 
-  const activitiesText = item.activities.map((activity) => activity.name).join(", ")
+  const firstActivities = item.activities.slice(0, 2)
+  const remainingActivities = item.activities.slice(2)
+  
+  let activitiesText = firstActivities.map((activity) => activity.name).join(", ")
+
+  if (remainingActivities.length > 1) {
+    activitiesText += ` + ${remainingActivities.length} others`
+  }
+  else if (remainingActivities.length === 1) {
+    activitiesText += `, ${remainingActivities[0].name}`
+  }
+
 
   return (
     <Card bottom={Spacing.medium} key={item.uuid}>

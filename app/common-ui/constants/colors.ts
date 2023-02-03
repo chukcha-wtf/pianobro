@@ -32,12 +32,14 @@ export enum Palette {
   pink = "#FF89BB",
   pink800 = "#FFC7DE",
   pink100 = "#FFF3F8",
+
+  violette = "#925FF1",
 }
 
 export const Colors = {
   dark: Palette.black, // dark, used for blacks
   lightDark: Palette.black800, // light dark
-  primary: Palette.blue, // dark blue
+  primary: Palette.violette, // dark blue
   danger: Palette.red, // red
   warning: Palette.yellow, // yellow
   success: Palette.green, // green

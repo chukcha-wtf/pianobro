@@ -1,7 +1,6 @@
 import React from "react"
 import {
   ColorValue,
-  TouchableOpacity,
   TouchableOpacityProps,
   ViewStyle,
   TextStyle,
@@ -15,7 +14,8 @@ import { Colors, ColorTypes } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { If } from "@common-ui/components/Conditional"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
-import { adjustColor } from "@common-ui/utils/adjustColor"
+import { RectButton } from "react-native-gesture-handler"
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 
 type BaseButtonProps = {
   title?: string
@@ -38,12 +38,17 @@ type BaseButtonProps = {
   borderRadius?: number
   paddingHorizontal?: number
   align?: "left" | "right"
-  shadowOffset?: { width: number; height: number }
+  noShadow?: boolean
 } & TouchableOpacityProps &
   OffsetProps
 
 type ButtonProps = BaseButtonProps & {
   type?: keyof typeof ColorTypes
+}
+
+const TIMING_CONFIG = {
+  duration: 150,
+  easing: Easing.out(Easing.exp)
 }
 
 function BaseButton(props: BaseButtonProps) {
@@ -68,7 +73,7 @@ function BaseButton(props: BaseButtonProps) {
     large,
     small,
     align,
-    shadowOffset,
+    noShadow,
     ...offsetProps
   } = props
 
@@ -79,6 +84,7 @@ function BaseButton(props: BaseButtonProps) {
 
   let buttonStyle: ViewStyle[] = [$button]
   const textStyle: TextStyle[] = [$buttonText]
+  const shadowStyle: ViewStyle[] = [$shadowStyle]
 
   buttonStyle = useOffsetStyles(buttonStyle, offsetProps)
 
@@ -124,42 +130,70 @@ function BaseButton(props: BaseButtonProps) {
     buttonStyle.push(align === "left" ? $alignLeft : $alignRight)
   }
 
-  if (shadowOffset) {
-    buttonStyle.push({ shadowOffset })
-  }
-
   if (borderRadius) {
     buttonStyle.push({ borderRadius })
+    shadowStyle.push({ borderRadius })
   }
 
   if (paddingHorizontal) {
     buttonStyle.push({ paddingHorizontal })
   }
 
+  const buttonState = useSharedValue(false)
+
+  const onActiveStateChange = (active: boolean) => {
+    buttonState.value = active
+  }
+
+  const opacityStyle = useAnimatedStyle(() => {
+    const transformMultiplier = buttonState.value ? 1 : 0
+    const opacityMultiplier = buttonState.value ? 0.98 : 1
+
+    return {
+      opacity: withTiming(opacityMultiplier, TIMING_CONFIG),
+      transform: [
+        {
+          translateX: withTiming(transformMultiplier * 2, TIMING_CONFIG)
+        },
+        {
+          translateY: withTiming(transformMultiplier * 4, TIMING_CONFIG)
+        }
+      ],
+
+    }
+  }, [])
+
   return (
-    <TouchableOpacity
-      style={buttonStyle}
-      disabled={isButtonDisabled}
+    <RectButton
+      enabled={!isButtonDisabled}
       onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={buttonText}
+      onActiveStateChange={onActiveStateChange}
+      underlayColor={Colors.transparent}
     >
-      <If condition={!!leftIcon}>
-        <Feather size={leftIconSize} name={leftIcon} color={textColor} style={$leftIcon} />
-      </If>
-      <If condition={!!isLoading}>
-        <ActivityIndicator size="small" color={textColor} style={$activityIndicator} />
-      </If>
-      <If condition={!!title}>
-        <MediumText textStyle={textStyle}>{buttonText}</MediumText>
-      </If>
-      <If condition={!!icon}>
-        <Feather size={iconSize} name={icon} color={textColor} textStyle={$icon} />
-      </If>
-      <If condition={!!rightIcon}>
-        <Feather size={rightIconSize} name={rightIcon} color={textColor} style={$rightIcon} />
-      </If>
-    </TouchableOpacity>
+      {!noShadow && <Animated.View style={shadowStyle} />}
+      <Animated.View
+        style={[buttonStyle, opacityStyle]}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={buttonText}
+      >
+        <If condition={!!leftIcon}>
+          <Feather size={leftIconSize} name={leftIcon} color={textColor} style={$leftIcon} />
+        </If>
+        <If condition={!!isLoading}>
+          <ActivityIndicator size="small" color={textColor} style={$activityIndicator} />
+        </If>
+        <If condition={!!title}>
+          <MediumText textStyle={textStyle}>{buttonText}</MediumText>
+        </If>
+        <If condition={!!icon}>
+          <Feather size={iconSize} name={icon} color={textColor} textStyle={$icon} />
+        </If>
+        <If condition={!!rightIcon}>
+          <Feather size={rightIconSize} name={rightIcon} color={textColor} style={$rightIcon} />
+        </If>
+      </Animated.View>
+    </RectButton>
   )
 }
 
@@ -191,7 +225,7 @@ export function SolidButton(props: ButtonProps) {
   const { type, ...rest } = props
 
   const backgroundColor = type ? Colors[type] : Colors.primary
-  const borderColor = backgroundColor
+  const borderColor = Colors.dark
 
   return <BaseButton
     backgroundColor={backgroundColor}
@@ -273,7 +307,7 @@ export function LinkButton(props: ButtonProps) {
     borderColor="transparent"
     backgroundColor="transparent"
     textColor={textColor}
-    shadowOffset={{ width: 0, height: 0 }}
+    noShadow
     {...rest}
   />
 }
@@ -300,7 +334,6 @@ export function IconButton(props: ButtonProps) {
 
   return <BaseButton
     iconSize={Spacing.larger}
-    shadowOffset={{ width: 0, height: 2}}
     borderRadius={Spacing.button/2}
     paddingHorizontal={Spacing.tiny}
     borderColor={Colors.dark}
@@ -318,14 +351,17 @@ const $button: ViewStyle = {
   height: Spacing.button,
   justifyContent: "center",
   paddingHorizontal: Spacing.medium,
-  shadowColor: Colors.dark,
-  shadowOpacity: 1,
-  shadowRadius: 0,
-  elevation: 6,
-  shadowOffset: {
-    width: 0,
-    height: 6,
-  },
+}
+
+const $shadowStyle: ViewStyle = {
+  borderRadius: Spacing.medium,
+  backgroundColor: Colors.dark,
+  position: "absolute",
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+  transform: [{ translateX: 2 }, { translateY: 4 }]
 }
 
 const $largeButton: ViewStyle = {

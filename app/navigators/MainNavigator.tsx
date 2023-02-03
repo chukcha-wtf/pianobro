@@ -3,7 +3,6 @@ import { TouchableOpacity, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
 
-import { createStackNavigator } from "@react-navigation/stack"
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { BottomTabDescriptorMap, BottomTabNavigationEventMap } from "@react-navigation/bottom-tabs/lib/typescript/src/types"
@@ -11,7 +10,7 @@ import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigatio
 import { CompositeScreenProps, NavigationHelpers, ParamListBase, TabNavigationState } from "@react-navigation/native"
 
 
-import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
+import { AppStackParamList, AppStackScreenProps, ROUTES } from "./AppNavigator"
 import { HomeScreen, StatisticsScreen, ProfileScreen } from "../screens"
 import { Colors, Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
@@ -59,15 +58,6 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>()
 const StatisticsStack = createNativeStackNavigator<StatisticsStackParamList>()
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
-
-export enum ROUTES {
-  Home = "Home",
-  Statistics = "Statistics",
-  Profile = "Profile",
-  SessionDetails = "SessionDetails",
-  ActivityDetails = "ActivityDetails",
-}
-
 
 const TABBAR_HEIGHT = 70
 
