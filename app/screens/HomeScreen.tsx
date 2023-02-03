@@ -57,14 +57,13 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
     const isPracticing = practiceSessionStore.isPracticing && !!practiceSessionStore.activeSession
 
     const handleStartStop = () => {
-      return
-      // if (isPracticing) {
-      //   editPracticeModalRef.current?.open()
-      //   return
-      // }
+      if (isPracticing) {
+        editPracticeModalRef.current?.open()
+        return
+      }
       
-      // // Start a new session
-      // practiceSessionStore.start()
+      // Start a new session
+      practiceSessionStore.start()
     }
 
     const addSession = () => {

@@ -6,6 +6,8 @@ import {
   TextStyle,
   ActivityIndicator,
 } from "react-native"
+import { RectButton } from "react-native-gesture-handler"
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 
 import { Feather } from "@expo/vector-icons"
 import { MediumText } from "./Text"
@@ -14,8 +16,6 @@ import { Colors, ColorTypes } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { If } from "@common-ui/components/Conditional"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
-import { RectButton } from "react-native-gesture-handler"
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 
 type BaseButtonProps = {
   title?: string
@@ -147,7 +147,7 @@ function BaseButton(props: BaseButtonProps) {
 
   const opacityStyle = useAnimatedStyle(() => {
     const transformMultiplier = buttonState.value ? 1 : 0
-    const opacityMultiplier = buttonState.value ? 0.98 : 1
+    const opacityMultiplier = buttonState.value ? 0.96 : 1
 
     return {
       opacity: withTiming(opacityMultiplier, TIMING_CONFIG),
