@@ -4,6 +4,7 @@ import { View, ViewStyle } from "react-native"
 import { Colors } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
+import { LinearGradient } from "expo-linear-gradient"
 
 type RowProps = {
   children: React.ReactNode
@@ -22,6 +23,7 @@ type CellProps = {
 
 type BottomContainerProps = {
   children: React.ReactNode
+  withGradient?: boolean
 } & OffsetProps
 
 /**
@@ -112,7 +114,34 @@ export const Cell = ({ children, align, justify, flex, ...offsetProps }: CellPro
 
 /**
  * BottomContainer is a flexbox container that sticks content to the bottom.
+ * @param {React.ReactNode} children - The children to render.
+ * @param {boolean} withGradient - Whether to add a gradient to the bottom of the container.
+ * @param {OffsetProps} props - The offset props.
+ * @example
+ * <BottomContainer>
+ *  <Text>Text</Text>
+ * </BottomContainer>
  */
+export const BottomContainer = ({ children, ...offsetProps }: BottomContainerProps) => {
+  let styles: ViewStyle[] = [$bottomContainer]
+
+  styles = useOffsetStyles(styles, offsetProps)
+
+  return (
+    <View style={styles}>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={['rgba(255,255,255,1)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0.2)']}
+        style={$linearBackground}
+        locations={[0, 0.3, 0.5, 0.8, 1]}
+        start={{ x: 0, y: 1 }}
+        end={{ x: 0, y: 0 }}
+      />
+      {children}
+    </View>
+  )
+}
+
 const $bottomContainer: ViewStyle = {
   position: "absolute",
   left: 0,
@@ -120,10 +149,11 @@ const $bottomContainer: ViewStyle = {
   bottom: 0,
 }
 
-export const BottomContainer = ({ children, ...offsetProps }: BottomContainerProps) => {
-  let styles: ViewStyle[] = [$bottomContainer]
-
-  styles = useOffsetStyles(styles, offsetProps)
-
-  return <View style={styles}>{children}</View>
+const $linearBackground: ViewStyle = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
 }
+

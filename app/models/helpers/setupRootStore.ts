@@ -12,11 +12,22 @@
 import { applySnapshot, IDisposer, onSnapshot } from "mobx-state-tree"
 import type { RootStore } from "../RootStore"
 import * as storage from "../../utils/storage"
+import { ACTIVITIES } from "@models/Activity"
+import { QUOTES } from "@models/PianoQuote"
 
 /**
  * The key we'll be saving our state as within async storage.
  */
-const ROOT_STATE_STORAGE_KEY = "root-v2"
+const ROOT_STATE_STORAGE_KEY = "root-v1"
+
+export const ROOT_STORE_DEFAULT = {
+  activitiesStore: {
+    activities: ACTIVITIES,
+  },
+  quotesStore: {
+    quotes: QUOTES,
+  },
+}
 
 /**
  * Setup the root state.
@@ -27,7 +38,7 @@ export async function setupRootStore(rootStore: RootStore) {
 
   try {
     // load the last known state from AsyncStorage
-    restoredState = (await storage.load(ROOT_STATE_STORAGE_KEY)) || {}
+    restoredState = (await storage.load(ROOT_STATE_STORAGE_KEY)) || ROOT_STORE_DEFAULT
     applySnapshot(rootStore, restoredState)
   } catch (e) {
     // if there's any problems loading, then inform the dev what happened

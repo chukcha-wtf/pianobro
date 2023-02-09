@@ -16,6 +16,7 @@ import { Colors, ColorTypes } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { If } from "@common-ui/components/Conditional"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
+import { Timing } from "@common-ui/constants/timing"
 
 type BaseButtonProps = {
   title?: string
@@ -39,6 +40,8 @@ type BaseButtonProps = {
   paddingHorizontal?: number
   align?: "left" | "right"
   noShadow?: boolean
+  shadowOffsetRight?: number
+  shadowOffsetBottom?: number
 } & TouchableOpacityProps &
   OffsetProps
 
@@ -47,7 +50,7 @@ type ButtonProps = BaseButtonProps & {
 }
 
 const TIMING_CONFIG = {
-  duration: 150,
+  duration: Timing.fast,
   easing: Easing.out(Easing.exp)
 }
 
@@ -74,6 +77,8 @@ function BaseButton(props: BaseButtonProps) {
     small,
     align,
     noShadow,
+    shadowOffsetRight,
+    shadowOffsetBottom,
     ...offsetProps
   } = props
 
@@ -84,7 +89,12 @@ function BaseButton(props: BaseButtonProps) {
 
   let buttonStyle: ViewStyle[] = [$button]
   const textStyle: TextStyle[] = [$buttonText]
-  const shadowStyle: ViewStyle[] = [$shadowStyle]
+  const shadowStyle: ViewStyle[] = [$shadowStyle, {
+    transform: [
+      { translateX: shadowOffsetRight || 2 },
+      { translateY: shadowOffsetBottom || 4 }
+    ]
+  }]
 
   buttonStyle = useOffsetStyles(buttonStyle, offsetProps)
 
@@ -146,22 +156,32 @@ function BaseButton(props: BaseButtonProps) {
   }
 
   const opacityStyle = useAnimatedStyle(() => {
-    const transformMultiplier = buttonState.value ? 1 : 0
-    const opacityMultiplier = buttonState.value ? 0.96 : 1
+    const opacityValue = noShadow ? 0.2 : 0.96
 
-    return {
+    const transformMultiplier = buttonState.value ? 1 : 0
+    const opacityMultiplier = buttonState.value ? opacityValue : 1
+
+    const offsetRight = shadowOffsetRight || 2
+    const offsetBottom = shadowOffsetBottom || 4
+
+    const animationConfig: ViewStyle = {
       opacity: withTiming(opacityMultiplier, TIMING_CONFIG),
-      transform: [
+    }
+
+    if (!noShadow) {
+      animationConfig.transform = [
         {
-          translateX: withTiming(transformMultiplier * 2, TIMING_CONFIG)
+          translateX: withTiming(transformMultiplier * offsetRight, TIMING_CONFIG)
         },
         {
-          translateY: withTiming(transformMultiplier * 4, TIMING_CONFIG)
+          translateY: withTiming(transformMultiplier * offsetBottom, TIMING_CONFIG)
         }
-      ],
-
+      ]
     }
+
+    return animationConfig;
   }, [])
+
 
   return (
     <RectButton
@@ -336,6 +356,7 @@ export function IconButton(props: ButtonProps) {
     iconSize={Spacing.larger}
     borderRadius={Spacing.button/2}
     paddingHorizontal={Spacing.tiny}
+    shadowOffsetBottom={3}
     borderColor={Colors.dark}
     {...rest}
   />
@@ -361,7 +382,6 @@ const $shadowStyle: ViewStyle = {
   left: 0,
   bottom: 0,
   right: 0,
-  transform: [{ translateX: 2 }, { translateY: 4 }]
 }
 
 const $largeButton: ViewStyle = {

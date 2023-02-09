@@ -99,7 +99,7 @@ export const PianoQuoteStoreModel = types
   }))
 
 // Populate the store with quotes data
-PianoQuoteStoreModel.create({ quotes: QUOTES })
+// PianoQuoteStoreModel.create({ quotes: QUOTES })
 
 export interface PianoQuoteStore extends Instance<typeof PianoQuoteStoreModel> {}
 export interface PianoQuoteStoreSnapshot extends SnapshotOut<typeof PianoQuoteStoreModel> {}

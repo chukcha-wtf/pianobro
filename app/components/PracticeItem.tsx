@@ -5,7 +5,8 @@ import { Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { PracticeSession } from "@models/PracticeSession"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { MainTabParamList, ROUTES } from "@navigators/MainNavigator"
+import { MainTabParamList } from "@navigators/MainNavigator"
+import { ROUTES } from "@navigators/AppNavigator"
 import { Card } from "@common-ui/components/Card"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { Cell, Row } from "@common-ui/components/Common"
@@ -48,7 +49,10 @@ export const PracticeItem = function PracticeItem({ item }: { item: PracticeSess
 
 
   return (
-    <Card bottom={Spacing.medium} key={item.uuid}>
+    <Card
+      key={item.uuid}
+      bottom={Spacing.medium}
+    >
       <TouchableOpacity onPress={showDetails}>
         <Cell>
           <If condition={!!item.satisfaction}>

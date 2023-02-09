@@ -11,15 +11,15 @@ export enum Palette {
   black700 = "#969BAB",
   black300 = "#9FA4B4",
   black200 = "#EEEFF4",
-  black100 = "#F4F5F7",
+  black100 = "#F6F6F6",
 
   blue = "#1947E5",
   blue800 = "#8094FF",
   blue100 = "#E9E7FC",
 
-  yellow = "#FFBD12",
-  yellow800 = "#FFD465",
-  yellow100 = "#FFF4CC",
+  yellow = "#FFBD00",
+  yellow800 = "#F9D262",
+  yellow100 = "#FFE8B2",
 
   green = "#00C6AE",
   green800 = "#61E4C5",
@@ -52,9 +52,14 @@ export const Colors = {
   text: Palette.black, // text color
   tint: Palette.black300, // tint color
   background: Palette.white,
+  grayBackground: Palette.black100, // background color
 
   tagBackground: Palette.red800, // tag background color
   tabBackground: Palette.white, // tab background color
+
+  chartBarOver: Palette.yellow,
+  chartBarNormal: Palette.yellow800,
+  chartBarUnder: Palette.yellow100,
   
   // colors
   transparent: Palette.transparent,

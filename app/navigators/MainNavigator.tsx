@@ -17,6 +17,7 @@ import { Spacing } from "@common-ui/constants/spacing"
 import Icon from "@common-ui/components/Icon"
 import { SessionDetailsScreen } from "@screens/SessionDetailsScreen"
 import { ActivityDetailsScreen } from "@screens/ActivityDetailsScreen"
+import { ChartMode } from "@components/ChartControl";
 
 
 type TabParamList = {
@@ -27,7 +28,12 @@ type TabParamList = {
 
 type StatisticsStackParamList = {
   Statistics: undefined
-  ActivityDetails: { activityId: string }
+  ActivityDetails: {
+    activityId: string
+    startDate: string
+    endDate: string
+    mode: keyof typeof ChartMode
+  }
   SessionDetails: { activitySessionId: string }
 }
 
@@ -59,7 +65,7 @@ const StatisticsStack = createNativeStackNavigator<StatisticsStackParamList>()
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
 
-const TABBAR_HEIGHT = 70
+export const TABBAR_HEIGHT = 70
 
 function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBarProps) {
   const { bottom } = useSafeAreaInsets()

@@ -11,7 +11,7 @@ export type ContentProps = {
   padding?: number
   noPadding?: boolean
   noBackground?: boolean
-  backgroundColor?: string
+  bgColor?: string
   style?: ViewStyle
   scrollViewStyle?: ScrollViewProps
   scrollable?: boolean
@@ -23,7 +23,7 @@ export type ContentProps = {
  * @param {React.ReactNode} children - content to wrap
  * @param {boolean} noPadding - disable inner padding (default false)
  * @param {boolean} noBackground - disable default background color (defaults to gray)
- * @param {string} backgroundColor - set background color
+ * @param {string} bgColor - set background color
  * @param {ViewStyle} style - extra styles for the non-scrollable <Content />
  * @param {ScrollViewProps} scrollViewStyle - extra styles for the scrollable <Content />
  * @param {boolean} scrollable - whether the content is scrollable or not
@@ -33,7 +33,7 @@ export type ContentProps = {
  * </Content>
  */
 export const Content = (props: ContentProps) => {
-  const { children, noPadding, noBackground, backgroundColor, style, scrollViewStyle, scrollable, ...rest } =
+  const { children, noPadding, noBackground, bgColor, style, scrollViewStyle, scrollable, ...rest } =
     props
 
   const paddingBottom = useBottomPadding()
@@ -48,9 +48,9 @@ export const Content = (props: ContentProps) => {
     scrollStyles.push($noBackground)
   }
 
-  if (backgroundColor) {
-    holderStyles.push({ backgroundColor })
-    scrollStyles.push({ backgroundColor })
+  if (bgColor) {
+    holderStyles.push({ backgroundColor: bgColor })
+    scrollStyles.push({ backgroundColor: bgColor })
   }
 
   if (noPadding) {
@@ -78,6 +78,7 @@ export const Content = (props: ContentProps) => {
 /**
  * Screen - generic wrapper for screens. Includes SafeAreaView and ErrorBoundary
  * @param {React.ReactNode} children - inner content for Screen component
+ * @param {string} bgColor - set background color
  * @example
  * <Screen>
  *  <Content>
@@ -85,9 +86,17 @@ export const Content = (props: ContentProps) => {
  *  </Content>
  * </Screen>
  */
-export const Screen = ({ children }: { children: React.ReactNode }) => {
+export const Screen = (props: { children: React.ReactNode, bgColor?: string }) => {
+  const { children, bgColor } = props
+
+  const styles = [$container]
+
+  if (bgColor) {
+    styles.push({ backgroundColor: bgColor })
+  }
+
   return (
-    <SafeAreaView edges={["top", "right", "left"]} style={$container}>
+    <SafeAreaView edges={["top", "right", "left"]} style={styles}>
       {children}
     </SafeAreaView>
   )

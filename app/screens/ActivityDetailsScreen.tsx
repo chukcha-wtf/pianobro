@@ -1,37 +1,37 @@
 import React, { FC } from "react"
+import { observer } from "mobx-react-lite"
+import { FlashList } from "@shopify/flash-list"
 
 import { HugeTitle, LargeTitle, MediumTitle } from "@common-ui/components/Text"
 import { Spacing } from "@common-ui/constants/spacing"
 import { Content, Screen } from "@common-ui/components/Screen"
 
 import { MainTabScreenProps } from "../navigators/MainNavigator"
-import { observer } from "mobx-react-lite"
 import { useStores } from "@models/index"
-import { endOfWeek, startOfWeek } from "date-fns"
-import { getDateLocale } from "@utils/formatDate"
 import { Card } from "@common-ui/components/Card"
-import { ProgressChart } from "@components/ProgressChart"
 import { PracticeSession } from "@models/PracticeSession"
-import { FlashList } from "@shopify/flash-list"
 import { PracticeItem, PRACTICE_ITEM_HEIGHT } from "@components/PracticeItem"
 import { Cell } from "@common-ui/components/Common"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
+import { ChartControl, ChartMode } from "@components/ChartControl"
 
 type ListHeaderProps = {
   startDay: Date
   endDay: Date
+  mode: keyof typeof ChartMode
   sessions: PracticeSession[]
   totalPracticeTime: {
     hours: string
     minutes: string
   }
+  onDateRangeChange: (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => void;
 } 
 
 function ListHeader(props: ListHeaderProps) {
-  const { startDay, endDay, sessions, totalPracticeTime } = props
+  const { startDay, endDay, mode, sessions, totalPracticeTime, onDateRangeChange } = props
 
   return (
-    <>
+    <Cell bottom={Spacing.large}>
       <Card flex>
         <MediumTitle align="center" bottom={Spacing.small}>
           Practice Time
@@ -40,37 +40,44 @@ function ListHeader(props: ListHeaderProps) {
           {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min
         </LargeTitle>
       </Card>
-      <Card vertical={Spacing.large}>
-        <ProgressChart
-          mode="week"
-          startDate={startDay}
-          endDate={endDay}
-          sessions={sessions}
-        />
-      </Card>
-    </>
+      <ChartControl
+        startDate={startDay}
+        endDate={endDay}
+        mode={mode}
+        sessions={sessions}
+        onDateRangeChange={onDateRangeChange}
+      />
+    </Cell>
   )
 }
 
 export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = observer(
   function ActivityDetailsScreen(props) {
-    const { activityId } = props.route.params
+    const { activityId, startDate, endDate, mode } = props.route.params
     const paddingBottom = useBottomPadding()
+
+    const [dateRange, setDateRange] = React.useState<{
+      startDay: Date
+      endDay: Date,
+      chartMode: keyof typeof ChartMode
+    }>({
+      startDay: new Date(startDate),
+      endDay: new Date(endDate),
+      chartMode: mode
+    })
+
+    const onDateRangeChange = (startDay: Date, endDay: Date, chartMode: keyof typeof ChartMode) => {
+      setDateRange({
+        startDay,
+        endDay,
+        chartMode,
+      })
+    }
 
     const { practiceSessionStore, activitiesStore } = useStores()
 
-    const startDay = startOfWeek(new Date(), {
-      locale: getDateLocale(),
-      weekStartsOn: 1
-    })
-    const endDay = endOfWeek(new Date(), {
-      locale: getDateLocale(),
-      weekStartsOn: 1
-    })
-
     const activity = activitiesStore.getActivityById(activityId)
-    const sessions = practiceSessionStore.getSessionsCompletedBetweenDates(startDay, endDay, activityId)
-    const daysPracticed = practiceSessionStore.getDaysWithCompletedSessions(sessions)
+    const sessions = practiceSessionStore.getSessionsCompletedBetweenDates(dateRange.startDay, dateRange.endDay, activityId)
     const totalPracticeTime = practiceSessionStore.getTotalPracticeTimeFromSessions(sessions)
 
     const $flashListContentContainerStyle = { paddingBottom }
@@ -97,10 +104,12 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
               estimatedItemSize={PRACTICE_ITEM_HEIGHT}
               ListHeaderComponent={() => (
                 <ListHeader
-                  startDay={startDay}
-                  endDay={endDay}
+                  startDay={dateRange.startDay}
+                  endDay={dateRange.endDay}
+                  mode={dateRange.chartMode}
                   sessions={sessions}
                   totalPracticeTime={totalPracticeTime}
+                  onDateRangeChange={onDateRangeChange}
                 />
               )}
             />

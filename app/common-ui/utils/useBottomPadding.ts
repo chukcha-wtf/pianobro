@@ -1,4 +1,4 @@
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import { TABBAR_HEIGHT } from "@navigators/MainNavigator"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 /**
@@ -6,8 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
  * it includes bottom TabBar offset and bottom safe area offset
  */
 export const useBottomPadding = () => {
-  const tabBarHeight = useBottomTabBarHeight()
   const { bottom } = useSafeAreaInsets()
 
-  return tabBarHeight + bottom
+  return TABBAR_HEIGHT + bottom
 }

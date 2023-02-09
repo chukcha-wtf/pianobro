@@ -71,7 +71,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
     }
     
     const buttonTitle = isPracticing ? translate("homeScreen.mainButtonTextActive") : translate("homeScreen.mainButtonTextInactive")
-    const buttonIcon = isPracticing ? "pause" : "play"
+    const buttonType = isPracticing ? "danger" : "primary"
     
     return (
       <Screen>
@@ -82,11 +82,9 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
         <Cell horizontal={Spacing.medium} vertical={Spacing.large} >
           <SolidButton
             large
-            type="primary"
+            type={buttonType}
             title={buttonTitle}
             onPress={handleStartStop}
-            rightIcon={buttonIcon}
-            rightIconSize={Spacing.large}
           />
         </Cell>
         <Content scrollable>

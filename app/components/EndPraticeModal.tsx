@@ -64,9 +64,7 @@ export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(func
     >
       <Cell
         flex
-        justify="space-between"
         innerHorizontal={Spacing.medium}
-        bottom={bottom + Spacing.medium}
       >
         <EndPracticeForm activeSession={practiceSessionStore.activeSession} onSave={onSave} />
       </Cell>

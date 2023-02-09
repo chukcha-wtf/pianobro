@@ -8,10 +8,12 @@ import { MainTabScreenProps } from "../navigators/MainNavigator"
 import { observer } from "mobx-react-lite"
 import { useStores } from "@models/index"
 import { Card } from "@common-ui/components/Card"
-import { Row } from "@common-ui/components/Common"
+import { BottomContainer, Row } from "@common-ui/components/Common"
 import { SatisfactionStars } from "@components/PracticeItem"
 import { Label } from "@common-ui/components/Label"
 import { formatDateTime } from "@utils/formatDate"
+import { LinkButton } from "@common-ui/components/Button"
+import { Alert } from "react-native"
 
 export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = observer(
   function SessionDetailsScreen(props) {
@@ -19,6 +21,26 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
     const { practiceSessionStore } = useStores()
 
     const session = practiceSessionStore.getSessionById(activitySessionId)
+
+    const deleteSession = () => {
+      Alert.alert("Delete Session", "Are you sure you want to delete this session?", [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          onPress: () => {
+            practiceSessionStore.deleteSession(activitySessionId)
+            props.navigation.goBack()
+          }
+        }
+      ])
+    }
+
+    if (!session) {
+      return null
+    }
 
     const practiceTime = `${formatDateTime(session.startTime, "MMM dd, hh:mm a")} - ${formatDateTime(session.endTime, "MMM dd, hh:mm a")}`
 
@@ -76,6 +98,14 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
             Comments
           </MediumText>
           <RegularText text={session.notes} />
+          <BottomContainer>
+            <LinkButton
+              type="danger"
+              title="Delete"
+              onPress={deleteSession}
+              bottom={Spacing.medium}
+            />
+          </BottomContainer>
         </Content>
       </Screen>
     )

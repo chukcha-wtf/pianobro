@@ -1,6 +1,9 @@
 import React, { FC } from "react"
+import { ViewStyle } from "react-native"
+import { Switch, TouchableOpacity } from "react-native-gesture-handler"
 
 import * as Application from "expo-application"
+import { observer } from "mobx-react-lite"
 import { translate } from "@i18n/translate"
 
 import { HugeTitle, LargeTitle, MediumText, RegularText } from "@common-ui/components/Text"
@@ -8,17 +11,15 @@ import { BottomContainer, Row } from "@common-ui/components/Common"
 import { Spacing } from "@common-ui/constants/spacing"
 import { LinkButton } from "@common-ui/components/Button"
 import { Content, Screen } from "@common-ui/components/Screen"
-
 import { MainTabScreenProps } from "../navigators/MainNavigator"
-import { observer } from "mobx-react-lite"
-import { useStores } from "@models/index"
 import { If } from "@common-ui/components/Conditional"
 import { Card } from "@common-ui/components/Card"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
-import { Switch, TouchableOpacity } from "react-native-gesture-handler"
-import { REMINDER_DATES } from "@models/Reminder"
 import { Colors } from "@common-ui/constants/colors"
-import { ViewStyle } from "react-native"
+
+import { useStores } from "@models/index"
+import { REMINDER_DATES } from "@models/Reminder"
+import { populateDevData } from "@utils/populateDevData"
 
 function DateCell({ date, isSelected, onPress }) {
   const text = date.slice(0, 1).toUpperCase()
@@ -43,15 +44,14 @@ function DateCell({ date, isSelected, onPress }) {
 
 export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
   function ProfileScreen() {
-    const { practiceSessionStore, remindersStore } = useStores()
+    const store = useStores()
+    const { practiceSessionStore, remindersStore } = store
     const bottomPadding = useBottomPadding()
 
-    const handleButton = () => undefined
+    const handleButton = () => populateDevData(store, 100)
     const onDatePress = (date) => {
       remindersStore.toggleDate(date)
     }
-
-    console.log("scheduled", remindersStore.scheduledNotifications)
 
     return (
       <Screen>
@@ -87,7 +87,15 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
               )
             })}
           </Row>
-          <LinkButton top={Spacing.extraLarge} type="primary" title={translate("profileScreen.reportBugs")} onPress={handleButton} />
+
+          <If condition={__DEV__}>
+            <LinkButton
+              top={Spacing.extraLarge}
+              type="primary"
+              title="Populate Dev Data"
+              onPress={handleButton}
+            />
+          </If>
 
           <BottomContainer bottom={bottomPadding + Spacing.large}>
             <Row flex align="center" top={Spacing.small}>

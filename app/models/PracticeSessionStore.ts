@@ -7,6 +7,13 @@ import { calculateDuration } from "@utils/calculateDuration"
 import { DurationObject, formatDuration } from "@utils/formatDate";
 import { Activity } from "./Activity";
 
+export type AggregatedActivity = {
+  key: string,
+  humanTitle: string,
+  sessions: Array<PracticeSession>,
+  duration: DurationObject,
+}
+
 export const PracticeSessionStoreModel = types
   .model("PracticeSessionStore")
   .props({
@@ -105,7 +112,12 @@ export const PracticeSessionStoreModel = types
         }
 
         store.isPracticing = true
-      }
+      },
+      deleteSession(sessionId: string) {
+        const sessionIndex = store.practiceSessions.findIndex(session => session.uuid === sessionId)
+
+        store.practiceSessions.splice(sessionIndex, 1)
+      },
     }
   })
   .views((store) => ({
@@ -142,12 +154,7 @@ export const PracticeSessionStoreModel = types
 
       const uniqueActivities = [...new Set(allActivities)]
 
-      const sessionsByActivity: {
-        key: string,
-        humanTitle: string,
-        sessions: Array<PracticeSession>,
-        duration: DurationObject,
-      }[] = []
+      const sessionsByActivity: AggregatedActivity[] = []
       
       uniqueActivities.forEach((activity: Activity) => {
         const sessionsWithActivity = sessions.filter(session => session.activities.includes(activity))

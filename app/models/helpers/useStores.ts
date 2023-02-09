@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { setReactotronRootStore } from "../../services/reactotron"
 import { RootStore, RootStoreModel } from "../RootStore"
-import { setupRootStore } from "./setupRootStore"
+import { ROOT_STORE_DEFAULT, setupRootStore } from "./setupRootStore"
 
 /**
  * Create the initial (empty) global RootStore instance here.
@@ -15,7 +15,7 @@ import { setupRootStore } from "./setupRootStore"
  * very large), you may want to use a different strategy than immediately
  * instantiating it, although that should be rare.
  */
-const _rootStore = RootStoreModel.create({})
+const _rootStore = RootStoreModel.create(ROOT_STORE_DEFAULT)
 
 /**
  * The RootStoreContext provides a way to access

@@ -99,7 +99,7 @@ export const ActivityStoreModel = types
   })
 
 // Populate the store with the activities
-ActivityStoreModel.create({ activities: ACTIVITIES })
+// ActivityStoreModel.create({ activities: ACTIVITIES })
 
 export interface ActivityStore extends Instance<typeof ActivityStoreModel> {}
 export interface ActivityStoreSnapshot extends SnapshotOut<typeof ActivityStoreModel> {}

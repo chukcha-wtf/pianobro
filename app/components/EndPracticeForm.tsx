@@ -6,7 +6,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { PracticeSession } from "@models/PracticeSession"
 
 import { LabelText, LargeTitle, MediumTitle } from "@common-ui/components/Text"
-import { Cell, Row } from "@common-ui/components/Common"
+import { BottomContainer, Cell, Row } from "@common-ui/components/Common"
 import { Tag } from "@common-ui/components/Tag"
 import { SolidButton } from "@common-ui/components/Button"
 
@@ -20,6 +20,7 @@ import { StarPicker } from "./StarPicker";
 import { LargeInput } from "@common-ui/components/Input";
 import { If } from "@common-ui/components/Conditional";
 import { ACTIVITIES, Activity } from "@models/Activity";
+import { useBottomPadding } from "@common-ui/utils/useBottomPadding";
 
 type EndPracticeFormProps = {
   activeSession?: PracticeSession
@@ -29,6 +30,8 @@ type EndPracticeFormProps = {
 export const EndPracticeForm = observer(
   function EndPracticeForm(props: EndPracticeFormProps) {
     const { activeSession, onSave } = props
+
+    const bottomPadding = useBottomPadding()
 
     const [startTime, setStartTime] = useState(activeSession?.startTime || new Date().toISOString())
     const [endTime, setEndTime] = useState(activeSession?.endTime || new Date().toISOString())
@@ -71,10 +74,12 @@ export const EndPracticeForm = observer(
         return prev.filter((activity) => activity.uuid !== key)
       })
     }
+
+    const $scrollView: ViewStyle = { paddingBottom: bottomPadding + Spacing.huge }
     
     return (
       <>
-        <KeyboardAwareScrollView showsVerticalScrollIndicator={false} contentContainerStyle={$scrollView}>
+        <KeyboardAwareScrollView extraScrollHeight={Spacing.medium} showsVerticalScrollIndicator={false} contentContainerStyle={$scrollView}>
           {/* Duration Selection */}
           <LargeTitle top={Spacing.medium}>
             <MediumTitle>You've played </MediumTitle>
@@ -125,17 +130,18 @@ export const EndPracticeForm = observer(
             placeholder="Add details..."
           />
         </KeyboardAwareScrollView>
-        <SolidButton
-          large
-          type="primary"
-          title="Save"
-          onPress={saveSession}
-        />
+        <BottomContainer
+          innerTop={Spacing.large}
+          innerBottom={Spacing.button}
+          innerHorizontal={Spacing.medium}>
+          <SolidButton
+            large
+            type="primary"
+            title="Save"
+            onPress={saveSession}
+          />
+        </BottomContainer>
       </>
     )
   }
 )
-
-const $scrollView: ViewStyle = {
-  paddingBottom: Spacing.larger
-}

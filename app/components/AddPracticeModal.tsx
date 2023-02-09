@@ -7,7 +7,6 @@ import { LinkButton } from "@common-ui/components/Button";
 import { Cell } from "@common-ui/components/Common";
 import { Spacing } from "@common-ui/constants/spacing";
 import { Colors } from "@common-ui/constants/colors";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { EndPracticeForm } from "./EndPracticeForm";
 import { useStores } from "@models/index";
 import { Instance } from "mobx-state-tree";
@@ -32,7 +31,6 @@ const HandleComponent = ({ closeModal }) => (
 )
 
 export const AddPracticeModal = forwardRef<AddPracticeModalHandle, unknown>(function AddPracticeModal(_props: unknown, ref: ForwardedRef<EndPracticeModalHandle>) {
-  const { bottom } = useSafeAreaInsets()
   const { practiceSessionStore } = useStores()
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -65,9 +63,7 @@ export const AddPracticeModal = forwardRef<AddPracticeModalHandle, unknown>(func
     >
       <Cell
         flex
-        justify="space-between"
         innerHorizontal={Spacing.medium}
-        bottom={bottom + Spacing.medium}
       >
         <EndPracticeForm onSave={onSave} />
       </Cell>

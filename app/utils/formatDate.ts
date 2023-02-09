@@ -48,6 +48,10 @@ export function convertMilisecondsToHours(miliseconds: number): number {
   return miliseconds / 1000 / 60 / 60
 }
 
+const prettifyTime = (time: number): string => {
+  return time < 10 ? `0${time}` : `${time}`
+}
+
 export const formatDuration = (duration: number): DurationObject => {
   const milliseconds = Number(duration)
   const seconds = Math.floor(milliseconds / 1000)
@@ -56,9 +60,9 @@ export const formatDuration = (duration: number): DurationObject => {
   const minutes = Math.floor((seconds % 3600) / 60)
   const secondsLeft = Math.floor((seconds % 3600) % 60)
 
-  const hoursFormatted = hours > 0 ? `${hours}` : "00"
-  const minutesFormatted = minutes > 0 ? `${minutes}` : "00"
-  const secondsFormatted = secondsLeft > 0 ? `${secondsLeft}` : "00"
+  const hoursFormatted = hours > 0 ? `${prettifyTime(hours)}` : "00"
+  const minutesFormatted = minutes > 0 ? `${prettifyTime(minutes)}` : "00"
+  const secondsFormatted = secondsLeft > 0 ? `${prettifyTime(secondsLeft)}` : "00"
 
   const durationObject: DurationObject = {
     hours: hoursFormatted,
