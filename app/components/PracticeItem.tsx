@@ -13,6 +13,7 @@ import { Cell, Row } from "@common-ui/components/Common"
 import { LabelText, LargeTitle, RegularText } from "@common-ui/components/Text"
 import { formatTime } from "@utils/formatDate"
 import { If } from "@common-ui/components/Conditional"
+import { FLASH_LIST_OFFSET } from "@screens/ActivityDetailsScreen"
 
 export function SatisfactionStars({ satisfaction }: { satisfaction: number }) {
   const satisfactionStars = Array.from({ length: satisfaction }, (_, i) => i)
@@ -52,6 +53,7 @@ export const PracticeItem = function PracticeItem({ item }: { item: PracticeSess
     <Card
       key={item.uuid}
       bottom={Spacing.medium}
+      right={FLASH_LIST_OFFSET}
     >
       <TouchableOpacity onPress={showDetails}>
         <Cell>

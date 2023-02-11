@@ -20,18 +20,24 @@ type ListHeaderProps = {
   endDay: Date
   mode: keyof typeof ChartMode
   sessions: PracticeSession[]
+  practiceGoal: number
   totalPracticeTime: {
     hours: string
     minutes: string
   }
   onDateRangeChange: (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => void;
-} 
+}
+
+// Flash list have some weird UI glitch where it tends to cut about 1px to the right
+// of the list. This is a hack to fix that. We first cut the right padding of the container
+// by 2px, then we add a padding to the list item to make up for the lost 2px.
+export const FLASH_LIST_OFFSET = 2
 
 function ListHeader(props: ListHeaderProps) {
-  const { startDay, endDay, mode, sessions, totalPracticeTime, onDateRangeChange } = props
+  const { startDay, endDay, mode, sessions, practiceGoal, totalPracticeTime, onDateRangeChange } = props
 
   return (
-    <Cell bottom={Spacing.large}>
+    <Cell bottom={Spacing.large} right={FLASH_LIST_OFFSET}>
       <Card flex>
         <MediumTitle align="center" bottom={Spacing.small}>
           Practice Time
@@ -45,6 +51,7 @@ function ListHeader(props: ListHeaderProps) {
         endDate={endDay}
         mode={mode}
         sessions={sessions}
+        practiceGoal={practiceGoal}
         onDateRangeChange={onDateRangeChange}
       />
     </Cell>
@@ -74,7 +81,7 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
       })
     }
 
-    const { practiceSessionStore, activitiesStore } = useStores()
+    const { practiceSessionStore, activitiesStore, remindersStore } = useStores()
 
     const activity = activitiesStore.getActivityById(activityId)
     const sessions = practiceSessionStore.getSessionsCompletedBetweenDates(dateRange.startDay, dateRange.endDay, activityId)
@@ -90,7 +97,8 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
         <Content noPadding>
           <Cell
             flex
-            horizontal={Spacing.medium}
+            left={Spacing.medium}
+            right={Spacing.medium - FLASH_LIST_OFFSET}
             vertical={Spacing.medium}
           >
             <FlashList
@@ -108,6 +116,7 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
                   endDay={dateRange.endDay}
                   mode={dateRange.chartMode}
                   sessions={sessions}
+                  practiceGoal={remindersStore.goal}
                   totalPracticeTime={totalPracticeTime}
                   onDateRangeChange={onDateRangeChange}
                 />

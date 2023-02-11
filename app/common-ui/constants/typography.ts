@@ -60,7 +60,7 @@ export const Typography: TypographyType = {
     fontFamily: Fonts.montserrat.bold,
     fontWeight: "700",
     fontSize: 32,
-    lineHeight: 34,
+    lineHeight: 36,
     color: Colors.dark,
   },
 

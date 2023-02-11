@@ -1,37 +1,20 @@
 import React, { ForwardedRef, forwardRef, useImperativeHandle, useMemo, useRef } from "react";
-import { View, ViewStyle } from "react-native";
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ExtraLargeTitle } from "@common-ui/components/Text";
-import { LinkButton } from "@common-ui/components/Button";
 import { Cell } from "@common-ui/components/Common";
 import { Spacing } from "@common-ui/constants/spacing";
-import { Colors } from "@common-ui/constants/colors";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { EndPracticeForm } from "./EndPracticeForm";
 import { useStores } from "@models/index";
 import { PracticeSession } from "@models/PracticeSession";
 import { Activity } from "@models/Activity";
+import { $modalStyle, ModalHeader } from "@common-ui/components/Modal";
 
 export type EndPracticeModalHandle = {
   open: () => void
   close: () => void
 }
 
-const HandleComponent = ({ closeModal }) => (
-  <View style={$header}>
-    <ExtraLargeTitle>Record Session</ExtraLargeTitle>
-    <LinkButton
-      icon="x"
-      textColor={Colors.dark}
-      iconSize={Spacing.larger}
-      onPress={closeModal}
-    />
-  </View>
-)
-
 export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(function EndPracticeModal(_props: unknown, ref: ForwardedRef<EndPracticeModalHandle>) {
-  const { bottom } = useSafeAreaInsets()
   const { practiceSessionStore } = useStores()
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -55,7 +38,7 @@ export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(func
   return (
     <BottomSheetModal
       index={0}
-      handleComponent={() => <HandleComponent closeModal={closeModal} />}
+      handleComponent={() => <ModalHeader title="Record Session" onClose={closeModal} />}
       style={$modalStyle}
       name="endPracticeModal"
       ref={bottomSheetRef}
@@ -71,20 +54,3 @@ export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(func
     </BottomSheetModal>
   )
 })
-
-const $modalStyle: ViewStyle = {
-  borderTopLeftRadius: Spacing.medium,
-  borderTopRightRadius: Spacing.medium,
-  borderWidth: 2,
-  borderColor: Colors.dark,
-}
-
-const $header: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  paddingLeft: Spacing.medium,
-  paddingVertical: Spacing.small,
-  borderBottomColor: Colors.dark,
-  borderBottomWidth: 2,
-}

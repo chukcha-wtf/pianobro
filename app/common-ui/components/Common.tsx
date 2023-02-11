@@ -7,7 +7,7 @@ import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
 import { LinearGradient } from "expo-linear-gradient"
 
 type RowProps = {
-  children: React.ReactNode
+  children?: React.ReactNode
   wrap?: boolean
   flex?: boolean
   align?: "center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"
@@ -15,14 +15,14 @@ type RowProps = {
 } & OffsetProps
 
 type CellProps = {
-  children: React.ReactNode
+  children?: React.ReactNode
   flex?: boolean
   align?: "center" | "flex-start" | "flex-end" | "stretch" | "baseline"
   justify?: "center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"
 } & OffsetProps
 
 type BottomContainerProps = {
-  children: React.ReactNode
+  children?: React.ReactNode
   withGradient?: boolean
 } & OffsetProps
 

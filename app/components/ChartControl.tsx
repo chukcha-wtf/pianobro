@@ -1,7 +1,6 @@
 import React from "react"
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { startOfWeek, endOfWeek, subWeeks, subMonths, subYears, addWeeks, addMonths, addYears, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns"
-import { runOnJS } from "react-native-reanimated";
 
 import { ProgressChart } from "./ProgressChart";
 import { Card } from "@common-ui/components/Card";
@@ -11,12 +10,14 @@ import { Spacing } from "@common-ui/constants/spacing";
 
 import { PracticeSession } from "@models/PracticeSession";
 import { formatDate, getDateLocale } from "@utils/formatDate"
+import { WINDOW_WIDTH } from "@gorhom/bottom-sheet";
 
 
 type ChartControlProps = {
   startDate: Date;
   endDate: Date;
   mode: keyof typeof ChartMode;
+  practiceGoal: number;
   sessions: PracticeSession[];
   onDateRangeChange: (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => void;
 }
@@ -101,11 +102,11 @@ export const getChartEndDate = (mode: keyof typeof ChartMode, date: Date) => {
 }
 
 export function ChartControl(props: ChartControlProps) {
-  const { startDate, mode, sessions, endDate, onDateRangeChange } = props
+  const { startDate, endDate, practiceGoal, mode, sessions, onDateRangeChange } = props
 
     const changeMode = (newMode: keyof typeof ChartMode) => {
-      const newStartDate = getChartStartDate(newMode, new Date())
-      const newEndDate = getChartEndDate(newMode, new Date())
+      const newStartDate = getChartStartDate(newMode, startDate)
+      const newEndDate = getChartEndDate(newMode, endDate)
 
       onDateRangeChange(newStartDate, newEndDate, newMode)
     }
@@ -123,11 +124,17 @@ export function ChartControl(props: ChartControlProps) {
     }
 
 
-  const swipeGesture = Gesture.Pan().onEnd((event) => {
+  const swipeGesture = Gesture.Pan().runOnJS(true).onEnd((event) => {
+    // Do nothing if it wasn't really a swipe left or right
+    // (i.e. if the user just tapped the chart)
+    if (Math.abs(event.translationX) < WINDOW_WIDTH * 0.2) {
+      return
+    }
+
     if (event.translationX > 0) {
-      runOnJS(modifyStartAndEndDate)("left")
+      modifyStartAndEndDate("left")
     } else {
-      runOnJS(modifyStartAndEndDate)("right")
+      modifyStartAndEndDate("right")
     }
   })
 
@@ -147,6 +154,7 @@ export function ChartControl(props: ChartControlProps) {
         <GestureDetector gesture={swipeGesture}>
           <ProgressChart
             mode={mode}
+            practiceGoal={practiceGoal}
             startDate={startDate}
             sessions={sessions}
           />

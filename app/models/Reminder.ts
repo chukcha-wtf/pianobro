@@ -19,7 +19,8 @@ export const ReminderStoreModel = types
   .props({
     isEnabled: false,
     pushToken: types.optional(types.string, ""),
-    time: types.optional(types.string, "9:00"),
+    goal: types.optional(types.number, 0), // In minutes
+    scheduledDates: types.map(types.frozen<string>()),
     scheduledNotifications: types.map(types.frozen<string>())
   })
   .actions((store) => {
@@ -27,13 +28,18 @@ export const ReminderStoreModel = types
       const nextState = !store.isEnabled
       const token = store.pushToken
 
+      console.log("toggleEnabled", nextState, token)
+
       // If nextState is true, we need to register the token
       if (nextState) {
         // If there is no token, we need to register for push notifications
         if (!token) {
-          store.pushToken = yield registerForPushNotificationsAsync()
+          const newToken = yield registerForPushNotificationsAsync()
+          store.pushToken = newToken
 
-          if (!store.pushToken) {
+          console.log("newToken", newToken)
+
+          if (!newToken) {
             return
           }
         }
@@ -42,61 +48,72 @@ export const ReminderStoreModel = types
         // If nextState is false, we need to unregister the token
         store.pushToken = ""
         store.scheduledNotifications.clear()
+        store.scheduledDates.clear()
         yield clearAllScheduledNotifications()
       }
+
+      console.log("nextState", nextState)
 
       store.isEnabled = nextState
     })
 
-    const toggleDate = flow(function* (date: ReminderDate) {
+    const setDateReminder = flow(function* (date: ReminderDate, time: string) {
       // If the reminder is not enabled, we don't need to do anything
       if (!store.isEnabled) {
         return
       }
 
-      if (store.scheduledNotifications.has(date)) {
-        // We need to remove the scheduled notifications for this date
-        const scheduledNotificationId = store.scheduledNotifications.get(date)
-        yield removeScheduledNotification(scheduledNotificationId)
+      // We need to schedule a notification for this date
+      const scheduledNotificationId = yield scheduleLocalWeeklyPushNotification({
+        weekday: DateToDayMap[date],
+        hour: parseInt(time.split(":")[0]),
+        minute: parseInt(time.split(":")[1]),
+        repeats: true,
+      })
 
-        store.scheduledNotifications.delete(date)
-      } else {
-        // We need to schedule a notification for this date
-        const scheduledNotificationId = yield scheduleLocalWeeklyPushNotification({
-          weekday: DateToDayMap[date],
-          hour: parseInt(store.time.split(":")[0]),
-          minute: parseInt(store.time.split(":")[1]),
-          repeats: true,
-        })
-        store.scheduledNotifications.set(date, scheduledNotificationId)
-      }
+      store.scheduledDates.set(date, time)
+      store.scheduledNotifications.set(date, scheduledNotificationId)
     })
 
-    const setTime = flow(function* (time: string) {
-      store.time = time
+    const removeDateReminder = flow(function* (date: ReminderDate) {
+      // If the reminder is not enabled, we don't need to do anything
+      if (!store.isEnabled) {
+        return
+      }
       
-      // Update all scheduled notifications
-      if (store.scheduledNotifications.size !== 0) {
-        store.scheduledNotifications.forEach(function* ([date, scheduledNotificationId]) {
-          yield removeScheduledNotification(scheduledNotificationId)
+      // We need to remove the scheduled notifications for this date
+      const scheduledNotificationId = store.scheduledNotifications.get(date)
+      yield removeScheduledNotification(scheduledNotificationId)
 
-          const newScheduledNotificationId = yield scheduleLocalWeeklyPushNotification({
-            weekday: DateToDayMap[date],
-            hour: parseInt(time.split(":")[0]),
-            minute: parseInt(time.split(":")[1]),
-            repeats: true,
-          })
-          store.scheduledNotifications.set(date, newScheduledNotificationId)
-        })
-      }
+      store.scheduledNotifications.delete(date)
+      store.scheduledDates.delete(date)
     })
+
+    const setGoalTime = function(time: number) {
+      store.goal = time      
+    }
 
     return {
       toggleEnabled,
-      toggleDate,
-      setTime,
+      setDateReminder,
+      removeDateReminder,
+      setGoalTime,
     }
   })
+  .views((store) => ({
+    isDateScheduled(date: string) {
+      return store.scheduledDates.has(date)
+    },
+
+    getScheduleTime(date: string) {
+      return store.scheduledDates.get(date)
+    },
+
+    getGoalTime() {
+      return store.goal
+    },
+  }))
+
 
 export interface ReminderStore extends Instance<typeof ReminderStoreModel> {}
 export interface ReminderStoreSnapshot extends SnapshotOut<typeof ReminderStoreModel> {}

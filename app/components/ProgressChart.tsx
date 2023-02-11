@@ -13,12 +13,13 @@ import { If } from "@common-ui/components/Conditional"
 import { calculateDuration } from "@utils/calculateDuration"
 import { convertMilisecondsToHours, formatDate } from "@utils/formatDate"
 import { PracticeSession } from "@models/PracticeSession"
-import { ChartMode } from "@screens/StatisticsScreen"
+import { ChartMode } from "./ChartControl"
 
 type ProgressChartProps = {
   sessions: PracticeSession[]
   mode: keyof typeof ChartMode
   startDate?: Date
+  practiceGoal: number;
 }
 
 const CHART_HEIGHT = 200
@@ -175,13 +176,14 @@ function buildData(
 }
 
 export function ProgressChart(props: ProgressChartProps) {
-  const { sessions, mode, startDate } = props
+  const { sessions, mode, startDate, practiceGoal } = props
 
-  const trainingGoal = 0
-  const [data, maxXValue] = buildData(sessions, mode, trainingGoal, startDate)
+  const goalTime = (practiceGoal ?? 0) / 60 // Convert to hours
+  
+  const [data, maxXValue] = buildData(sessions, mode, goalTime, startDate)
 
-  const goalLineStart = data.length ? data[0].x - 0.5 : 0
-  const goalLineEnd = data.length ? data[data.length - 1].x + 0.5 : 0
+  const goalLineStart = data.length ? data[0].x + 0.5 : 0
+  const goalLineEnd = data.length ? data[data.length - 1].x + 1 : 0
   const goalLineStrokeConfig: DomainTuple = [goalLineStart, goalLineEnd]
 
   // Build nice tick values for the vertical axis
@@ -194,8 +196,8 @@ export function ProgressChart(props: ProgressChartProps) {
     case !!data.length:
       maxDomainTime = data[data.length - 1].y || baseDomainNumber
       break;
-    case !!trainingGoal:
-      maxDomainTime = trainingGoal || baseDomainNumber
+    case !!goalTime:
+      maxDomainTime = goalTime || baseDomainNumber
       break;
     default:
       maxDomainTime = baseDomainNumber
@@ -264,13 +266,11 @@ export function ProgressChart(props: ProgressChartProps) {
           },
         }}
       />
-      <If condition={!!trainingGoal}>
-        <VictoryLine
-          domain={{ x: goalLineStrokeConfig }}
-          style={{ data: { stroke: "rgba(0,0,0,0.1)", strokeDasharray: "8 4", strokeWidth: "1" } }}
-          y={() => trainingGoal}
-        />
-      </If>
+      <VictoryLine
+        domain={{ x: goalLineStrokeConfig }}
+        style={{ data: { stroke: "rgba(0,0,0,0.1)", strokeDasharray: "8 4", strokeWidth: "1" } }}
+        y={() => goalTime}
+      />
     </VictoryChart>
   )
 }

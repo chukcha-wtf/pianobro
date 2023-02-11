@@ -55,7 +55,7 @@ function ActivityItem({ activity, startDate, endDate, mode, onDateRangeChange, n
 export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
   function StatisticsScreen(props) {
     const { navigation } = props
-    const { practiceSessionStore } = useStores()
+    const { practiceSessionStore, remindersStore } = useStores()
     
     const [dateRange, setDateRange] = React.useState<{
       startDate: Date
@@ -115,6 +115,7 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
               startDate={dateRange.startDate}
               endDate={dateRange.endDate}
               mode={dateRange.mode}
+              practiceGoal={remindersStore.goal}
               sessions={sessionsCompletedThisWeek}
               onDateRangeChange={onDateRangeChange}
             />
