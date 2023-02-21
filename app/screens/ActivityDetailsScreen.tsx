@@ -1,8 +1,8 @@
-import React, { FC } from "react"
+import React, { FC, useMemo } from "react"
 import { observer } from "mobx-react-lite"
 import { FlashList } from "@shopify/flash-list"
 
-import { HugeTitle, LargeTitle, MediumTitle } from "@common-ui/components/Text"
+import { HugeTitle, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
 import { Spacing } from "@common-ui/constants/spacing"
 import { Content, Screen } from "@common-ui/components/Screen"
 
@@ -11,9 +11,11 @@ import { useStores } from "@models/index"
 import { Card } from "@common-ui/components/Card"
 import { PracticeSession } from "@models/PracticeSession"
 import { PracticeItem, PRACTICE_ITEM_HEIGHT } from "@components/PracticeItem"
-import { Cell } from "@common-ui/components/Common"
+import { AbsoluteContainer, Cell, Row } from "@common-ui/components/Common"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { ChartControl, ChartMode } from "@components/ChartControl"
+import { LinkButton } from "@common-ui/components/Button"
+import { Colors } from "@common-ui/constants/colors"
 
 type ListHeaderProps = {
   startDay: Date
@@ -28,7 +30,7 @@ type ListHeaderProps = {
   onDateRangeChange: (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => void;
 }
 
-// Flash list have some weird UI glitch where it tends to cut about 1px to the right
+// ScrollView have some weird UI glitch where it tends to cut about 1px to the right
 // of the list. This is a hack to fix that. We first cut the right padding of the container
 // by 2px, then we add a padding to the list item to make up for the lost 2px.
 export const FLASH_LIST_OFFSET = 2
@@ -37,7 +39,7 @@ function ListHeader(props: ListHeaderProps) {
   const { startDay, endDay, mode, sessions, practiceGoal, totalPracticeTime, onDateRangeChange } = props
 
   return (
-    <Cell bottom={Spacing.large} right={FLASH_LIST_OFFSET}>
+    <Cell vertical={Spacing.large} right={FLASH_LIST_OFFSET}>
       <Card flex>
         <MediumTitle align="center" bottom={Spacing.small}>
           Practice Time
@@ -83,23 +85,42 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
 
     const { practiceSessionStore, activitiesStore, remindersStore } = useStores()
 
-    const activity = activitiesStore.getActivityById(activityId)
+    const activity = useMemo(
+      () => activitiesStore.getActivityById(activityId),
+      [activityId]
+    )
     const sessions = practiceSessionStore.getSessionsCompletedBetweenDates(dateRange.startDay, dateRange.endDay, activityId)
-    const totalPracticeTime = practiceSessionStore.getTotalPracticeTimeFromSessions(sessions)
+    
+    const totalPracticeTime = useMemo(
+      () => practiceSessionStore.getTotalPracticeTimeFromSessions(sessions),
+      [sessions]
+    )
 
     const $flashListContentContainerStyle = { paddingBottom }
 
     return (
-      <Screen>
-        <HugeTitle left={Spacing.medium} top={Spacing.large}>
-          {activity.name}
-        </HugeTitle>
-        <Content noPadding>
+      <Screen bgColor={Colors.grayBackground}>
+        <Row align="center" justify="center" height={Spacing.button} bottom={Spacing.extraSmall}>
+          <AbsoluteContainer sticks={['left']}>
+            <LinkButton
+              icon="chevron-left"
+              iconSize={Spacing.larger}
+              textColor={Colors.dark}
+              onPress={props.navigation.goBack}
+              innerLeft={Spacing.small}
+            />
+          </AbsoluteContainer>
+          <MediumText>
+            {activity.name}
+          </MediumText>
+        </Row>
+
+        <Content bgColor={Colors.grayBackground} noPadding>
           <Cell
             flex
             left={Spacing.medium}
             right={Spacing.medium - FLASH_LIST_OFFSET}
-            vertical={Spacing.medium}
+            bottom={Spacing.medium}
           >
             <FlashList
               contentContainerStyle={$flashListContentContainerStyle}

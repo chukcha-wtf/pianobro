@@ -148,7 +148,7 @@ function StatsticsNavigator() {
       initialRouteName={ROUTES.Statistics}
     >
       <StatisticsStack.Screen
-        name={ROUTES.Statistics}
+        name={ROUTES.Statistics}  
         component={StatisticsScreen} />
       <StatisticsStack.Screen
         name={ROUTES.ActivityDetails}

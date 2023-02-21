@@ -1,11 +1,11 @@
 import React from "react"
-import { Row } from "@common-ui/components/Common"
-import { TouchableOpacity } from "react-native-gesture-handler"
-import Icon from "@common-ui/components/Icon"
-import { Spacing } from "@common-ui/constants/spacing"
-import { Palette } from "@common-ui/constants/colors"
-import { Colors } from "react-native/Libraries/NewAppScreen"
 import { ViewStyle } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
+
+import { Row } from "@common-ui/components/Common"
+import { StarFilled } from "@common-ui/components/Icon"
+import { Spacing } from "@common-ui/constants/spacing"
+import { Colors } from "@common-ui/constants/colors"
 
 type StarPickerProps = {
   count: number
@@ -18,11 +18,9 @@ const Star = ({ selected, value, onPress }) => {
     onPress(value)
   }
 
-
-
   return (
     <TouchableOpacity style={$star} onPress={handlePress}>
-      <Icon name={"star"} color={selected ? Palette.yellow : Colors.dark} size={Spacing.large} />
+      <StarFilled color={selected ? Colors.warning : Colors.grayBackground} size={Spacing.large} />
     </TouchableOpacity>
   )
 }

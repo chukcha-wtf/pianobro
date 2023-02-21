@@ -4,8 +4,6 @@ import { Colors, ColorTypes, Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
 import { LabelText } from "./Text"
-import { If } from "./Conditional"
-import Icon from "./Icon"
 import { Row } from "./Common"
 
 type TagProps = {
@@ -105,9 +103,6 @@ export function Tag(props: TagProps) {
     <TouchableOpacity style={tagStyle} onPress={toggleSelection}>
       <Row>
         <LabelText textStyle={textStyle}>{text}</LabelText>
-        <If condition={isSelected}>
-          <Icon name="x" left={Spacing.tiny} size={Spacing.medium} color={Colors.dark} />
-        </If>
       </Row>
     </TouchableOpacity>
   )

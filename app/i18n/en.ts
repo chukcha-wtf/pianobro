@@ -34,7 +34,7 @@ const en = {
     mainButtonTextInactive: "Start Practicing",
   },
   statisticsScreen: {
-    title: "Statistics",
+    title: "Progress",
   },
   sessionDetailsScreen: {
     title: "Session Details",

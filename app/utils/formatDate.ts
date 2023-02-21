@@ -60,7 +60,7 @@ export const formatDuration = (duration: number): DurationObject => {
   const minutes = Math.floor((seconds % 3600) / 60)
   const secondsLeft = Math.floor((seconds % 3600) % 60)
 
-  const hoursFormatted = hours > 0 ? `${prettifyTime(hours)}` : "00"
+  const hoursFormatted = hours > 0 ? `${hours}` : "0"
   const minutesFormatted = minutes > 0 ? `${prettifyTime(minutes)}` : "00"
   const secondsFormatted = secondsLeft > 0 ? `${prettifyTime(secondsLeft)}` : "00"
 

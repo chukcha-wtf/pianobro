@@ -6,7 +6,7 @@ import {
   TextStyle,
   ActivityIndicator,
 } from "react-native"
-import { RectButton } from "react-native-gesture-handler"
+import { RectButton, BorderlessButton } from "react-native-gesture-handler"
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 
 import { Feather } from "@expo/vector-icons"
@@ -42,6 +42,7 @@ type BaseButtonProps = {
   noShadow?: boolean
   shadowOffsetRight?: number
   shadowOffsetBottom?: number
+  mode?: "rect" | "borderless"
 } & TouchableOpacityProps &
   OffsetProps
 
@@ -79,6 +80,7 @@ function BaseButton(props: BaseButtonProps) {
     noShadow,
     shadowOffsetRight,
     shadowOffsetBottom,
+    mode,
     ...offsetProps
   } = props
 
@@ -91,8 +93,8 @@ function BaseButton(props: BaseButtonProps) {
   const textStyle: TextStyle[] = [$buttonText]
   const shadowStyle: ViewStyle[] = [$shadowStyle, {
     transform: [
-      { translateX: shadowOffsetRight || 2 },
-      { translateY: shadowOffsetBottom || 4 }
+      { translateX: shadowOffsetRight ?? 2 },
+      { translateY: shadowOffsetBottom ?? 4 }
     ]
   }]
 
@@ -182,15 +184,18 @@ function BaseButton(props: BaseButtonProps) {
     return animationConfig;
   }, [])
 
+  const Wrapper = mode === "borderless" ? BorderlessButton : RectButton
 
   return (
-    <RectButton
+    <Wrapper
       enabled={!isButtonDisabled}
       onPress={onPress}
       onActiveStateChange={onActiveStateChange}
       underlayColor={Colors.transparent}
     >
-      {!noShadow && <Animated.View style={shadowStyle} />}
+      <If condition={!noShadow}>
+        <Animated.View style={shadowStyle} />
+      </If>
       <Animated.View
         style={[buttonStyle, opacityStyle]}
         accessible
@@ -213,7 +218,7 @@ function BaseButton(props: BaseButtonProps) {
           <Feather size={rightIconSize} name={rightIcon} color={textColor} style={$rightIcon} />
         </If>
       </Animated.View>
-    </RectButton>
+    </Wrapper>
   )
 }
 
@@ -326,6 +331,7 @@ export function LinkButton(props: ButtonProps) {
   return <BaseButton
     borderColor="transparent"
     backgroundColor="transparent"
+    mode="borderless"
     textColor={textColor}
     noShadow
     {...rest}
@@ -356,7 +362,8 @@ export function IconButton(props: ButtonProps) {
     iconSize={Spacing.larger}
     borderRadius={Spacing.button/2}
     paddingHorizontal={Spacing.tiny}
-    shadowOffsetBottom={3}
+    shadowOffsetRight={1}
+    shadowOffsetBottom={2}
     borderColor={Colors.dark}
     {...rest}
   />

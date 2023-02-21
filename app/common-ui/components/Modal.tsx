@@ -5,7 +5,6 @@ import { LinkButton } from "./Button"
 import { LargeTitle } from "./Text"
 import { Spacing } from "@common-ui/constants/spacing"
 import { Colors } from "@common-ui/constants/colors"
-import { Cell } from "./Common"
 
 export const ModalHeader = ({
   title,
@@ -23,6 +22,7 @@ export const ModalHeader = ({
           textColor={Colors.dark}
           iconSize={Spacing.larger}
           onPress={onClose}
+          innerRight={Spacing.extraSmall}
         />
       </View>
     </View>
@@ -36,12 +36,24 @@ export const $modalStyle: ViewStyle = {
   borderColor: Colors.dark,
 }
 
+export const $modalBackdropStyle: ViewStyle = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(24, 25, 31, 0.2)",
+}
+
 const $header: ViewStyle = {
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
   paddingLeft: Spacing.medium,
   paddingVertical: Spacing.medium,
+  borderTopLeftRadius: Spacing.medium,
+  borderTopRightRadius: Spacing.medium,
+  backgroundColor: Colors.grayBackground,
 }
 
 const $closeButtonHolder: ViewStyle = {

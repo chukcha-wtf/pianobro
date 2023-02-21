@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { Dimensions } from "react-native"
 import { processFontFamily } from "expo-font"
 
@@ -9,7 +9,6 @@ import { addDays, addMonths, endOfDay, endOfMonth, startOfDay, startOfMonth } fr
 import { Spacing } from "@common-ui/constants/spacing"
 import { Colors } from "@common-ui/constants/colors"
 import { Fonts } from "@common-ui/constants/typography"
-import { If } from "@common-ui/components/Conditional"
 import { calculateDuration } from "@utils/calculateDuration"
 import { convertMilisecondsToHours, formatDate } from "@utils/formatDate"
 import { PracticeSession } from "@models/PracticeSession"
@@ -180,7 +179,10 @@ export function ProgressChart(props: ProgressChartProps) {
 
   const goalTime = (practiceGoal ?? 0) / 60 // Convert to hours
   
-  const [data, maxXValue] = buildData(sessions, mode, goalTime, startDate)
+  const [data, maxXValue] = useMemo(
+    () => buildData(sessions, mode, goalTime, startDate),
+    [startDate, mode, goalTime, sessions]
+  )
 
   const goalLineStart = data.length ? data[0].x + 0.5 : 0
   const goalLineEnd = data.length ? data[data.length - 1].x + 1 : 0
@@ -268,7 +270,13 @@ export function ProgressChart(props: ProgressChartProps) {
       />
       <VictoryLine
         domain={{ x: goalLineStrokeConfig }}
-        style={{ data: { stroke: "rgba(0,0,0,0.1)", strokeDasharray: "8 4", strokeWidth: "1" } }}
+        style={{
+          data: {
+            stroke: goalTime ? "rgba(0,0,0,0.1)" : "transparent",
+            strokeDasharray: "8 4",
+            strokeWidth: "1"
+          }
+        }}
         y={() => goalTime}
       />
     </VictoryChart>

@@ -17,7 +17,8 @@ export function populateDevData(store: RootStore, numberOfSessions: number) {
 
   for (let i = 0; i < numberOfSessions; i++) {
     const randomDate = new Date(startDate + Math.random() * (endDate.getTime() - startDate))
-    const randomDuration = Math.floor(Math.random() * 50 * 60) * 60 * 1000
+    // Random duration between 1 and 8 hours
+    const randomDuration = Math.floor(Math.random() * 8 * 60) * 60 * 1000
     const randomActivity = store.activitiesStore.activities[Math.floor(Math.random() * store.activitiesStore.activities.length)]
 
     const intencity = Math.floor(Math.random() * 10)

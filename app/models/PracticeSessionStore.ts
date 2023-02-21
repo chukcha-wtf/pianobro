@@ -1,4 +1,4 @@
-import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import { destroy, Instance, SnapshotOut, types } from "mobx-state-tree"
 import { v4 as uuidv4 } from 'uuid';
 
 import { PracticeSession, PracticeSessionModel } from "./PracticeSession"
@@ -8,7 +8,7 @@ import { DurationObject, formatDuration } from "@utils/formatDate";
 import { Activity } from "./Activity";
 
 export type AggregatedActivity = {
-  key: string,
+  uuid: string,
   humanTitle: string,
   sessions: Array<PracticeSession>,
   duration: DurationObject,
@@ -114,9 +114,9 @@ export const PracticeSessionStoreModel = types
         store.isPracticing = true
       },
       deleteSession(sessionId: string) {
-        const sessionIndex = store.practiceSessions.findIndex(session => session.uuid === sessionId)
+        const session = store.practiceSessions.find(session => session.uuid === sessionId)
 
-        store.practiceSessions.splice(sessionIndex, 1)
+        destroy(session)
       },
     }
   })
@@ -161,7 +161,7 @@ export const PracticeSessionStoreModel = types
         const totalDuration = sessionsWithActivity.reduce((acc, session) => acc + session.duration, 0)
 
         sessionsByActivity.push({
-          key: activity.uuid,
+          uuid: activity.uuid,
           humanTitle: activity.name,
           sessions: sessionsWithActivity,
           duration: formatDuration(totalDuration),

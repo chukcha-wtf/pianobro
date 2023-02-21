@@ -79,7 +79,10 @@ export const EndPracticeForm = observer(
     
     return (
       <>
-        <KeyboardAwareScrollView extraScrollHeight={Spacing.medium} showsVerticalScrollIndicator={false} contentContainerStyle={$scrollView}>
+        <KeyboardAwareScrollView
+          extraScrollHeight={Spacing.medium}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={$scrollView}>
           {/* Duration Selection */}
           <LargeTitle top={Spacing.medium}>
             <MediumTitle>You've played </MediumTitle>
@@ -131,6 +134,7 @@ export const EndPracticeForm = observer(
           />
         </KeyboardAwareScrollView>
         <BottomContainer
+          withGradient
           innerTop={Spacing.large}
           innerBottom={Spacing.button}
           innerHorizontal={Spacing.medium}>

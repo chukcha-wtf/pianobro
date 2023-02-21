@@ -28,16 +28,12 @@ export const ReminderStoreModel = types
       const nextState = !store.isEnabled
       const token = store.pushToken
 
-      console.log("toggleEnabled", nextState, token)
-
       // If nextState is true, we need to register the token
       if (nextState) {
         // If there is no token, we need to register for push notifications
         if (!token) {
           const newToken = yield registerForPushNotificationsAsync()
           store.pushToken = newToken
-
-          console.log("newToken", newToken)
 
           if (!newToken) {
             return
@@ -51,8 +47,6 @@ export const ReminderStoreModel = types
         store.scheduledDates.clear()
         yield clearAllScheduledNotifications()
       }
-
-      console.log("nextState", nextState)
 
       store.isEnabled = nextState
     })

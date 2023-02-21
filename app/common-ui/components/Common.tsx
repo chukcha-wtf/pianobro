@@ -1,10 +1,11 @@
 import React from "react"
-import { View, ViewStyle } from "react-native"
+import { ColorValue, View, ViewStyle } from "react-native"
 
 import { Colors } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
 import { LinearGradient } from "expo-linear-gradient"
+import { If } from "./Conditional"
 
 type RowProps = {
   children?: React.ReactNode
@@ -19,11 +20,17 @@ type CellProps = {
   flex?: boolean
   align?: "center" | "flex-start" | "flex-end" | "stretch" | "baseline"
   justify?: "center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"
+  bgColor?: ColorValue
 } & OffsetProps
 
 type BottomContainerProps = {
   children?: React.ReactNode
   withGradient?: boolean
+} & OffsetProps
+
+type AbsoluteContainerProps = {
+  children?: React.ReactNode
+  sticks?: Array<"top" | "bottom" | "left" | "right">
 } & OffsetProps
 
 /**
@@ -85,13 +92,14 @@ export const Spacer = ({ height }: { height?: number }) => <View style={{ height
  * @param {boolean} flex - Whether to use flexbox to layout the children.
  * @param {"center" | "flex-start" | "flex-end" | "stretch" | "baseline"} align - How to align the children in the column.
  * @param {"center" | "space-between" | "space-around" | "space-evenly" | "flex-start" | "flex-end"} justify - How to align the children in the column.
+ * @param {ColorValue} bgColor - The background color of the cell.
  * @param {OffsetProps} props - The offset props.
  * @example
  * <Cell align="stretch">
  *   <Text>Text</Text>
  * </Cell>
  */
-export const Cell = ({ children, align, justify, flex, ...offsetProps }: CellProps) => {
+export const Cell = ({ children, align, justify, flex, bgColor, ...offsetProps }: CellProps) => {
   let styles: ViewStyle[] = [{ flexDirection: "column", justifyContent: "center" }]
 
   styles = useOffsetStyles(styles, offsetProps)
@@ -108,6 +116,10 @@ export const Cell = ({ children, align, justify, flex, ...offsetProps }: CellPro
     styles.push({ flex: 1 })
   }
 
+  if (bgColor) {
+    styles.push({ backgroundColor: bgColor })
+  }
+
   return <View style={styles}>{children}</View>
 }
 
@@ -122,21 +134,23 @@ export const Cell = ({ children, align, justify, flex, ...offsetProps }: CellPro
  *  <Text>Text</Text>
  * </BottomContainer>
  */
-export const BottomContainer = ({ children, ...offsetProps }: BottomContainerProps) => {
+export const BottomContainer = ({ children, withGradient, ...offsetProps }: BottomContainerProps) => {
   let styles: ViewStyle[] = [$bottomContainer]
 
   styles = useOffsetStyles(styles, offsetProps)
 
   return (
     <View style={styles}>
-      <LinearGradient
-        // Background Linear Gradient
-        colors={['rgba(255,255,255,1)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0.2)']}
-        style={$linearBackground}
-        locations={[0, 0.3, 0.5, 0.8, 1]}
-        start={{ x: 0, y: 1 }}
-        end={{ x: 0, y: 0 }}
-      />
+      <If condition={withGradient}>
+        <LinearGradient
+          // Background Linear Gradient
+          colors={['rgba(255,255,255,1)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0.2)']}
+          style={$linearBackground}
+          locations={[0, 0.3, 0.5, 0.8, 1]}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 0, y: 0 }}
+        />
+      </If>
       {children}
     </View>
   )
@@ -157,3 +171,40 @@ const $linearBackground: ViewStyle = {
   bottom: 0,
 }
 
+/**
+ * AbsoluteContainer is a flexbox container that sticks content to some direction ("left", "right", "top", "bottom").
+ * @param {React.ReactNode} children - The children to render.
+ * @param {"left" | "right" | "top" | "bottom"} sticks - The position of the container.
+ * @param {OffsetProps} props - The offset props.
+ * @example
+ * <AbsoluteContainer positions=["right", "top"]>
+ *  <Text>Text</Text>
+ * </AbsoluteContainer>
+ */
+export const AbsoluteContainer = ({ children, sticks, ...offsetProps }: AbsoluteContainerProps) => {
+  let styles: ViewStyle[] = [{ position: "absolute" }]
+
+  styles = useOffsetStyles(styles, offsetProps)
+
+  if (sticks.includes("left")) {
+    styles.push({ left: 0 })
+  }
+
+  if (sticks.includes("right")) {
+    styles.push({ right: 0 })
+  }
+
+  if (sticks.includes("top")) {
+    styles.push({ top: 0 })
+  }
+
+  if (sticks.includes("bottom")) {
+    styles.push({ bottom: 0 })
+  }
+
+  return (
+    <View style={styles}>
+      {children}
+    </View>
+  )
+}

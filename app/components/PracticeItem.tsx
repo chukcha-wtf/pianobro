@@ -1,7 +1,6 @@
 import React from "react"
 
-import Icon from "@common-ui/components/Icon"
-import { Palette } from "@common-ui/constants/colors"
+import { StarFilled } from "@common-ui/components/Icon"
 import { Spacing } from "@common-ui/constants/spacing"
 import { PracticeSession } from "@models/PracticeSession"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
@@ -15,13 +14,15 @@ import { formatTime } from "@utils/formatDate"
 import { If } from "@common-ui/components/Conditional"
 import { FLASH_LIST_OFFSET } from "@screens/ActivityDetailsScreen"
 
-export function SatisfactionStars({ satisfaction }: { satisfaction: number }) {
+export function SatisfactionStars({ satisfaction, size }: { satisfaction: number, size?: number }) {
   const satisfactionStars = Array.from({ length: satisfaction }, (_, i) => i)
 
   return (
     <>
       {satisfactionStars.map((_, i) => (
-        <Icon key={i} color={Palette.yellow} name="star" size={Spacing.small} />
+        <Cell key={i} right={Spacing.tiny}>
+          <StarFilled size={size ?? Spacing.small} />
+        </Cell>
       ))}
     </>
   )
@@ -36,18 +37,21 @@ export const PracticeItem = function PracticeItem({ item }: { item: PracticeSess
     navigation.navigate(ROUTES.SessionDetails, { activitySessionId: item.uuid })
   }
 
-  const firstActivities = item.activities.slice(0, 2)
-  const remainingActivities = item.activities.slice(2)
+  let activitiesText = ""
+
+  if (item.activities.length) {
+    const firstActivities = item.activities.slice(0, 2)
+    const remainingActivities = item.activities.slice(2)
+    
+    activitiesText = firstActivities.map((activity) => activity?.name).join(", ")
   
-  let activitiesText = firstActivities.map((activity) => activity.name).join(", ")
-
-  if (remainingActivities.length > 1) {
-    activitiesText += ` + ${remainingActivities.length} others`
+    if (remainingActivities.length > 1) {
+      activitiesText += ` + ${remainingActivities.length} others`
+    }
+    else if (remainingActivities.length === 1) {
+      activitiesText += `, ${remainingActivities[0]?.name}`
+    }
   }
-  else if (remainingActivities.length === 1) {
-    activitiesText += `, ${remainingActivities[0].name}`
-  }
-
 
   return (
     <Card

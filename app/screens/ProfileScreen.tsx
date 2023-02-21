@@ -23,6 +23,7 @@ import { populateDevData } from "@utils/populateDevData"
 import { TimePickerModal, TimePickerModalHandle } from "@components/TimePickerModal"
 import Icon from "@common-ui/components/Icon"
 import { prettifyTime } from "@utils/prettifyTime"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 function DateCell({ date, scheduledTime, onPress }: { date: string; scheduledTime: string; onPress: (date: string) => void }) {
   const isSelected = !!scheduledTime
@@ -131,8 +132,8 @@ const PracticeGoalSetting = observer(
         {/* Modal shown when manually logging practice */}
         <TimePickerModal
           title="Set Practice Goal"
-          hours={goalHours}
-          minutes={goalMinutes}
+          hours={goalHours || 1}
+          minutes={goalMinutes || 0}
           ref={timePickerModalRef}
           onSave={handleSave}
         />
@@ -145,20 +146,20 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
   function ProfileScreen() {
     const store = useStores()
     const bottomPadding = useBottomPadding()
+    const { top } = useSafeAreaInsets()
     
     const { practiceSessionStore, remindersStore } = store
     const { totalPracticeTime, hasCompletedSessions } = practiceSessionStore
 
-    const handleButton = () => populateDevData(store, 100)
+    const handleButton = () => populateDevData(store, 1000)
 
     return (
-      <Screen>
-        <HugeTitle left={Spacing.medium} top={Spacing.large} text={translate("profileScreen.title")} />
-        <Content>
+      <Screen edges={["left", "right"]}>
+        <Content bgColor={Colors.grayBackground} innerTop={top + Spacing.medium}>
           <If condition={!!hasCompletedSessions}>
             <Card>
               <LargeTitle align="center" bottom={Spacing.medium}>
-                Total Practice Time
+                Total Progress
               </LargeTitle>
               <HugeTitle align="center">
                 {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min

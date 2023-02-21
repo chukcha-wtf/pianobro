@@ -4,13 +4,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from 'expo-haptics';
 
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import { BottomContainer, Cell, Row } from "@common-ui/components/Common";
 import { Spacing } from "@common-ui/constants/spacing";
-import { $modalStyle, ModalHeader } from "@common-ui/components/Modal";
+import { $modalBackdropStyle, $modalStyle, ModalHeader } from "@common-ui/components/Modal";
 import { SolidButton } from "@common-ui/components/Button";
 import { HugeTitle } from "@common-ui/components/Text";
 import { prettifyTime } from "@utils/prettifyTime";
+import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut, FadeOutDown } from "react-native-reanimated";
+import { Timing } from "@common-ui/constants/timing";
+import { If } from "@common-ui/components/Conditional";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i))
 const MINUTES = Array.from({ length: 12 }, (_, i) => {
@@ -100,8 +103,12 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
 
   const [hour, setHour] = useState<number>(hours || new Date().getHours())
   const [minute, setMinute] = useState<number>(minutes || new Date().getMinutes())
+  const [isVisible, setIsVisible] = useState<boolean>(false)
 
-  const closeModal = () => bottomSheetRef.current?.dismiss()
+  const closeModal = () => {
+    bottomSheetRef.current?.dismiss()
+    setIsVisible(false)
+  }
 
   const handleSave = () => {
     onSave(hour, minute)
@@ -111,6 +118,7 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
   useImperativeHandle(ref, () => ({
     open: () => {
       bottomSheetRef.current?.present()
+      setIsVisible(true)
     },
     close: closeModal
   }))
@@ -123,71 +131,81 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
     const roundedMinute = roundingFunction(minute, "minute")
     return MINUTES.indexOf(String(roundedMinute))
   }, [])
-
+    
   return (
-    <BottomSheetModal
-      index={0}
-      handleComponent={() => <ModalHeader title={title || "Set Reminder"} onClose={closeModal} />}
-      style={$modalStyle}
-      name="setReminderModal"
-      ref={bottomSheetRef}
-      snapPoints={snapPoints}
-      enableDismissOnClose
-      enablePanDownToClose={false}
-    >
-      <Cell
-        flex
-        innerHorizontal={Spacing.medium}
-        bottom={bottom + Spacing.medium}
-        horizontal={Spacing.medium}
+    <>
+      <If condition={isVisible}>
+        <Animated.View
+          style={$modalBackdropStyle}
+          entering={FadeIn}
+          exiting={FadeOut}
+        />
+      </If>
+      <BottomSheetModal
+        index={0}
+        handleComponent={() => <ModalHeader title={title || "Set Reminder"} onClose={closeModal} />}
+        style={$modalStyle}
+        name="setReminderModal"
+        ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        enableDismissOnClose
+        enablePanDownToClose={false}
+        detached
       >
-        <Row height={ITEM_SIZE * 5} bottom={bottom + Spacing.large}>
-          <Cell flex></Cell>
-          <Cell flex>
-            <List
-              data={HOURS}
-              scrollIndex={hourScrollIndex}
-              onChange={setHour}
-            />
-          </Cell>
-          <Cell flex>
-            <TimeItem item=":" />
-          </Cell>
-          <Cell flex>
-            <List
-              data={MINUTES}
-              scrollIndex={minuteScrollIndex}
-              onChange={setMinute}
-            />
-          </Cell>
-          <Cell flex></Cell>
-        </Row>
-        <LinearGradient
-          pointerEvents="none"
-          colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.1)']}
-          style={$topLinearBackground}
-          locations={[1, 0.8, 0.5, 0.3, 0]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-        />
-        <LinearGradient
-          pointerEvents="none"
-          colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.1)']}
-          style={[$bottomLinearBackground, { bottom: bottom + Spacing.large }]}
-          locations={[0, 0.3, 0.5, 0.8, 1]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-        />
-        <BottomContainer>
-          <SolidButton
-            large
-            title="Save"
-            type="primary"
-            onPress={handleSave}
+        <Cell
+          flex
+          innerHorizontal={Spacing.medium}
+          bottom={bottom + Spacing.medium}
+          horizontal={Spacing.medium}
+        >
+          <Row height={ITEM_SIZE * 5} bottom={bottom + Spacing.large}>
+            <Cell flex></Cell>
+            <Cell flex>
+              <List
+                data={HOURS}
+                scrollIndex={hourScrollIndex}
+                onChange={setHour}
+              />
+            </Cell>
+            <Cell flex>
+              <TimeItem item=":" />
+            </Cell>
+            <Cell flex>
+              <List
+                data={MINUTES}
+                scrollIndex={minuteScrollIndex}
+                onChange={setMinute}
+              />
+            </Cell>
+            <Cell flex></Cell>
+          </Row>
+          <LinearGradient
+            pointerEvents="none"
+            colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.1)']}
+            style={$topLinearBackground}
+            locations={[1, 0.8, 0.5, 0.3, 0]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
           />
-        </BottomContainer>
-      </Cell>
-    </BottomSheetModal>
+          <LinearGradient
+            pointerEvents="none"
+            colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.8)', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.1)']}
+            style={[$bottomLinearBackground, { bottom: bottom + Spacing.large }]}
+            locations={[0, 0.3, 0.5, 0.8, 1]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
+          />
+          <BottomContainer>
+            <SolidButton
+              large
+              title="Save"
+              type="primary"
+              onPress={handleSave}
+            />
+          </BottomContainer>
+        </Cell>
+      </BottomSheetModal>
+    </>
   )
 })
 

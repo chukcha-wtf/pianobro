@@ -5,11 +5,10 @@ import { startOfWeek, endOfWeek, subWeeks, subMonths, subYears, addWeeks, addMon
 import { ProgressChart } from "./ProgressChart";
 import { Card } from "@common-ui/components/Card";
 import { SegmentControl } from "@common-ui/components/SegmentControl";
-import { LabelText } from "@common-ui/components/Text";
 import { Spacing } from "@common-ui/constants/spacing";
 
 import { PracticeSession } from "@models/PracticeSession";
-import { formatDate, getDateLocale } from "@utils/formatDate"
+import { getDateLocale } from "@utils/formatDate"
 import { WINDOW_WIDTH } from "@gorhom/bottom-sheet";
 
 
@@ -37,53 +36,18 @@ const DATE_MODIFIER_FUNCTIONS = {
     right: addWeeks,
     start: startOfWeek,
     end: endOfWeek,
-    getTimeRangeText: (startDate: Date, endDate: Date) => {
-      const startDateISO = startDate.toISOString()
-      const endDateISO = endDate.toISOString()
-
-      const startDay = formatDate(startDateISO, "d")
-      const endDay = formatDate(endDateISO, "d")
-
-      const startMonth = formatDate(startDateISO, "MMM")
-      const endMonth = formatDate(endDateISO, "MMM")
-
-      const endYear = endDate.getFullYear()
-      const todayYear = new Date().getFullYear()
-
-      let text = `${startDay} ${startMonth} - ${endDay} ${endMonth}`
-
-      if (startMonth === endMonth) {
-        text = `${startDay} - ${endDay} ${startMonth}`
-      }
-
-      if (endYear !== todayYear) {
-        text += ` ${endYear}`
-      }
-
-      return text
-    }
   },
   month: {
     left: subMonths,
     right: addMonths,
     start: startOfMonth,
     end: endOfMonth,
-    getTimeRangeText: (startDate: Date, _: Date) => {
-      const month = formatDate(startDate.toISOString(), "MMMM")
-      const startYear = startDate.getFullYear()
-      const todayYear = new Date().getFullYear()
-      
-      return startYear === todayYear ? month : `${month} ${startYear}`
-    }
   },
   year: {
     left: subYears,
     right: addYears,
     start: startOfYear,
     end: endOfYear,
-    getTimeRangeText: (startDate: Date, _: Date) => {
-      return `${startDate.getFullYear()}`
-    }
   },
 }
 
@@ -103,25 +67,25 @@ export const getChartEndDate = (mode: keyof typeof ChartMode, date: Date) => {
 
 export function ChartControl(props: ChartControlProps) {
   const { startDate, endDate, practiceGoal, mode, sessions, onDateRangeChange } = props
+  
+  const changeMode = (newMode: keyof typeof ChartMode) => {
+    const newStartDate = getChartStartDate(newMode, startDate)
+    const newEndDate = getChartEndDate(newMode, newStartDate)
 
-    const changeMode = (newMode: keyof typeof ChartMode) => {
-      const newStartDate = getChartStartDate(newMode, startDate)
-      const newEndDate = getChartEndDate(newMode, endDate)
+    onDateRangeChange(newStartDate, newEndDate, newMode)
+  }
 
-      onDateRangeChange(newStartDate, newEndDate, newMode)
+  const modifyStartAndEndDate = (panDirection: PanDirection) => {
+    const newStartDate = DATE_MODIFIER_FUNCTIONS[mode][panDirection](startDate, 1)
+    const newEndDate = DATE_MODIFIER_FUNCTIONS[mode][panDirection](endDate, 1)
+
+    // Do not attempt to scroll to the future
+    if (newStartDate.getTime() > new Date().getTime()) {
+      return
     }
-
-    const modifyStartAndEndDate = (panDirection: PanDirection) => {
-      const newStartDate = DATE_MODIFIER_FUNCTIONS[mode][panDirection](startDate, 1)
-      const newEndDate = DATE_MODIFIER_FUNCTIONS[mode][panDirection](endDate, 1)
-
-      // Do not attempt to scroll to the future
-      if (newStartDate.getTime() > new Date().getTime()) {
-        return
-      }
-      
-      onDateRangeChange(newStartDate, newEndDate, mode)
-    }
+    
+    onDateRangeChange(newStartDate, newEndDate, mode)
+  }
 
 
   const swipeGesture = Gesture.Pan().runOnJS(true).onEnd((event) => {
@@ -137,8 +101,6 @@ export function ChartControl(props: ChartControlProps) {
       modifyStartAndEndDate("right")
     }
   })
-
-  const chartTimeRangeText = DATE_MODIFIER_FUNCTIONS[mode].getTimeRangeText(startDate, endDate)
 
   return (
     <>
@@ -159,9 +121,6 @@ export function ChartControl(props: ChartControlProps) {
             sessions={sessions}
           />
         </GestureDetector>
-        <LabelText align="center" top={Spacing.tiny}>
-          {chartTimeRangeText}
-        </LabelText>
       </Card>
     </>
   )

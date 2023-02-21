@@ -1,10 +1,14 @@
 import React from "react"
 import { View, ScrollView, ViewProps, ScrollViewProps, ViewStyle } from "react-native"
+import { Edge, SafeAreaView } from "react-native-safe-area-context"
+import Animated from "react-native-reanimated"
+
 import { Colors } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
+
+const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView)
 
 export type ContentProps = {
   children: React.ReactNode
@@ -67,7 +71,10 @@ export const Content = (props: ContentProps) => {
   }
 
   return (
-    <Container showsVerticalScrollIndicator={false} style={scrollStyles}>
+    <Container
+      contentInsetAdjustmentBehavior="automatic"
+      showsVerticalScrollIndicator={false}
+      style={scrollStyles}>
       <View style={holderStyles} {...rest}>
         {children}
       </View>
@@ -79,6 +86,7 @@ export const Content = (props: ContentProps) => {
  * Screen - generic wrapper for screens. Includes SafeAreaView and ErrorBoundary
  * @param {React.ReactNode} children - inner content for Screen component
  * @param {string} bgColor - set background color
+ * @param {Edge[]} edges - edges to apply SafeAreaView to
  * @example
  * <Screen>
  *  <Content>
@@ -86,8 +94,8 @@ export const Content = (props: ContentProps) => {
  *  </Content>
  * </Screen>
  */
-export const Screen = (props: { children: React.ReactNode, bgColor?: string }) => {
-  const { children, bgColor } = props
+export const Screen = (props: { children: React.ReactNode, bgColor?: string, edges?: Edge[] }) => {
+  const { children, bgColor, edges } = props
 
   const styles = [$container]
 
@@ -95,10 +103,12 @@ export const Screen = (props: { children: React.ReactNode, bgColor?: string }) =
     styles.push({ backgroundColor: bgColor })
   }
 
+  const safeAreaEdges = edges || ["top", "right", "left"]
+
   return (
-    <SafeAreaView edges={["top", "right", "left"]} style={styles}>
+    <AnimatedSafeAreaView edges={safeAreaEdges} style={styles}>
       {children}
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   )
 }
 

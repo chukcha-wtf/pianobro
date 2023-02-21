@@ -9,6 +9,7 @@ import { Instance } from "mobx-state-tree";
 import { PracticeSessionModel } from "@models/PracticeSession";
 import { Activity } from "@models/Activity";
 import { $modalStyle, ModalHeader } from "@common-ui/components/Modal";
+import { Colors } from "@common-ui/constants/colors";
 
 export type AddPracticeModalHandle = {
   open: () => void
@@ -49,6 +50,7 @@ export const AddPracticeModal = forwardRef<AddPracticeModalHandle, unknown>(func
       <Cell
         flex
         innerHorizontal={Spacing.medium}
+        bgColor={Colors.grayBackground}
       >
         <EndPracticeForm onSave={onSave} />
       </Cell>

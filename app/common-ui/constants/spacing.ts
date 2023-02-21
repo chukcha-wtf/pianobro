@@ -8,6 +8,7 @@ export enum Spacing {
   extraSmall = 8,
   small = 12,
   medium = 16,
+  mediumXL = 20,
   large = 24,
   larger = 32,
   button = 44,

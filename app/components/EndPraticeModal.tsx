@@ -8,6 +8,7 @@ import { useStores } from "@models/index";
 import { PracticeSession } from "@models/PracticeSession";
 import { Activity } from "@models/Activity";
 import { $modalStyle, ModalHeader } from "@common-ui/components/Modal";
+import { Colors } from "@common-ui/constants/colors";
 
 export type EndPracticeModalHandle = {
   open: () => void
@@ -48,6 +49,7 @@ export const EndPracticeModal = forwardRef<EndPracticeModalHandle, unknown>(func
       <Cell
         flex
         innerHorizontal={Spacing.medium}
+        bgColor={Colors.grayBackground}
       >
         <EndPracticeForm activeSession={practiceSessionStore.activeSession} onSave={onSave} />
       </Cell>

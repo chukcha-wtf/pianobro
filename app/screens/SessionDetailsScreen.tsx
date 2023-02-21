@@ -1,19 +1,20 @@
 import React, { FC } from "react"
+import { Alert } from "react-native"
+import { observer } from "mobx-react-lite"
 
-import { HugeTitle, LargeTitle, MediumText, MediumTitle, RegularText } from "@common-ui/components/Text"
+import { HugeTitle, LargeTitle, MediumText, RegularText } from "@common-ui/components/Text"
 import { Spacing } from "@common-ui/constants/spacing"
 import { Content, Screen } from "@common-ui/components/Screen"
 
 import { MainTabScreenProps } from "../navigators/MainNavigator"
-import { observer } from "mobx-react-lite"
 import { useStores } from "@models/index"
 import { Card } from "@common-ui/components/Card"
-import { BottomContainer, Row } from "@common-ui/components/Common"
+import { AbsoluteContainer, BottomContainer, Row } from "@common-ui/components/Common"
 import { SatisfactionStars } from "@components/PracticeItem"
 import { Label } from "@common-ui/components/Label"
-import { formatDateTime } from "@utils/formatDate"
 import { LinkButton } from "@common-ui/components/Button"
-import { Alert } from "react-native"
+import { Colors } from "@common-ui/constants/colors"
+import { formatDateRangeText } from "@utils/formatDateRangeText"
 
 export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = observer(
   function SessionDetailsScreen(props) {
@@ -42,21 +43,30 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
       return null
     }
 
-    const practiceTime = `${formatDateTime(session.startTime, "MMM dd, hh:mm a")} - ${formatDateTime(session.endTime, "MMM dd, hh:mm a")}`
+    const practiceTime = formatDateRangeText(session.startTime, session.endTime, "week")
 
     return (
-      <Screen>
-        <Row align="center">
-          <MediumTitle>
+      <Screen edges={["bottom"]} bgColor={Colors.grayBackground}>
+        <Row align="center" top={Spacing.large} bottom={Spacing.extraSmall}>
+          <MediumText>
             {practiceTime}
-          </MediumTitle>
+          </MediumText>
+          <AbsoluteContainer sticks={['right']}>
+            <LinkButton
+              icon="chevron-down"
+              iconSize={Spacing.larger}
+              textColor={Colors.dark}
+              onPress={props.navigation.goBack}
+              innerRight={Spacing.small}
+            />
+          </AbsoluteContainer>
         </Row>
-        <Content>
+        <Content bgColor={Colors.grayBackground}>
           <Card>
             <LargeTitle align="center" bottom={Spacing.medium}>
               Practice Time
             </LargeTitle>
-            <HugeTitle align="center">
+            <HugeTitle align="center" color={Colors.primary}>
               {session.formattedDuration.hours}hr {session.formattedDuration.minutes}min
             </HugeTitle>
           </Card>          
@@ -77,19 +87,20 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
                 Fun
               </MediumText>
               <Row align="center">
-                <SatisfactionStars satisfaction={session.satisfaction} />
+                <SatisfactionStars satisfaction={session.satisfaction} size={Spacing.mediumXL} />
               </Row>
             </Card>
           </Row>
           <MediumText top={Spacing.large} bottom={Spacing.small}>
             Categories
           </MediumText>
-          <Row>
+          <Row wrap>
             {session.activities.map((activity, index) => (
               <Label
                 key={index}
                 text={activity.name}
-                left={index !== 0 && Spacing.extraSmall}
+                right={Spacing.extraSmall}
+                bottom={Spacing.extraSmall}
                 randomBgColor
               />
             ))}
