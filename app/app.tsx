@@ -29,6 +29,7 @@ import { customFontsToLoad } from "./common-ui/constants/typography"
 import { Timing } from "@common-ui/constants/timing"
 import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
+import { AlertProvider } from "@common-ui/contexts/AlertContext"
 
 const hostname = NativeModules.SourceCode.scriptURL
   .split('://')[1] // Remove the scheme
@@ -111,11 +112,13 @@ function App(props: AppProps) {
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <ErrorBoundary catchErrors={Config.catchErrors}>
           <BottomSheetModalProvider>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
+            <AlertProvider>
+              <AppNavigator
+                linking={linking}
+                initialState={initialNavigationState}
+                onStateChange={onNavigationStateChange}
+              />
+            </AlertProvider>
           </BottomSheetModalProvider>
         </ErrorBoundary>
       </SafeAreaProvider>

@@ -2,7 +2,7 @@ import React, { FC, useMemo } from "react"
 import { observer } from "mobx-react-lite"
 import { FlashList } from "@shopify/flash-list"
 
-import { HugeTitle, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
+import { LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
 import { Spacing } from "@common-ui/constants/spacing"
 import { Content, Screen } from "@common-ui/components/Screen"
 
@@ -16,6 +16,7 @@ import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { ChartControl, ChartMode } from "@components/ChartControl"
 import { LinkButton } from "@common-ui/components/Button"
 import { Colors } from "@common-ui/constants/colors"
+import { formatDateRangeText } from "@utils/formatDateRangeText"
 
 type ListHeaderProps = {
   startDay: Date
@@ -38,8 +39,15 @@ export const FLASH_LIST_OFFSET = 2
 function ListHeader(props: ListHeaderProps) {
   const { startDay, endDay, mode, sessions, practiceGoal, totalPracticeTime, onDateRangeChange } = props
 
+  const title = useMemo(() => {
+    return formatDateRangeText(startDay, endDay, mode)
+  }, [startDay, endDay, mode])
+
   return (
     <Cell vertical={Spacing.large} right={FLASH_LIST_OFFSET}>
+      <MediumText bottom={Spacing.large}>
+        {title}
+      </MediumText>
       <Card flex>
         <MediumTitle align="center" bottom={Spacing.small}>
           Practice Time

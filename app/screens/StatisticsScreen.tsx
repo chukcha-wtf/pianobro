@@ -5,7 +5,7 @@ import { Content, Screen } from "@common-ui/components/Screen"
 
 import { MainTabParamList, MainTabScreenProps } from "../navigators/MainNavigator"
 import { ROUTES } from "@navigators/AppNavigator"
-import { HugeTitle, LabelText, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
+import { HugeTitle, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
 import { translate } from "@i18n/translate"
 import { Spacing } from "@common-ui/constants/spacing"
 import { useStores } from "@models/index"
@@ -16,12 +16,13 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 import { NavigationProp } from "@react-navigation/native"
 import { AggregatedActivity } from "@models/PracticeSessionStore"
 import { ChartControl, ChartMode, getChartEndDate, getChartStartDate } from "@components/ChartControl"
-import { Colors } from "@common-ui/constants/colors"
+import { Colors, Palette } from "@common-ui/constants/colors"
 import { PracticeSession } from "@models/PracticeSession"
 import { SectionList } from "react-native"
 import { PracticeItem } from "@components/PracticeItem"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
 import { FLASH_LIST_OFFSET } from "./ActivityDetailsScreen"
+import Icon from "@common-ui/components/Icon"
 
 type ActivityItemProps = {
   activity: AggregatedActivity
@@ -39,6 +40,14 @@ type StatisticsHeaderProps = {
   onDateRangeChange: (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => void;
 }
 
+const RANDOM_BG_COLORS = [
+  Palette.blue100,
+  Palette.green100,
+  Palette.red100,
+  Palette.yellow100,
+  Palette.pink100,
+]
+
 const SECTION_TITLES = {
   activities: "Activities",
   sessions: "Practice Sessions",
@@ -54,16 +63,26 @@ function ActivityItem({ activity, startDate, endDate, mode, navigation }: Activi
     })
   }
 
+  const randomBgColor = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * RANDOM_BG_COLORS.length)
+    return RANDOM_BG_COLORS[randomIndex]
+  }, [])
+
   return (
-    <Card nonElevated bottom={Spacing.large}>
+    <Card backgroundColor={randomBgColor} nonElevated bottom={Spacing.large}>
       <TouchableOpacity onPress={openActivityScreen}>
         <Row align="space-between">
-          <MediumTitle align="center">
-            {activity.humanTitle}
-          </MediumTitle>
-          <LargeTitle align="center">
-            {activity.duration.hours}h {activity.duration.minutes}m
-          </LargeTitle>
+          <Row flex right={Spacing.medium} align="space-between">
+            <MediumTitle align="center">
+              {activity.humanTitle}
+            </MediumTitle>
+            <LargeTitle align="center">
+              {activity.duration.hours}h {activity.duration.minutes}m
+            </LargeTitle>
+          </Row>
+          <Icon
+            name="chevron-right"
+            size={Spacing.large} />
         </Row>
       </TouchableOpacity>
     </Card>

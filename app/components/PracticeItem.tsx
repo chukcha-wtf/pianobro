@@ -1,6 +1,6 @@
 import React from "react"
 
-import { StarFilled } from "@common-ui/components/Icon"
+import Icon, { StarFilled } from "@common-ui/components/Icon"
 import { Spacing } from "@common-ui/constants/spacing"
 import { PracticeSession } from "@models/PracticeSession"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
@@ -60,24 +60,29 @@ export const PracticeItem = function PracticeItem({ item }: { item: PracticeSess
       right={FLASH_LIST_OFFSET}
     >
       <TouchableOpacity onPress={showDetails}>
-        <Cell>
-          <If condition={!!item.satisfaction}>
-            <Row bottom={Spacing.extraSmall}>
-              <SatisfactionStars satisfaction={item.satisfaction} />
-            </Row>
-          </If>
-          <LargeTitle>
-            {item.formattedDuration.hours}:{item.formattedDuration.minutes}
-            <RegularText>
-              {"  "}{formatTime(item.startTime)}-{formatTime(item.endTime)}
-            </RegularText>
-          </LargeTitle>
-        </Cell>
-        <If condition={!!item.activities.length}>
-          <Row top={Spacing.extraSmall}>
-            <LabelText text={activitiesText} />
-          </Row>
-        </If>
+        <Row flex align="space-between">
+          <Cell>
+            <Cell>
+              <If condition={!!item.satisfaction}>
+                <Row bottom={Spacing.extraSmall}>
+                  <SatisfactionStars satisfaction={item.satisfaction} />
+                </Row>
+              </If>
+              <LargeTitle>
+                {item.formattedDuration.hours}:{item.formattedDuration.minutes}
+                <RegularText>
+                  {"  "}{formatTime(item.startTime)}-{formatTime(item.endTime)}
+                </RegularText>
+              </LargeTitle>
+            </Cell>
+            <If condition={!!item.activities.length}>
+              <Row top={Spacing.extraSmall}>
+                <LabelText text={activitiesText} />
+              </Row>
+            </If>
+          </Cell>
+          <Icon name="chevron-right" />
+        </Row>
       </TouchableOpacity>
     </Card>
   )

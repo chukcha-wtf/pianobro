@@ -185,7 +185,7 @@ export function ProgressChart(props: ProgressChartProps) {
   )
 
   const goalLineStart = data.length ? data[0].x + 0.5 : 0
-  const goalLineEnd = data.length ? data[data.length - 1].x + 1 : 0
+  const goalLineEnd = data.length ? data[data.length - 1].x + 1.5 : 0
   const goalLineStrokeConfig: DomainTuple = [goalLineStart, goalLineEnd]
 
   // Build nice tick values for the vertical axis

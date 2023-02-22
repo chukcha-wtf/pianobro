@@ -8,13 +8,21 @@ import { Colors } from "@common-ui/constants/colors"
 
 export const ModalHeader = ({
   title,
+  bgColor,
   onClose,
 }: {
   title: string
+  bgColor?: string
   onClose: () => void
 }) => {
+  const $style = [$header]
+
+  if (bgColor) {
+    $style.push({ backgroundColor: bgColor })
+  }
+  
   return (
-    <View style={$header}>
+    <View style={$style}>
       <LargeTitle align="center">{title}</LargeTitle>
       <View style={$closeButtonHolder}>
         <LinkButton

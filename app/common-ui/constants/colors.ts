@@ -9,7 +9,7 @@ export enum Palette {
   black = "#18191F",
   black800 = "#474A57",
   black700 = "#969BAB",
-  black300 = "#9FA4B4",
+  black300 = "#D6D8D6",
   black200 = "#EEEFF4",
   black100 = "#F6F6F6",
 

@@ -91,7 +91,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
         <Row horizontal={Spacing.medium} top={Spacing.large} align="space-between" justify="flex-start">
           <Cell>
             <LargeTitle>
-              Hey, Pavlo 👋
+              Hey 👋
             </LargeTitle>
             <HugeTitle>
               Let's practice!

@@ -15,6 +15,7 @@ import { Label } from "@common-ui/components/Label"
 import { LinkButton } from "@common-ui/components/Button"
 import { Colors } from "@common-ui/constants/colors"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
+import { If } from "@common-ui/components/Conditional"
 
 export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = observer(
   function SessionDetailsScreen(props) {
@@ -91,24 +92,28 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
               </Row>
             </Card>
           </Row>
-          <MediumText top={Spacing.large} bottom={Spacing.small}>
-            Categories
-          </MediumText>
-          <Row wrap>
-            {session.activities.map((activity, index) => (
-              <Label
-                key={index}
-                text={activity.name}
-                right={Spacing.extraSmall}
-                bottom={Spacing.extraSmall}
-                randomBgColor
-              />
-            ))}
-          </Row>
-          <MediumText top={Spacing.large} bottom={Spacing.small}>
-            Comments
-          </MediumText>
-          <RegularText text={session.notes} />
+          <If condition={!!session.activities?.length}>
+            <MediumText top={Spacing.large} bottom={Spacing.small}>
+              Categories
+            </MediumText>
+            <Row wrap>
+              {session.activities.map((activity, index) => (
+                <Label
+                  key={index}
+                  text={activity.name}
+                  right={Spacing.extraSmall}
+                  bottom={Spacing.extraSmall}
+                  randomBgColor
+                />
+              ))}
+            </Row>
+          </If>
+          <If condition={!!session.notes}>
+            <MediumText top={Spacing.large} bottom={Spacing.small}>
+              Comments
+            </MediumText>
+            <RegularText text={session.notes} />
+          </If>
           <BottomContainer>
             <LinkButton
               type="danger"

@@ -91,7 +91,7 @@ function BaseButton(props: BaseButtonProps) {
 
   let buttonStyle: ViewStyle[] = [$button]
   const textStyle: TextStyle[] = [$buttonText]
-  const shadowStyle: ViewStyle[] = [$shadowStyle, {
+  let shadowStyle: ViewStyle[] = [$shadowStyle, {
     transform: [
       { translateX: shadowOffsetRight ?? 2 },
       { translateY: shadowOffsetBottom ?? 4 }
@@ -99,6 +99,7 @@ function BaseButton(props: BaseButtonProps) {
   }]
 
   buttonStyle = useOffsetStyles(buttonStyle, offsetProps)
+  shadowStyle = useOffsetStyles(shadowStyle, offsetProps)
 
   if (backgroundColor) {
     buttonStyle.push({ backgroundColor })
@@ -288,7 +289,7 @@ export function OutlinedButton(props: ButtonProps) {
   const { disabled, type } = props
 
   const backgroundColor = disabled && !type ? Colors.lightGrey : Colors.white
-  const borderColor = type ? Colors[type] : Colors.midGrey
+  const borderColor = type ? Colors[type] : Colors.dark
   const textColor = type ? Colors[type] : Colors.dark
 
   return <BaseButton

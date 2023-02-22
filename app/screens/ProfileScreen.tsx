@@ -24,6 +24,9 @@ import { TimePickerModal, TimePickerModalHandle } from "@components/TimePickerMo
 import Icon from "@common-ui/components/Icon"
 import { prettifyTime } from "@utils/prettifyTime"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useAlert } from "@common-ui/contexts/AlertContext"
+import { isPushNotificationsEnabledAsync } from "@services/pushNotifications"
+import { openAppSettings } from "@utils/openLinkInBrowser"
 
 function DateCell({ date, scheduledTime, onPress }: { date: string; scheduledTime: string; onPress: (date: string) => void }) {
   const isSelected = !!scheduledTime
@@ -48,8 +51,9 @@ function DateCell({ date, scheduledTime, onPress }: { date: string; scheduledTim
 
 const NotificationRemindersScheduler = observer(
   function NotificationRemindersScheduler({ remindersStore }: { remindersStore: ReminderStore }) {
+    const { showAlert } = useAlert()
+    
     const timePickerModalRef = useRef<TimePickerModalHandle>(null)
-
     const activeDate = useRef<ReminderDate | null>(null)
 
     const onDatePress = (date: ReminderDate) => {
@@ -68,13 +72,37 @@ const NotificationRemindersScheduler = observer(
       remindersStore.setDateReminder(activeDate.current, `${hours}:${minutes}`)
     }
 
+    const handleValueChange = async () => {
+      if (!remindersStore.isEnabled) {
+        const permissionGranted = await isPushNotificationsEnabledAsync()
+
+        if (!permissionGranted) {
+          showAlert(
+            "Notifications Not Enabled",
+            "Enable notifications in your phone settings to use this feature",
+            [
+              {
+                text: "Open Settings",
+                onPress: () => openAppSettings(),
+              },
+            ]
+          )
+
+          return
+        }
+      }
+
+      remindersStore.toggleEnabled()  
+    }
+
     return (
       <>
         <Row top={Spacing.large} bottom={Spacing.tiny} align="space-between">
           <MediumText>Practice Reminders</MediumText>
           <Switch
+            trackColor={{ false: "#F8F4FF", true: "#F9D262" }}
             value={remindersStore.isEnabled}
-            onValueChange={remindersStore.toggleEnabled}
+            onValueChange={handleValueChange}
           />
         </Row>
         <SmallText bottom={Spacing.medium} muted>
@@ -151,7 +179,7 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
     const { practiceSessionStore, remindersStore } = store
     const { totalPracticeTime, hasCompletedSessions } = practiceSessionStore
 
-    const handleButton = () => populateDevData(store, 1000)
+    const handleButton = () => populateDevData(store, 200)
 
     return (
       <Screen edges={["left", "right"]}>
@@ -161,7 +189,7 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
               <LargeTitle align="center" bottom={Spacing.medium}>
                 Total Progress
               </LargeTitle>
-              <HugeTitle align="center">
+              <HugeTitle align="center" color={Colors.primary}>
                 {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min
               </HugeTitle>
             </Card>
@@ -200,7 +228,7 @@ const $dateCell: ViewStyle = {
   paddingTop: Spacing.micro,
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: Colors.lightGrey,
+  backgroundColor: Colors.midGrey,
 }
 
 const $selectedDateCell: ViewStyle = {

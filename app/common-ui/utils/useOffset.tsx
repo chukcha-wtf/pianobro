@@ -15,6 +15,8 @@ export type OffsetProps = {
   innerRight?: number
   height?: number
   width?: number
+  minHeight?: number
+  minWidth?: number
 }
 
 /**
@@ -29,13 +31,32 @@ export type OffsetProps = {
  * @param innerRight - right padding.
  * @param height - height.
  * @param width - width.
+ * @param minWidth - minimum width.
+ * @param minHeight - minimum height.
  * @returns style - An object containing the applied offset styles.
  * @example
  * const style = useOffsetStyles([], { top: 2, left: 2, bottom: 2, right: 2 })
  */
 
 export function useOffsetStyles(styles: FlexStyle[], props: OffsetProps): Array<FlexStyle> {
-  const { top, left, bottom, right, vertical, horizontal, innerVertical, innerHorizontal, innerTop, innerLeft, innerBottom, innerRight, height, width } = props
+  const {
+    top,
+    left,
+    bottom,
+    right,
+    vertical,
+    horizontal,
+    innerVertical,
+    innerHorizontal,
+    innerTop,
+    innerLeft,
+    innerBottom,
+    innerRight,
+    height,
+    width,
+    minHeight,
+    minWidth,
+  } = props
 
   if (top) {
     styles.push({ marginTop: top })
@@ -91,6 +112,14 @@ export function useOffsetStyles(styles: FlexStyle[], props: OffsetProps): Array<
 
   if (width) {
     styles.push({ width })
+  }
+
+  if (minHeight) {
+    styles.push({ minHeight })
+  }
+
+  if (minWidth) {
+    styles.push({ minWidth })
   }
 
   return styles

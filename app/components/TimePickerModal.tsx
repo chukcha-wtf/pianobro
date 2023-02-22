@@ -14,6 +14,7 @@ import { prettifyTime } from "@utils/prettifyTime";
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut, FadeOutDown } from "react-native-reanimated";
 import { Timing } from "@common-ui/constants/timing";
 import { If } from "@common-ui/components/Conditional";
+import { Colors } from "@common-ui/constants/colors";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i))
 const MINUTES = Array.from({ length: 12 }, (_, i) => {
@@ -143,7 +144,7 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
       </If>
       <BottomSheetModal
         index={0}
-        handleComponent={() => <ModalHeader title={title || "Set Reminder"} onClose={closeModal} />}
+        handleComponent={() => <ModalHeader bgColor={Colors.background} title={title || "Set Reminder"} onClose={closeModal} />}
         style={$modalStyle}
         name="setReminderModal"
         ref={bottomSheetRef}
