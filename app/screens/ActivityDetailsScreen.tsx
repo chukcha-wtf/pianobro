@@ -44,8 +44,8 @@ function ListHeader(props: ListHeaderProps) {
   }, [startDay, endDay, mode])
 
   return (
-    <Cell vertical={Spacing.large} right={FLASH_LIST_OFFSET}>
-      <MediumText bottom={Spacing.large}>
+    <Cell top={Spacing.medium} bottom={Spacing.large} right={FLASH_LIST_OFFSET}>
+      <MediumText bottom={Spacing.medium}>
         {title}
       </MediumText>
       <Card flex>

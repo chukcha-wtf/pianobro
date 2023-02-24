@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useRef, useState } from "react"
+import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { observer } from "mobx-react-lite"
 
 import { MainTabScreenProps } from "@navigators/MainNavigator"
@@ -16,11 +16,11 @@ import { EndPracticeModal, EndPracticeModalHandle } from "@components/EndPratice
 import { Spacing } from "@common-ui/constants/spacing"
 import { useInterval } from "@utils/useInterval"
 import { AddPracticeModal, AddPracticeModalHandle } from "@components/AddPracticeModal"
-import { Colors } from "react-native/Libraries/NewAppScreen"
 import { PracticeItem } from "@components/PracticeItem"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { calculateDuration } from "@utils/calculateDuration"
 import { formatDuration } from "@utils/formatDate"
+import { Colors } from "@common-ui/constants/colors"
 
 const ActiveSession = observer(
   function ActiveSession(_props) {
@@ -40,13 +40,12 @@ const ActiveSession = observer(
     const formattedDuration = formatDuration(duration)
 
     return (
-      <Card type="info" bottom={Spacing.medium} innerVertical={Spacing.large}>
+      <Card bottom={Spacing.medium} innerVertical={Spacing.large}>
         <LargeTitle align="center" bottom={Spacing.medium}>
           Practice in Progress
         </LargeTitle>
-        <HugeTitle align="center" bottom={Spacing.small}>
-          {formattedDuration.hours}:{formattedDuration.minutes}
-          <LargeTitle> {formattedDuration.seconds}</LargeTitle>
+        <HugeTitle align="center" bottom={Spacing.small} color={Colors.primary}>
+          {formattedDuration.hours}:{formattedDuration.minutes}:{formattedDuration.seconds}
         </HugeTitle>
         <LabelText align="center">Shhh, let the music flow...</LabelText>
       </Card>
@@ -56,7 +55,7 @@ const ActiveSession = observer(
 
 export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
   function HomeScreen(_props) {
-    const { practiceSessionStore, quotesStore } = useStores()
+    const { practiceSessionStore, quotesStore, settingsStore } = useStores()
 
     const editPracticeModalRef = useRef<EndPracticeModalHandle>(null)
     const addPracticeModalRef = useRef<AddPracticeModalHandle>(null)
@@ -65,6 +64,10 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
 
     const isPracticing = practiceSessionStore.isPracticing && !!practiceSessionStore.activeSession
     const hasCompletedSessions = !!practiceSessionStore.sessionsCompletedToday.length
+
+    useEffect(() => {
+      settingsStore.setInstallDate()
+    }, [])
 
     const handleStartStop = () => {
       if (isPracticing) {
@@ -90,7 +93,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
       <Screen>
         <Row horizontal={Spacing.medium} top={Spacing.large} align="space-between" justify="flex-start">
           <Cell>
-            <LargeTitle>
+            <LargeTitle bottom={Spacing.extraSmall}>
               Hey 👋
             </LargeTitle>
             <HugeTitle>
@@ -98,10 +101,10 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
             </HugeTitle>
           </Cell>
           <Cell>
-            <IconButton icon="plus" onPress={addSession} />
+            <IconButton backgroundColor={Colors.warning} icon="plus" onPress={addSession} />
           </Cell>
         </Row>
-        <Cell horizontal={Spacing.medium} vertical={Spacing.large} >
+        <Cell horizontal={Spacing.medium} vertical={Spacing.larger} >
           <SolidButton
             large
             type={buttonType}
@@ -115,9 +118,9 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
           </If>
 
           <If condition={hasCompletedSessions && !practiceSessionStore.activeSession}>
-            <Card type="success" bottom={Spacing.medium} innerVertical={Spacing.large}>
-              <MediumTitle align="center" bottom={Spacing.small}>You practiced today for</MediumTitle>
-              <HugeTitle align="center" bottom={Spacing.small}>
+            <Card bottom={Spacing.medium} innerVertical={Spacing.large}>
+              <MediumTitle align="center" bottom={Spacing.small}>You practiced today</MediumTitle>
+              <HugeTitle align="center" bottom={Spacing.small} color={Colors.primary}>
                 {practiceSessionStore.totalPracticeTimeToday.hours}hr {practiceSessionStore.totalPracticeTimeToday.minutes}min
               </HugeTitle>
               <LabelText align="center">Keep up the good work!</LabelText>
@@ -125,7 +128,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
           </If>
 
           <If condition={!hasCompletedSessions && !practiceSessionStore.activeSession}>
-            <RegularText align="center">
+            <RegularText align="center" bottom={Spacing.larger}>
               You haven't logged any practice sessions{'\n'}today yet.
             </RegularText>
 
@@ -133,7 +136,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
               large
               title="Add practice session"
               leftIcon="plus-circle"
-              leftIconSize={Spacing.large}
+              leftIconSize={Spacing.larger}
               textColor={Colors.dark}
               onPress={addSession}
             />

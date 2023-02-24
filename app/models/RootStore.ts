@@ -3,6 +3,7 @@ import { ActivityStoreModel } from "./Activity"
 import { PianoQuoteStoreModel } from "./PianoQuote"
 import { PracticeSessionStoreModel } from "./PracticeSessionStore"
 import { ReminderStoreModel } from "./Reminder"
+import { SettingsStoreModel } from "./Settings"
 
 /**
  * A RootStore model.
@@ -12,6 +13,7 @@ export const RootStoreModel = types.model("RootStore").props({
   quotesStore: types.optional(PianoQuoteStoreModel, {}),
   activitiesStore: types.optional(ActivityStoreModel, {}),
   remindersStore: types.optional(ReminderStoreModel, {}),
+  settingsStore: types.optional(SettingsStoreModel, {}),
 })
 
 /**

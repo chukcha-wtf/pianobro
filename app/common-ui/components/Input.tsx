@@ -69,6 +69,7 @@ const $input: TextStyle = {
   color: Colors.dark,
   paddingHorizontal: Spacing.medium,
   paddingVertical: Spacing.medium,
+  backgroundColor: Colors.white,
   ...Typography.largeTitle
 }
 

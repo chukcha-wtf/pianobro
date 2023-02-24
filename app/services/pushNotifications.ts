@@ -58,8 +58,8 @@ export async function scheduleLocalWeeklyPushNotification(trigger: WeeklyTrigger
 
   return await Notifications.scheduleNotificationAsync({
     content: {
-      title: "You've got some work to do! 🎹",
-      body: "Don't forget to practice today! 🎶"
+      title: "It's play time 🎹",
+      body: "Don't forget to practice piano today! 🎶"
     },
     trigger,
   });

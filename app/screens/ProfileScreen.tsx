@@ -6,7 +6,7 @@ import * as Application from "expo-application"
 import { observer } from "mobx-react-lite"
 import { translate } from "@i18n/translate"
 
-import { HugeTitle, LargeTitle, MediumText, RegularText, SmallText } from "@common-ui/components/Text"
+import { HugeTitle, LabelText, LargeTitle, MediumText, RegularText, SmallText } from "@common-ui/components/Text"
 import { BottomContainer, Row } from "@common-ui/components/Common"
 import { Spacing } from "@common-ui/constants/spacing"
 import { LinkButton } from "@common-ui/components/Button"
@@ -157,6 +157,9 @@ const PracticeGoalSetting = observer(
             </Row>
           </TouchableOpacity>
         </Row>
+        <SmallText bottom={Spacing.medium} muted>
+          Set a goal for your practice time.{"\n"}You can change this at any time.
+        </SmallText>
         {/* Modal shown when manually logging practice */}
         <TimePickerModal
           title="Set Practice Goal"
@@ -176,14 +179,15 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
     const bottomPadding = useBottomPadding()
     const { top } = useSafeAreaInsets()
     
-    const { practiceSessionStore, remindersStore } = store
+    const { practiceSessionStore, remindersStore, settingsStore } = store
     const { totalPracticeTime, hasCompletedSessions } = practiceSessionStore
 
     const handleButton = () => populateDevData(store, 200)
 
     return (
-      <Screen edges={["left", "right"]}>
-        <Content bgColor={Colors.grayBackground} innerTop={top + Spacing.medium}>
+      <Screen bgColor={Colors.grayBackground} edges={["left", "right"]}>
+        <HugeTitle left={Spacing.medium} top={top + Spacing.medium} text={translate("profileScreen.title")} />
+        <Content bgColor={Colors.grayBackground}>
           <If condition={!!hasCompletedSessions}>
             <Card>
               <LargeTitle align="center" bottom={Spacing.medium}>
@@ -192,6 +196,9 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
               <HugeTitle align="center" color={Colors.primary}>
                 {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min
               </HugeTitle>
+              <If condition={!!settingsStore.installDate}>
+                <LabelText align="center" top={Spacing.small}>Since {settingsStore.startDate}</LabelText>
+              </If>
             </Card>
           </If>
 

@@ -93,7 +93,7 @@ export const EndPracticeForm = observer(
           </LargeTitle>
           <DatePickerFormInput startTime={startTime} endTime={endTime} onChange={onTimeChange} />
           {/* Activities Selection */}
-          <LabelText bottom={Spacing.extraSmall} color={Colors.midGrey}>What have you practiced?</LabelText>
+          <LabelText bottom={Spacing.small}>What have you practiced?</LabelText>
           <Row bottom={Spacing.small} wrap align="center">
             {ACTIVITIES.map((activity) => (
               <Tag
@@ -102,13 +102,13 @@ export const EndPracticeForm = observer(
                 randomBgColor
                 text={activity.name}
                 onPress={handleTagPress}
-                bottom={Spacing.extraSmall}
+                bottom={Spacing.small}
                 left={Spacing.tiny}
               />
             ))}
           </Row>
           {/* Intencity */}
-          <LabelText bottom={Spacing.extraSmall} color={Colors.midGrey}>Was it hard?</LabelText>
+          <LabelText bottom={Spacing.small}>Was it hard?</LabelText>
           <Cell bottom={Spacing.medium}>
             <Slider
               tapToSeek
@@ -124,9 +124,9 @@ export const EndPracticeForm = observer(
             </Row>
           </Cell>
           {/* Satisfaction */}
-          <LabelText bottom={Spacing.extraSmall} color={Colors.midGrey}>Was it fun?</LabelText>
+          <LabelText bottom={Spacing.small}>Was it fun?</LabelText>
           <StarPicker count={5} value={satisfaction} onChange={setSatisfaction} />
-          <LabelText top={Spacing.medium} bottom={Spacing.extraSmall} color={Colors.midGrey}>Notes</LabelText>
+          <LabelText top={Spacing.medium} bottom={Spacing.small}>Notes</LabelText>
           <LargeInput
             value={notes}
             onChangeText={setNotes}

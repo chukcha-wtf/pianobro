@@ -10,7 +10,7 @@ import { Activity } from "./Activity";
 export type AggregatedActivity = {
   uuid: string,
   humanTitle: string,
-  sessions: Array<PracticeSession>,
+  sessionsCount: number,
   duration: DurationObject,
 }
 
@@ -163,7 +163,7 @@ export const PracticeSessionStoreModel = types
         sessionsByActivity.push({
           uuid: activity.uuid,
           humanTitle: activity.name,
-          sessions: sessionsWithActivity,
+          sessionsCount: sessionsWithActivity.length,
           duration: formatDuration(totalDuration),
         })
       })
