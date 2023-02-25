@@ -21,6 +21,8 @@ import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { calculateDuration } from "@utils/calculateDuration"
 import { formatDuration } from "@utils/formatDate"
 import { Colors } from "@common-ui/constants/colors"
+import Animated, { FadeInDown, FadeOutDown, FadeOutUp } from "react-native-reanimated"
+import { Timing } from "@common-ui/constants/timing"
 
 const ActiveSession = observer(
   function ActiveSession(_props) {
@@ -40,15 +42,19 @@ const ActiveSession = observer(
     const formattedDuration = formatDuration(duration)
 
     return (
-      <Card bottom={Spacing.medium} innerVertical={Spacing.large}>
-        <LargeTitle align="center" bottom={Spacing.medium}>
-          Practice in Progress
-        </LargeTitle>
-        <HugeTitle align="center" bottom={Spacing.small} color={Colors.primary}>
-          {formattedDuration.hours}:{formattedDuration.minutes}:{formattedDuration.seconds}
-        </HugeTitle>
-        <LabelText align="center">Shhh, let the music flow...</LabelText>
-      </Card>
+      <Animated.View
+        entering={FadeInDown}
+      >
+        <Card bottom={Spacing.medium} innerVertical={Spacing.large}>
+          <LargeTitle align="center" bottom={Spacing.medium}>
+            Practice in Progress
+          </LargeTitle>
+          <HugeTitle align="center" bottom={Spacing.small} color={Colors.primary}>
+            {formattedDuration.hours}:{formattedDuration.minutes}:{formattedDuration.seconds}
+          </HugeTitle>
+          <LabelText align="center">Shhh, let the music flow...</LabelText>
+        </Card>
+      </Animated.View>
     )
   }
 )
@@ -142,12 +148,13 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
             />
           </If>
 
-          {/* We could've used FlashList here but since the number of practices per day is small
-          it doesn't really make sense for now */}
-          {practiceSessionStore.sessionsCompletedToday.map((item) => (
-            <PracticeItem item={item} key={item.uuid} />
-          ))}
-          
+          <Cell top={Spacing.small}>
+            {/* We could've used FlashList here but since the number of practices per day is small
+            it doesn't really make sense for now */}
+            {practiceSessionStore.sessionsCompletedToday.map((item) => (
+              <PracticeItem item={item} key={item.uuid} />
+            ))}
+          </Cell>
         </Content>
         <If condition={!!quoteOfTheDay && !hasCompletedSessions}>
           <BottomContainer bottom={quoteOffset}>

@@ -9,6 +9,7 @@ export enum Palette {
   black = "#18191F",
   black800 = "#474A57",
   black700 = "#969BAB",
+  black400 = "#DADADA",
   black300 = "#D6D8D6",
   black200 = "#EEEFF4",
   black100 = "#F6F6F6",
@@ -60,6 +61,9 @@ export const Colors = {
   chartBarOver: Palette.yellow,
   chartBarNormal: Palette.yellow800,
   chartBarUnder: Palette.yellow100,
+
+  sliderBackground: Palette.black400, // slider background color
+  sliderFill: Palette.yellow800, // slider fill color
   
   // colors
   transparent: Palette.transparent,

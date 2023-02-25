@@ -64,6 +64,7 @@ export function LargeInput(props: InputProps) {
 
 const $input: TextStyle = {
   borderWidth: 2,
+  marginRight: 2,
   borderColor: Colors.dark,
   borderRadius: Spacing.medium,
   color: Colors.dark,
@@ -79,4 +80,12 @@ const $smallInput: TextStyle = {
 const $largeInput: TextStyle = {
   height: 120,
   paddingTop: Spacing.medium,
+  shadowColor: Colors.dark,
+  shadowOpacity: 1,
+  shadowRadius: 0,
+  elevation: 4,
+  shadowOffset: {
+    width: 2,
+    height: 4,
+  },
 }

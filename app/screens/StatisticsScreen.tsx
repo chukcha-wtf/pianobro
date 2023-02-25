@@ -126,17 +126,17 @@ const StatisticsHeader = observer(
         </MediumText>
         <Row align="space-between">
           <Card flex>
-            <MediumTitle align="center" bottom={Spacing.small}>
+            <MediumText align="center" bottom={Spacing.small}>
               Time
-            </MediumTitle>
+            </MediumText>
             <LargeTitle color={Colors.primary} align="center">
               {totalPracticeTimeText}
             </LargeTitle>
           </Card>
           <Card flex left={Spacing.medium}>
-            <MediumTitle align="center" bottom={Spacing.small}>
+            <MediumText align="center" bottom={Spacing.small}>
               Days
-            </MediumTitle>
+            </MediumText>
             <LargeTitle align="center">
               {daysPracticed.length}
             </LargeTitle>

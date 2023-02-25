@@ -2,7 +2,7 @@ import React, { FC, useMemo } from "react"
 import { observer } from "mobx-react-lite"
 import { FlashList } from "@shopify/flash-list"
 
-import { LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
+import { ExtraLargeTitle, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
 import { Spacing } from "@common-ui/constants/spacing"
 import { Content, Screen } from "@common-ui/components/Screen"
 
@@ -49,12 +49,12 @@ function ListHeader(props: ListHeaderProps) {
         {title}
       </MediumText>
       <Card flex>
-        <MediumTitle align="center" bottom={Spacing.small}>
+        <MediumText align="center" bottom={Spacing.small}>
           Practice Time
-        </MediumTitle>
-        <LargeTitle align="center">
+        </MediumText>
+        <ExtraLargeTitle align="center" color={Colors.primary}>
           {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min
-        </LargeTitle>
+        </ExtraLargeTitle>
       </Card>
       <ChartControl
         startDate={startDay}

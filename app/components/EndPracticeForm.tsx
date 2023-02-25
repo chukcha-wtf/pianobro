@@ -1,17 +1,16 @@
 import React, { useState } from "react"
 import { observer } from "mobx-react-lite"
-import Slider from '@react-native-community/slider';
+// import Slider from '@react-native-community/slider';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 import { PracticeSession } from "@models/PracticeSession"
 
-import { LabelText, LargeTitle, MediumTitle } from "@common-ui/components/Text"
+import { MediumText, LargeTitle, MediumTitle } from "@common-ui/components/Text"
 import { BottomContainer, Cell, Row } from "@common-ui/components/Common"
 import { Tag } from "@common-ui/components/Tag"
 import { SolidButton } from "@common-ui/components/Button"
 
 import { Spacing } from "@common-ui/constants/spacing"
-import { Colors } from "@common-ui/constants/colors"
 import { DatePickerFormInput } from "./DatePickerFormInput"
 import { calculateDuration } from "@utils/calculateDuration"
 import { formatDuration } from "@utils/formatDate"
@@ -21,6 +20,7 @@ import { LargeInput } from "@common-ui/components/Input";
 import { If } from "@common-ui/components/Conditional";
 import { ACTIVITIES, Activity } from "@models/Activity";
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding";
+import { Slider } from "@common-ui/components/Slider"
 
 type EndPracticeFormProps = {
   activeSession?: PracticeSession
@@ -85,15 +85,15 @@ export const EndPracticeForm = observer(
           contentContainerStyle={$scrollView}>
           {/* Duration Selection */}
           <LargeTitle top={Spacing.medium}>
-            <MediumTitle>You've played </MediumTitle>
-            {formatDuration(duration).hours}:{formatDuration(duration).minutes}
+            <MediumTitle>You played </MediumTitle>
+            {formatDuration(duration).hours}hrs {formatDuration(duration).minutes}min
             <If condition={!!activeSession}>
               <MediumTitle> today</MediumTitle>
             </If>
           </LargeTitle>
           <DatePickerFormInput startTime={startTime} endTime={endTime} onChange={onTimeChange} />
           {/* Activities Selection */}
-          <LabelText bottom={Spacing.small}>What have you practiced?</LabelText>
+          <MediumText bottom={Spacing.small}>What have you practiced?</MediumText>
           <Row bottom={Spacing.small} wrap align="center">
             {ACTIVITIES.map((activity) => (
               <Tag
@@ -108,7 +108,7 @@ export const EndPracticeForm = observer(
             ))}
           </Row>
           {/* Intencity */}
-          <LabelText bottom={Spacing.small}>Was it hard?</LabelText>
+          <MediumText bottom={Spacing.small}>Was it hard?</MediumText>
           <Cell bottom={Spacing.medium}>
             <Slider
               tapToSeek
@@ -118,15 +118,16 @@ export const EndPracticeForm = observer(
               value={intencity}
               onValueChange={setIntencity}
             />
+              
             <Row align="space-between">
               <MediumTitle>0</MediumTitle>
               <MediumTitle>10</MediumTitle>
             </Row>
           </Cell>
           {/* Satisfaction */}
-          <LabelText bottom={Spacing.small}>Was it fun?</LabelText>
+          <MediumText bottom={Spacing.small}>Was it fun?</MediumText>
           <StarPicker count={5} value={satisfaction} onChange={setSatisfaction} />
-          <LabelText top={Spacing.medium} bottom={Spacing.small}>Notes</LabelText>
+          <MediumText top={Spacing.medium} bottom={Spacing.small}>Notes</MediumText>
           <LargeInput
             value={notes}
             onChangeText={setNotes}
