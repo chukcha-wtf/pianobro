@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useMemo } from "react"
-import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, SectionList, ViewStyle, View } from "react-native"
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, FlatList, ViewStyle, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import Animated, { Extrapolate, interpolate, useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { observer } from "mobx-react-lite"
@@ -15,7 +15,7 @@ import { Spacing } from "@common-ui/constants/spacing"
 import { If } from "@common-ui/components/Conditional"
 import { Card } from "@common-ui/components/Card"
 import { Cell, Row } from "@common-ui/components/Common"
-import { AggregatedActivity } from "@models/PracticeSessionStore"
+import { AggregatedActivity } from "@models/Statistics"
 import { ChartControl, ChartMode, getChartEndDate, getChartStartDate } from "@components/ChartControl"
 import { Colors, Palette } from "@common-ui/constants/colors"
 import { PracticeSession } from "@models/PracticeSession"
@@ -26,6 +26,7 @@ import Icon from "@common-ui/components/Icon"
 import { useStores } from "@models/index"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
+import { formatDuration } from "@utils/formatDate"
 
 type ActivityItemProps = {
   activity: AggregatedActivity
@@ -36,9 +37,12 @@ type ActivityItemProps = {
 }
 
 type StatisticsHeaderProps = {
-  sessionsCompleted: PracticeSession[]
-  startDate: Date
-  endDate: Date,
+  daysPracticed: Map<string, number>;
+  activities: AggregatedActivity[];
+  navigation: NavigationProp<MainTabParamList>
+  totalPracticeTime: number;
+  startDate: Date;
+  endDate: Date;
   mode: keyof typeof ChartMode
   onDateRangeChange: (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => void;
 }
@@ -50,11 +54,6 @@ const RANDOM_BG_COLORS = [
   Palette.yellow100,
   Palette.pink100,
 ]
-
-const SECTION_TITLES = {
-  activities: "Activities",
-  sessions: "Practice Sessions",
-}
 
 const { width, height } = Dimensions.get("screen")
 
@@ -73,6 +72,9 @@ function ActivityItem({ activity, startDate, endDate, mode, navigation }: Activi
     return RANDOM_BG_COLORS[randomIndex]
   }, [])
 
+  const duration = formatDuration(activity.duration)
+  const sessionsCount = activity.sessionUuids.length
+
   return (
     <Card backgroundColor={randomBgColor} nonElevated bottom={Spacing.large}>
       <TouchableOpacity onPress={openActivityScreen}>
@@ -80,12 +82,12 @@ function ActivityItem({ activity, startDate, endDate, mode, navigation }: Activi
           <Row flex right={Spacing.medium} align="space-between">
             <Cell>
               <MediumTitle bottom={Spacing.tiny}>
-                {activity.humanTitle}
+                {activity.name}
               </MediumTitle>
-              <LabelText color={Colors.dark}>{activity.sessionsCount} Sessions</LabelText>
+              <LabelText color={Colors.dark}>{sessionsCount} Sessions</LabelText>
             </Cell>
             <LargeTitle align="center">
-              {activity.duration.hours}h {activity.duration.minutes}m
+              {duration.hours}h {duration.minutes}m
             </LargeTitle>
           </Row>
           <Icon
@@ -99,25 +101,29 @@ function ActivityItem({ activity, startDate, endDate, mode, navigation }: Activi
 
 const StatisticsHeader = observer(
   function StatisticsHeader(props: StatisticsHeaderProps) {
-    const { sessionsCompleted, startDate, endDate, mode, onDateRangeChange } = props
-    const { practiceSessionStore, remindersStore } = useStores()
+    const {
+      daysPracticed,
+      activities,
+      navigation,
+      totalPracticeTime,
+      startDate,
+      endDate,
+      mode,
+      onDateRangeChange
+    } = props
+    const { remindersStore } = useStores()
 
-    const daysPracticed = useMemo(
-      () => practiceSessionStore.getDaysWithCompletedSessions(sessionsCompleted),
-      [sessionsCompleted]
-    )
-    const totalPracticeTime = useMemo(
-      () => practiceSessionStore.getTotalPracticeTimeFromSessions(sessionsCompleted),
-      [sessionsCompleted]
-    )
+    const totalPracticeTimeFormatted = formatDuration(totalPracticeTime)
 
     const title = useMemo(() => {
       return formatDateRangeText(startDate, endDate, mode)
     }, [startDate, endDate, mode])
 
-    const totalPracticeTimeText = totalPracticeTime.hours?.length > 2 ?
-      `${totalPracticeTime.hours} hr` :
-      `${totalPracticeTime.hours}hr ${totalPracticeTime.minutes}min`
+    const totalDaysPracticed = daysPracticed.size
+    
+    const totalPracticeTimeText = totalPracticeTimeFormatted.hours?.length > 2 ?
+      `${totalPracticeTimeFormatted.hours} hr` :
+      `${totalPracticeTimeFormatted.hours}hr ${totalPracticeTimeFormatted.minutes}min`
 
     return (
       <Cell right={FLASH_LIST_OFFSET} bottom={Spacing.larger}>
@@ -138,7 +144,7 @@ const StatisticsHeader = observer(
               Days
             </MediumText>
             <LargeTitle align="center">
-              {daysPracticed.length}
+              {totalDaysPracticed}
             </LargeTitle>
           </Card>
         </Row>
@@ -146,62 +152,47 @@ const StatisticsHeader = observer(
           startDate={startDate}
           endDate={endDate}
           mode={mode}
+          daysPracticed={daysPracticed}
           practiceGoal={remindersStore.goal}
-          sessions={sessionsCompleted}
           onDateRangeChange={onDateRangeChange}
         />
+        <MediumText top={Spacing.large} bottom={Spacing.large}>
+          Activities
+        </MediumText>
+        {activities.map((activity) => (
+          <Cell key={activity.uuid} right={FLASH_LIST_OFFSET}>
+            <ActivityItem
+              activity={activity}
+              navigation={navigation}
+              startDate={startDate}
+              endDate={endDate}
+              mode={mode}
+            />
+          </Cell>
+        ))}
+        <MediumText>
+          Practice Sessions
+        </MediumText>
       </Cell>
     )
   }
 )
 
-const renderSectionHeader = ({ section }) => {
-  if (!section.data.length) {
-    return null
-  }
-
+const renderListItem = ({ item }: { item: PracticeSession }) => {
   return (
-    <Cell bgColor={Colors.grayBackground} flex>
-      <MediumText innerVertical={Spacing.extraSmall} bottom={Spacing.small}>
-        {section.title}
-      </MediumText>
+    <Cell right={FLASH_LIST_OFFSET}>
+      <PracticeItem item={item} />
     </Cell>
   )
-}
-
-const renderSectionItem = ({ item, section, navigation, startDate, endDate, mode }) => {
-  if (section.title === SECTION_TITLES.activities) {
-    return (
-      <Cell right={FLASH_LIST_OFFSET}>
-        <ActivityItem
-          activity={item}
-          navigation={navigation}
-          startDate={startDate}
-          endDate={endDate}
-          mode={mode}
-        />
-      </Cell>
-    )
-  }
-
-  if (section.title === SECTION_TITLES.sessions) {
-    return (
-      <Cell right={FLASH_LIST_OFFSET}>
-        <PracticeItem item={item} key={item.uuid} />
-      </Cell>
-    )
-  }
-
-  return null
 }
 
 const HEADER_EXPANDED_HEIGHT = 52
 const HEADER_COLLAPSED_HEIGHT = 44
 
-export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
-  function StatisticsScreen(props) {
+export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
+  function ProgressScreen(props) {
     const { navigation } = props
-    const { practiceSessionStore } = useStores()
+    const { practiceSessionStore, statisticsStore } = useStores()
     const bottomPadding = useBottomPadding()
     
     const [dateRange, setDateRange] = React.useState<{
@@ -214,21 +205,26 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
       mode: ChartMode.week,
     })
 
-    const onDateRangeChange = useCallback((startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => {
+    const onDateRangeChange = (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => {
       setDateRange({
         startDate,
         endDate,
         mode,
       })
-    }, [])
+    }
 
-    const sessionsCompleted = practiceSessionStore.getSessionsCompletedBetweenDates(dateRange.startDate, dateRange.endDate)
+    const {
+      sessionUuids: completedSessionUuids,
+      activities,
+      daysPracticed,
+      totalPracticeTime,
+    } = statisticsStore.getRecordsBetween(dateRange.startDate, dateRange.endDate)
+    
+    const sessionsCompleted = practiceSessionStore.getSessionsFromUuids(completedSessionUuids)
 
-    const activities = useMemo(
-      () => practiceSessionStore.getActivitiesFromSessions(sessionsCompleted),
-      [sessionsCompleted]
-    )
-
+    const dayTitle = useMemo(() => {
+      return formatDateRangeText(dateRange.startDate, dateRange.endDate, dateRange.mode)
+    }, [dateRange.startDate, dateRange.endDate, dateRange.mode])
 
     const scrollY = useSharedValue(0)
     const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -237,24 +233,6 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
       
       scrollY.value = y
     }, [])
-
-    const dayTitle = useMemo(() => {
-      return formatDateRangeText(dateRange.startDate, dateRange.endDate, dateRange.mode)
-    }, [dateRange.startDate, dateRange.endDate, dateRange.mode])
-
-    const DATA: Array<{
-      title: string
-      data: Array<AggregatedActivity | PracticeSession>
-    }> = [
-      {
-        title: SECTION_TITLES.activities,
-        data: activities
-      },
-      {
-        title: SECTION_TITLES.sessions,
-        data: sessionsCompleted
-      }
-    ]
 
     const $largeTitleHeaderStyle = useAnimatedStyle(() => {
       return {
@@ -296,22 +274,24 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
           innerLeft={Spacing.medium}
           innerRight={Spacing.medium - FLASH_LIST_OFFSET}
         >
-          <SectionList
+          <FlatList
             contentContainerStyle={$scrollViewContent}
-            sections={DATA}
+            data={sessionsCompleted}
             onScroll={onScroll}
             scrollEventThrottle={16}
-            scrollEnabled={!!DATA.length}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            scrollEnabled={statisticsStore.hasCompletedSessions}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item, index) => `${item.uuid}_${index}`}
-            renderItem={({ section, item }) =>
-              renderSectionItem({ item, section, navigation, startDate: dateRange.startDate, endDate: dateRange.endDate, mode: dateRange.mode })
-            }
-            renderSectionHeader={renderSectionHeader}
+            renderItem={renderListItem}
             ListHeaderComponent={
-              <If condition={practiceSessionStore.hasCompletedSessions}>
+              <If condition={statisticsStore.hasCompletedSessions}>
                 <StatisticsHeader
-                  sessionsCompleted={sessionsCompleted}
+                  daysPracticed={daysPracticed}
+                  activities={activities}
+                  navigation={navigation}
+                  totalPracticeTime={totalPracticeTime}
                   startDate={dateRange.startDate}
                   endDate={dateRange.endDate}
                   mode={dateRange.mode}
@@ -321,17 +301,19 @@ export const StatisticsScreen: FC<MainTabScreenProps<"Statistics">> = observer(
             }
             ListEmptyComponent={() => {
               return (
-                <Cell top={height / 3} align="center" justify="center">
-                  <MediumTitle align="center" muted>
-                    Your progress will appear {"\n"} once you log a practice session.
-                  </MediumTitle>
-                </Cell>
+                <If condition={!statisticsStore.hasCompletedSessions}>
+                  <Cell top={height / 3} align="center" justify="center">
+                    <MediumTitle align="center" muted>
+                      Your progress will appear {"\n"} once you log a practice session.
+                    </MediumTitle>
+                  </Cell>
+                </If>
               )
             }}
           />
           <View style={$solidBackgroundStyle} />
           <Animated.View style={$largeTitleHeaderStyle}>
-            <HugeTitle text={translate("statisticsScreen.title")} />
+            <HugeTitle text={translate("progressScreen.title")} />
           </Animated.View>
           <Animated.View style={$smallTitleHeaderStyle}>
             <MediumText>{dayTitle}</MediumText>

@@ -11,7 +11,7 @@ import { CompositeScreenProps, NavigationHelpers, ParamListBase, TabNavigationSt
 
 
 import { AppStackParamList, AppStackScreenProps, ROUTES } from "./AppNavigator"
-import { HomeScreen, StatisticsScreen, ProfileScreen } from "../screens"
+import { HomeScreen, ProgressScreen, ProfileScreen } from "../screens"
 import { Colors, Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import Icon from "@common-ui/components/Icon"
@@ -22,12 +22,12 @@ import { ChartMode } from "@components/ChartControl";
 
 type TabParamList = {
   HomeStack: undefined
-  StatisticsStack: undefined
+  ProgressStack: undefined
   Profile: undefined
 }
 
-type StatisticsStackParamList = {
-  Statistics: undefined
+type ProgressStackParamList = {
+  Progress: undefined
   ActivityDetails: {
     activityId: string
     startDate: string
@@ -42,7 +42,7 @@ type HomeStackParamList = {
   SessionDetails: { activitySessionId: string }
 }
 
-export type MainTabParamList = TabParamList & StatisticsStackParamList & HomeStackParamList
+export type MainTabParamList = TabParamList & ProgressStackParamList & HomeStackParamList
 
 /**
  * Helper for automatically generating navigation prop types for each route.
@@ -61,7 +61,7 @@ type FloatingTabBarProps = {
 }
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>()
-const StatisticsStack = createNativeStackNavigator<StatisticsStackParamList>()
+const ProgressStack = createNativeStackNavigator<ProgressStackParamList>()
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
 
@@ -97,7 +97,7 @@ function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBarProps)
             }
           }
 
-          const iconColor = isFocused ? Palette.black : Palette.black300
+          const iconColor = isFocused ? Palette.violette : Palette.black300
 
           return (
             <TouchableOpacity
@@ -138,35 +138,35 @@ function HomeNavigator() {
   )
 }
 
-function StatsticsNavigator() {
+function ProgressNavigator() {
   return (
-    <StatisticsStack.Navigator
+    <ProgressStack.Navigator
       screenOptions={{
         headerShown: false,
         headerTitleAlign: "left",
       }}
-      initialRouteName={ROUTES.Statistics}
+      initialRouteName={ROUTES.Progress}
     >
-      <StatisticsStack.Screen
-        name={ROUTES.Statistics}  
-        component={StatisticsScreen} />
-      <StatisticsStack.Screen
+      <ProgressStack.Screen
+        name={ROUTES.Progress}  
+        component={ProgressScreen} />
+      <ProgressStack.Screen
         name={ROUTES.ActivityDetails}
         component={ActivityDetailsScreen} />
-      <StatisticsStack.Screen
+      <ProgressStack.Screen
         options={{
           presentation: 'modal',
         }}
         name={ROUTES.SessionDetails}
         component={SessionDetailsScreen} />
-    </StatisticsStack.Navigator>
+    </ProgressStack.Navigator>
   )
 }
 
 // Icons map for tabbar
 const ICONS_MAP = {
   HomeStack: "home",
-  StatisticsStack: "activity",
+  ProgressStack: "activity",
   Profile: "user",
 }
 
@@ -180,7 +180,7 @@ export function MainNavigator() {
       tabBar={(props) => <FloatingTabBar {...props} />}
     >
       <Tab.Screen name="HomeStack" component={HomeNavigator} />
-      <Tab.Screen name="StatisticsStack" component={StatsticsNavigator} />
+      <Tab.Screen name="ProgressStack" component={ProgressNavigator} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   )

@@ -20,7 +20,7 @@ import { If } from "@common-ui/components/Conditional"
 export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = observer(
   function SessionDetailsScreen(props) {
     const { activitySessionId } = props.route.params
-    const { practiceSessionStore } = useStores()
+    const { practiceSessionStore, removeSession } = useStores()
 
     const session = practiceSessionStore.getSessionById(activitySessionId)
 
@@ -33,7 +33,7 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
         {
           text: "Delete",
           onPress: () => {
-            practiceSessionStore.deleteSession(activitySessionId)
+            removeSession(activitySessionId)
             props.navigation.goBack()
           }
         }

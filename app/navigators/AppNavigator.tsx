@@ -46,7 +46,7 @@ const exitRoutes = Config.exitRoutes
 
 export enum ROUTES {
   Home = "Home",
-  Statistics = "Statistics",
+  Progress = "Progress",
   Profile = "Profile",
   SessionDetails = "SessionDetails",
   ActivityDetails = "ActivityDetails",

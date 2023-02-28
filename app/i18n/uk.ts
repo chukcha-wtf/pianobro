@@ -33,7 +33,7 @@ const uk: Translations = {
   homeScreen: {
     title: "Головна",
   },
-  statisticsScreen: {
+  progressScreen: {
     title: "Статистика",
   },
 }

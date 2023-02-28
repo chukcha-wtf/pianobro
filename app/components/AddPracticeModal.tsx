@@ -17,7 +17,7 @@ export type AddPracticeModalHandle = {
 }
 
 export const AddPracticeModal = forwardRef<AddPracticeModalHandle, unknown>(function AddPracticeModal(_props: unknown, ref: ForwardedRef<EndPracticeModalHandle>) {
-  const { practiceSessionStore } = useStores()
+  const { trackSession } = useStores()
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['90%'], []);
@@ -34,7 +34,7 @@ export const AddPracticeModal = forwardRef<AddPracticeModalHandle, unknown>(func
   const onSave = (practiceSession: Instance<typeof PracticeSessionModel>, activities: Array<Activity>) => {
     // Save session
     closeModal()
-    practiceSessionStore.addSession(practiceSession, activities)
+    trackSession(practiceSession, activities)
   }
 
   return (

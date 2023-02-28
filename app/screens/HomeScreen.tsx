@@ -61,7 +61,7 @@ const ActiveSession = observer(
 
 export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
   function HomeScreen(_props) {
-    const { practiceSessionStore, quotesStore, settingsStore } = useStores()
+    const { practiceSessionStore, quotesStore, settingsStore, statisticsStore } = useStores()
 
     const editPracticeModalRef = useRef<EndPracticeModalHandle>(null)
     const addPracticeModalRef = useRef<AddPracticeModalHandle>(null)
@@ -69,7 +69,8 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
     const quoteOfTheDay = useMemo(() => quotesStore.randomQuote, [])
 
     const isPracticing = practiceSessionStore.isPracticing && !!practiceSessionStore.activeSession
-    const hasCompletedSessions = !!practiceSessionStore.sessionsCompletedToday.length
+    const hasCompletedSessions = !!statisticsStore.todayCompletedSessionUUids.length
+    const sessionsToday = practiceSessionStore.getSessionsFromUuids(statisticsStore.todayCompletedSessionUUids)
 
     useEffect(() => {
       settingsStore.setInstallDate()
@@ -127,7 +128,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
             <Card bottom={Spacing.medium} innerVertical={Spacing.large}>
               <MediumTitle align="center" bottom={Spacing.small}>You practiced today</MediumTitle>
               <HugeTitle align="center" bottom={Spacing.small} color={Colors.primary}>
-                {practiceSessionStore.totalPracticeTimeToday.hours}hr {practiceSessionStore.totalPracticeTimeToday.minutes}min
+                {statisticsStore.totalPracticeTimeToday.hours}hr {statisticsStore.totalPracticeTimeToday.minutes}min
               </HugeTitle>
               <LabelText align="center">Keep up the good work!</LabelText>
             </Card>
@@ -151,7 +152,7 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
           <Cell top={Spacing.small}>
             {/* We could've used FlashList here but since the number of practices per day is small
             it doesn't really make sense for now */}
-            {practiceSessionStore.sessionsCompletedToday.map((item) => (
+            {sessionsToday.map((item) => (
               <PracticeItem item={item} key={item.uuid} />
             ))}
           </Cell>

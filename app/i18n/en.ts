@@ -5,9 +5,10 @@ const en = {
     back: "Back",
   },
   errorScreen: {
+    header: "Ooops...",
     title: "Something went wrong!",
     friendlySubtitle:
-      "We're working on the problem.",
+      "We're working on the problem.\nIn the meantime - feel free to restart the app.",
     reset: "Restart the app",
   },
   emptyStateComponent: {
@@ -33,7 +34,7 @@ const en = {
     mainButtonTextActive: "Stop",
     mainButtonTextInactive: "Start Practicing",
   },
-  statisticsScreen: {
+  progressScreen: {
     title: "Progress",
   },
   sessionDetailsScreen: {

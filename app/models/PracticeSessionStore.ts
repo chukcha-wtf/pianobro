@@ -4,28 +4,24 @@ import { v4 as uuidv4 } from 'uuid';
 import { PracticeSession, PracticeSessionModel } from "./PracticeSession"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { calculateDuration } from "@utils/calculateDuration"
-import { DurationObject, formatDuration } from "@utils/formatDate";
 import { Activity } from "./Activity";
-
-export type AggregatedActivity = {
-  uuid: string,
-  humanTitle: string,
-  sessionsCount: number,
-  duration: DurationObject,
-}
 
 export const PracticeSessionStoreModel = types
   .model("PracticeSessionStore")
   .props({
-    practiceSessions: types.array(PracticeSessionModel),
+    practiceSessions: types.map(PracticeSessionModel),
     isPracticing: false,
   })
   .actions(withSetPropAction)
   .views((store) => {
     return {
       get activeSession() {
-        return store.practiceSessions.find(session => session.isActive)
+        return Array.from(store.practiceSessions.values()).find(session => session.isActive)
       },
+
+      get practiceSessionsList() {
+        return Array.from(store.practiceSessions.values())
+      }
     }
   })
   .actions((store) => {
@@ -40,6 +36,7 @@ export const PracticeSessionStoreModel = types
         activeSession.duration = calculateDuration(new Date().toISOString(), activeSession.startTime)
         activeSession.endTime = new Date().toISOString()
       },
+
       start() {
         if (store.isPracticing) {
           return
@@ -59,11 +56,12 @@ export const PracticeSessionStoreModel = types
           duration: 0,
         })
 
-        store.practiceSessions.push(practiceSession)
+        store.practiceSessions.set(practiceSession.uuid, practiceSession)
       },
-      stop(practiceSession: PracticeSession, activities: Array<Activity>) {
+
+      completeSession(practiceSession: PracticeSession, activities: Array<Activity>) {
         if (!store.isPracticing) {
-          return
+          return null
         }
 
         const activeSession = store.activeSession
@@ -81,7 +79,10 @@ export const PracticeSessionStoreModel = types
         })
         
         store.isPracticing = false
+
+        return activeSession
       },
+
       addSession(practiceSession: PracticeSession, activities: Array<Activity>) {
         const newPracticeSession = PracticeSessionModel.create({
           uuid: uuidv4(),
@@ -97,24 +98,13 @@ export const PracticeSessionStoreModel = types
           newPracticeSession.addActivity(activity)
         })
 
-        store.practiceSessions.push(newPracticeSession)
-      },
-      pause() {
-        if (!store.isPracticing) {
-          return
-        }
+        store.practiceSessions.set(newPracticeSession.uuid, newPracticeSession)
 
-        store.isPracticing = false
+        return newPracticeSession
       },
-      resume() {
-        if (store.isPracticing) {
-          return
-        }
 
-        store.isPracticing = true
-      },
       deleteSession(sessionId: string) {
-        const session = store.practiceSessions.find(session => session.uuid === sessionId)
+        const session = store.practiceSessionsList.find(session => session.uuid === sessionId)
 
         destroy(session)
       },
@@ -122,96 +112,19 @@ export const PracticeSessionStoreModel = types
   })
   .views((store) => ({
     getSessionById(sessionId: string) {
-      return store.practiceSessions.find(session => session.uuid === sessionId)
+      return store.practiceSessionsList.find(session => session.uuid === sessionId)
     },
 
-    get completedSessions() {
-      return store.practiceSessions.filter(
-        session => session.endTime && session.duration
-      ).sort(sortByDateAsc)
-    },
+    getSessionsFromUuids(sessionsUuids: Array<string>) {
+      const sessions = []
 
-    get sessionsCompletedToday() {
-      return store.practiceSessions.filter(session => {
-        return session.endTime && session.duration && !session.isActive &&
-          new Date(session.endTime).toDateString() === new Date().toDateString()
-      }).sort(sortByDateAsc)
-    },
-
-    getSessionsCompletedBetweenDates(startDate: Date, endDate: Date, activityId?: string) {
-      return store.practiceSessions.filter(session => {
-        return session.endTime && session.duration &&
-          new Date(session.endTime).getTime() >= startDate.getTime() &&
-          new Date(session.endTime).getTime() <= endDate.getTime() &&
-          (!activityId || !!session.activities.find(activity => activity.uuid === activityId))
-      }).sort(sortByDateAsc)
-    },
-
-    getActivitiesFromSessions(sessions: Array<PracticeSession>) {
-      const allActivities = sessions.reduce((acc, session) => {
-        return acc.concat(session.activities)
-      }, [])
-
-      const uniqueActivities = [...new Set(allActivities)]
-
-      const sessionsByActivity: AggregatedActivity[] = []
-      
-      uniqueActivities.forEach((activity: Activity) => {
-        const sessionsWithActivity = sessions.filter(session => session.activities.includes(activity))
-        const totalDuration = sessionsWithActivity.reduce((acc, session) => acc + session.duration, 0)
-
-        sessionsByActivity.push({
-          uuid: activity.uuid,
-          humanTitle: activity.name,
-          sessionsCount: sessionsWithActivity.length,
-          duration: formatDuration(totalDuration),
-        })
+      sessionsUuids.forEach(uuid => {
+        sessions.push(store.practiceSessions.get(uuid))
       })
 
-      return sessionsByActivity
+      return sessions
     },
   }))
-  .views((store) => ({
-    get hasCompletedSessions() {
-      return store.completedSessions.length > 0
-    },
-
-    get totalPracticeTimeToday() {
-      const totalDuration = store.sessionsCompletedToday.reduce((acc, session) => acc + session.duration, 0)
-
-      return formatDuration(totalDuration)
-    },
-
-    get totalPracticeTime() {
-      const totalDuration = store.completedSessions.reduce((acc, session) => acc + session.duration, 0)
-
-      return formatDuration(totalDuration)
-    },
-
-    getTotalPracticeTimeFromSessions(sessions: Array<PracticeSession>) {
-      const totalDuration = sessions.reduce((acc, session) => acc + session.duration, 0)
-
-      return formatDuration(totalDuration)
-    },
-
-    getDaysWithCompletedSessions(sessions: Array<PracticeSession>) {
-      const days = sessions.reduce((acc, session) => {
-        const day = new Date(session.endTime).toDateString()
-
-        if (!acc.includes(day)) {
-          acc.push(day)
-        }
-
-        return acc
-      }, [])
-
-      return days
-    },
-
-  }))
-
-// Util function to sort by date
-const sortByDateAsc = (a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
 
 export interface PracticeSessionStore extends Instance<typeof PracticeSessionStoreModel> {}
 export interface PracticeSessionStoreSnapshot extends SnapshotOut<typeof PracticeSessionStoreModel> {}

@@ -179,10 +179,10 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
     const bottomPadding = useBottomPadding()
     const { top } = useSafeAreaInsets()
     
-    const { practiceSessionStore, remindersStore, settingsStore } = store
-    const { totalPracticeTime, hasCompletedSessions } = practiceSessionStore
+    const { remindersStore, settingsStore, statisticsStore } = store
+    const { totalPracticeTime, hasCompletedSessions } = statisticsStore
 
-    const handleButton = () => populateDevData(store, 200)
+    const handleButton = () => populateDevData(store, 2500)
 
     return (
       <Screen bgColor={Colors.grayBackground} edges={["left", "right"]}>

@@ -2,14 +2,13 @@ import React, { FC, useMemo } from "react"
 import { observer } from "mobx-react-lite"
 import { FlashList } from "@shopify/flash-list"
 
-import { ExtraLargeTitle, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
+import { ExtraLargeTitle, MediumText } from "@common-ui/components/Text"
 import { Spacing } from "@common-ui/constants/spacing"
 import { Content, Screen } from "@common-ui/components/Screen"
 
 import { MainTabScreenProps } from "../navigators/MainNavigator"
 import { useStores } from "@models/index"
 import { Card } from "@common-ui/components/Card"
-import { PracticeSession } from "@models/PracticeSession"
 import { PracticeItem, PRACTICE_ITEM_HEIGHT } from "@components/PracticeItem"
 import { AbsoluteContainer, Cell, Row } from "@common-ui/components/Common"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
@@ -17,12 +16,13 @@ import { ChartControl, ChartMode } from "@components/ChartControl"
 import { LinkButton } from "@common-ui/components/Button"
 import { Colors } from "@common-ui/constants/colors"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
+import { formatDuration } from "@utils/formatDate"
 
 type ListHeaderProps = {
   startDay: Date
   endDay: Date
   mode: keyof typeof ChartMode
-  sessions: PracticeSession[]
+  daysPracticed: Map<string, number>;
   practiceGoal: number
   totalPracticeTime: {
     hours: string
@@ -37,7 +37,7 @@ type ListHeaderProps = {
 export const FLASH_LIST_OFFSET = 2
 
 function ListHeader(props: ListHeaderProps) {
-  const { startDay, endDay, mode, sessions, practiceGoal, totalPracticeTime, onDateRangeChange } = props
+  const { startDay, endDay, mode, daysPracticed, practiceGoal, totalPracticeTime, onDateRangeChange } = props
 
   const title = useMemo(() => {
     return formatDateRangeText(startDay, endDay, mode)
@@ -60,7 +60,7 @@ function ListHeader(props: ListHeaderProps) {
         startDate={startDay}
         endDate={endDay}
         mode={mode}
-        sessions={sessions}
+        daysPracticed={daysPracticed}
         practiceGoal={practiceGoal}
         onDateRangeChange={onDateRangeChange}
       />
@@ -91,18 +91,21 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
       })
     }
 
-    const { practiceSessionStore, activitiesStore, remindersStore } = useStores()
+    const { practiceSessionStore, statisticsStore, activitiesStore, remindersStore } = useStores()
 
-    const activity = useMemo(
-      () => activitiesStore.getActivityById(activityId),
-      [activityId]
+    const activity = activitiesStore.getActivityById(activityId)
+
+    const {
+      sessionUuids,
+      daysPracticed,
+      totalPracticeTime
+    } = useMemo(
+      () => statisticsStore.getActivityRecordsBetween(dateRange.startDay, dateRange.endDay, activityId),
+      [dateRange.startDay, dateRange.endDay]
     )
-    const sessions = practiceSessionStore.getSessionsCompletedBetweenDates(dateRange.startDay, dateRange.endDay, activityId)
+    const sessions = practiceSessionStore.getSessionsFromUuids(sessionUuids)
     
-    const totalPracticeTime = useMemo(
-      () => practiceSessionStore.getTotalPracticeTimeFromSessions(sessions),
-      [sessions]
-    )
+    const totalPracticeTimeFormatted = formatDuration(totalPracticeTime)
 
     const $flashListContentContainerStyle = { paddingBottom }
 
@@ -139,17 +142,17 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
                 <PracticeItem item={item} />
               )}
               estimatedItemSize={PRACTICE_ITEM_HEIGHT}
-              ListHeaderComponent={() => (
+              ListHeaderComponent={
                 <ListHeader
                   startDay={dateRange.startDay}
                   endDay={dateRange.endDay}
                   mode={dateRange.chartMode}
-                  sessions={sessions}
+                  daysPracticed={daysPracticed}
                   practiceGoal={remindersStore.goal}
-                  totalPracticeTime={totalPracticeTime}
+                  totalPracticeTime={totalPracticeTimeFormatted}
                   onDateRangeChange={onDateRangeChange}
                 />
-              )}
+              }
             />
           </Cell>
         </Content>

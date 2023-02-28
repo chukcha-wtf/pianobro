@@ -63,7 +63,6 @@ export function SegmentControl(props: SegmentControlProps) {
             </MediumTitle>
           </TouchableOpacity>
         )
-
       })}
     </View>
   )

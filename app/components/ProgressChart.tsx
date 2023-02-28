@@ -15,7 +15,7 @@ import { PracticeSession } from "@models/PracticeSession"
 import { ChartMode } from "./ChartControl"
 
 type ProgressChartProps = {
-  sessions: PracticeSession[]
+  daysPracticed: Map<string, number>;
   mode: keyof typeof ChartMode
   startDate?: Date
   practiceGoal: number;
@@ -130,9 +130,33 @@ function aggregateFunction(
   return 0
 }
 
+function getDurationForDate(
+  date: Date,
+  daysPractice: Map<string, number>,
+  mode: keyof typeof ChartMode,
+): number {
+  const year = date.getFullYear().toString()
+  const month = date.getMonth().toString()
+  const day = date.getDate().toString()
+
+  let duration = daysPractice.get(`${year}.${month}.${day}`) || 0
+
+  // If the mode is "year" we need to aggregate daily durations into monthly durations
+  if (mode === "year") {
+    duration = Array.from(daysPractice.keys()).filter((key) => {
+      const [keyYear, keyMonth] = key.split(".")
+      return keyYear === year && keyMonth === month
+    }).reduce((total, key) => {
+      return total + daysPractice.get(key)
+    }, 0)
+  }
+
+  return duration
+}
+
 // Only "week" mode is implemented for now
 function buildData(
-  sessions: PracticeSession[],
+  daysPracticed: Map<string, number>,
   mode: keyof typeof ChartMode,
   goal?: number,
   startDate?: Date,
@@ -146,12 +170,7 @@ function buildData(
   
   // Fill the data array with empty values
   for (let i = 0; i < arrayLength; i++) {
-    let totalPlayedMils = 0
-
-    // Loop through sessions and find the ones that are in the current date range
-    sessions.forEach((session) => {
-      totalPlayedMils += aggregateFunction(session, date, mode)
-    })
+    const totalPlayedMils = getDurationForDate(date, daysPracticed, mode)
 
     const hoursPlayed = convertMilisecondsToHours(totalPlayedMils) || 0
     const day = CHART_SETTINGS[mode].formatFunction(date.toISOString())
@@ -175,14 +194,11 @@ function buildData(
 }
 
 export function ProgressChart(props: ProgressChartProps) {
-  const { sessions, mode, startDate, practiceGoal } = props
+  const { daysPracticed, mode, startDate, practiceGoal } = props
 
   const goalTime = (practiceGoal ?? 0) / 60 // Convert to hours
   
-  const [data, maxXValue] = useMemo(
-    () => buildData(sessions, mode, goalTime, startDate),
-    [startDate, mode, goalTime, sessions]
-  )
+  const [data, maxXValue] = buildData(daysPracticed, mode, goalTime, startDate)
 
   const goalLineStart = data.length ? data[0].x + 0.5 : 0
   const goalLineEnd = data.length ? data[data.length - 1].x + 1.5 : 0
@@ -229,7 +245,7 @@ export function ProgressChart(props: ProgressChartProps) {
             borderRadius: Spacing.tiny,
           },
         }}
-        labels={sessions.length ? [""] : ["No data"]}
+        labels={daysPracticed.size ? [""] : ["No data"]}
         labelComponent={
           <VictoryLabel
             textAnchor="middle"

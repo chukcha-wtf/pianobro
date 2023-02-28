@@ -7,9 +7,11 @@ import { Card } from "@common-ui/components/Card";
 import { SegmentControl } from "@common-ui/components/SegmentControl";
 import { Spacing } from "@common-ui/constants/spacing";
 
-import { PracticeSession } from "@models/PracticeSession";
 import { getDateLocale } from "@utils/formatDate"
 import { WINDOW_WIDTH } from "@gorhom/bottom-sheet";
+import { InteractionManager } from "react-native";
+import Animated, { FadeInLeft } from "react-native-reanimated";
+import { Timing } from "@common-ui/constants/timing";
 
 
 type ChartControlProps = {
@@ -17,7 +19,7 @@ type ChartControlProps = {
   endDate: Date;
   mode: keyof typeof ChartMode;
   practiceGoal: number;
-  sessions: PracticeSession[];
+  daysPracticed: Map<string, number>;
   onDateRangeChange: (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => void;
 }
 
@@ -28,7 +30,6 @@ export enum ChartMode {
 }
 
 type PanDirection = "left" | "right"
-
 
 const DATE_MODIFIER_FUNCTIONS = {
   week: {
@@ -66,13 +67,16 @@ export const getChartEndDate = (mode: keyof typeof ChartMode, date: Date) => {
 }
 
 export function ChartControl(props: ChartControlProps) {
-  const { startDate, endDate, practiceGoal, mode, sessions, onDateRangeChange } = props
+  const { startDate, endDate, practiceGoal, mode, daysPracticed, onDateRangeChange } = props
   
   const changeMode = (newMode: keyof typeof ChartMode) => {
-    const newStartDate = getChartStartDate(newMode, startDate)
+    // When changing modes - always stick to current time period
+    const newStartDate = getChartStartDate(newMode, new Date())
     const newEndDate = getChartEndDate(newMode, newStartDate)
 
-    onDateRangeChange(newStartDate, newEndDate, newMode)
+    InteractionManager.runAfterInteractions(() => {
+      onDateRangeChange(newStartDate, newEndDate, newMode)
+    })
   }
 
   const modifyStartAndEndDate = (panDirection: PanDirection) => {
@@ -84,9 +88,10 @@ export function ChartControl(props: ChartControlProps) {
       return
     }
     
-    onDateRangeChange(newStartDate, newEndDate, mode)
+    InteractionManager.runAfterInteractions(() => {
+      onDateRangeChange(newStartDate, newEndDate, mode)
+    })
   }
-
 
   const swipeGesture = Gesture.Pan().runOnJS(true).onEnd((event) => {
     // Do nothing if it wasn't really a swipe left or right
@@ -113,14 +118,16 @@ export function ChartControl(props: ChartControlProps) {
         onChange={changeMode}
       />
       <Card top={Spacing.extraSmall}>
-        <GestureDetector gesture={swipeGesture}>
-          <ProgressChart
-            mode={mode}
-            practiceGoal={practiceGoal}
-            startDate={startDate}
-            sessions={sessions}
-          />
-        </GestureDetector>
+        <Animated.View entering={FadeInLeft.delay(Timing.fast)}>
+          <GestureDetector gesture={swipeGesture}>
+            <ProgressChart
+              mode={mode}
+              practiceGoal={practiceGoal}
+              startDate={startDate}
+              daysPracticed={daysPracticed}
+            />
+          </GestureDetector>
+        </Animated.View>
       </Card>
     </>
   )
