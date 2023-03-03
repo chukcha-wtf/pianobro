@@ -273,7 +273,7 @@ export function ProgressChart(props: ProgressChartProps) {
         dependentAxis
         scale="time"
         domain={[0, maxDomainTime]}
-        tickFormat={(t) => `${t}h`}
+        tickFormat={(t) => `${t}${translate("common.h")}`}
         tickValues={verticalTickValues}
         tickCount={4}
         style={{

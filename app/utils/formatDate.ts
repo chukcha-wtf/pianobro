@@ -17,11 +17,11 @@ export const getDateLocale = (): Locale => {
   return locale === "uk" ? uk : en
 }
 
-const getTimeFormat = (): string => {
+export const getTimeFormat = (): string => {
   return getCalendars()[0]?.uses24hourClock ? "HH:mm" : "hh:mm a"
 }
 
-const getDateTimeFormat = (): string => {
+export const getDateTimeFormat = (): string => {
   return getCalendars()[0]?.uses24hourClock ? "HH:mm MMM dd, yyyy" : "hh:mm a MMM dd, yyyy"
 }
 

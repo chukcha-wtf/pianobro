@@ -108,7 +108,7 @@ const en = {
     practiceTime: "Practice Time",
   },
   practiceForm: {
-    title: "You layed for",
+    title: "You played for",
     today: "today",
     whatPracticed: "What did you practice?",
     wasItHard: "Was it hard?",

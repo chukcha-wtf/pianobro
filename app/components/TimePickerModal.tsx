@@ -15,6 +15,7 @@ import { prettifyTime } from "@utils/prettifyTime";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { If } from "@common-ui/components/Conditional";
 import { Colors } from "@common-ui/constants/colors";
+import { translate } from "@i18n/translate";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i))
 const MINUTES = Array.from({ length: 12 }, (_, i) => {
@@ -232,7 +233,7 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
           <BottomContainer>
             <SolidButton
               large
-              title="Save"
+              title={translate("common.save")}
               type="primary"
               onPress={handleSave}
             />

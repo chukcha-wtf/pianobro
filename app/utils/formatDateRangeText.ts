@@ -20,7 +20,7 @@
  */
 
 import { translate } from "@i18n/translate"
-import { formatDate, formatDateTime } from "./formatDate"
+import { formatDate, formatDateTime, getTimeFormat } from "./formatDate"
 
 export const formatDateRangeText = (startDate: Date | string, endDate: Date | string | undefined, mode: "week" | "month" | "year") => {
   const startDateObj = new Date(startDate)
@@ -53,8 +53,8 @@ export const formatDateRangeText = (startDate: Date | string, endDate: Date | st
     }
 
     if (startDay === endDay && startMonth === endMonth) {
-      const startTime = formatDateTime(startDateISO, "hh:mm a")
-      const endTime = formatDateTime(endDateISO, "hh:mm a")
+      const startTime = formatDateTime(startDateISO, getTimeFormat())
+      const endTime = formatDateTime(endDateISO, getTimeFormat())
 
       text = `${startTime} - ${endTime}, ${startDay} ${startMonth}`
     }
@@ -87,5 +87,5 @@ export const formatDateRangeText = (startDate: Date | string, endDate: Date | st
     return startYear === todayYear ? translate("dates.thisYear") : `${startYear}`
   }
 
-  return `${formatDateTime(startDateObj.toISOString(), "MMM dd, hh:mm a")} - ${formatDateTime(endDateObj.toISOString(), "MMM dd, hh:mm a")}`
+  return `${formatDateTime(startDateObj.toISOString(), `MMM dd, ${getTimeFormat()}`)} - ${formatDateTime(endDateObj.toISOString(), `MMM dd, ${getTimeFormat()}`)}`
 }

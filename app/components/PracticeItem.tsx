@@ -14,6 +14,7 @@ import { formatTime } from "@utils/formatDate"
 import { If } from "@common-ui/components/Conditional"
 import { FLASH_LIST_OFFSET } from "@screens/ActivityDetailsScreen"
 import { translate } from "@i18n/translate"
+import { TxKeyPath } from "@i18n/i18n"
 
 export function SatisfactionStars({ satisfaction, size }: { satisfaction: number, size?: number }) {
   const satisfactionStars = Array.from({ length: satisfaction }, (_, i) => i)
@@ -44,13 +45,13 @@ export const PracticeItem = function PracticeItem({ item }: { item: PracticeSess
     const firstActivities = item.activities.slice(0, 2)
     const remainingActivities = item.activities.slice(2)
     
-    activitiesText = firstActivities.map((activity) => activity?.name).join(", ")
+    activitiesText = firstActivities.map((activity) => translate(`activity.${activity?.key}` as TxKeyPath)).join(", ")
   
     if (remainingActivities.length > 1) {
       activitiesText += ` + ${remainingActivities.length} ${translate("practiceItem.others")}`
     }
     else if (remainingActivities.length === 1) {
-      activitiesText += `, ${remainingActivities[0]?.name}`
+      activitiesText += ", " + translate(`activity.${remainingActivities[0]?.key}` as TxKeyPath)
     }
   }
 

@@ -115,7 +115,7 @@ export const EndPracticeForm = observer(
           </Row>
           {/* Intencity */}
           <MediumText bottom={Spacing.small}>
-            Was it hard?
+            {translate("practiceForm.wasItHard")}
           </MediumText>
           <Cell bottom={Spacing.medium}>
             <Slider

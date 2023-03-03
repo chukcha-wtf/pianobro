@@ -17,6 +17,7 @@ import { Colors } from "@common-ui/constants/colors"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
 import { If, Ternary } from "@common-ui/components/Conditional"
 import { translate } from "@i18n/translate"
+import { TxKeyPath } from "@i18n/i18n"
 
 export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = observer(
   function SessionDetailsScreen(props) {
@@ -110,7 +111,7 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
               {session.activities.map((activity, index) => (
                 <Label
                   key={index}
-                  text={activity.name}
+                  text={translate(`activity.${activity.key}` as TxKeyPath)}
                   right={Spacing.extraSmall}
                   bottom={Spacing.extraSmall}
                   randomBgColor
