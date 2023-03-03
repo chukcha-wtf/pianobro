@@ -17,6 +17,8 @@ import { LinkButton } from "@common-ui/components/Button"
 import { Colors } from "@common-ui/constants/colors"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
 import { formatDuration } from "@utils/formatDate"
+import { translate } from "@i18n/translate"
+import { TxKeyPath } from "@i18n/i18n"
 
 type ListHeaderProps = {
   startDay: Date
@@ -50,10 +52,10 @@ function ListHeader(props: ListHeaderProps) {
       </MediumText>
       <Card flex>
         <MediumText align="center" bottom={Spacing.small}>
-          Practice Time
+          {translate("activityDetailsScreen.practiceTime")}
         </MediumText>
         <ExtraLargeTitle align="center" color={Colors.primary}>
-          {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min
+          {totalPracticeTime.hours}{translate("common.hr")} {totalPracticeTime.minutes}{translate("common.min")}
         </ExtraLargeTitle>
       </Card>
       <ChartControl
@@ -122,7 +124,7 @@ export const ActivityDetailsScreen: FC<MainTabScreenProps<"ActivityDetails">> = 
             />
           </AbsoluteContainer>
           <MediumText>
-            {activity.name}
+            {translate(`activity.${activity.key}` as TxKeyPath)}
           </MediumText>
         </Row>
 

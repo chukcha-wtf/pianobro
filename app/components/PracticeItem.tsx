@@ -13,6 +13,7 @@ import { LabelText, LargeTitle, RegularText } from "@common-ui/components/Text"
 import { formatTime } from "@utils/formatDate"
 import { If } from "@common-ui/components/Conditional"
 import { FLASH_LIST_OFFSET } from "@screens/ActivityDetailsScreen"
+import { translate } from "@i18n/translate"
 
 export function SatisfactionStars({ satisfaction, size }: { satisfaction: number, size?: number }) {
   const satisfactionStars = Array.from({ length: satisfaction }, (_, i) => i)
@@ -46,7 +47,7 @@ export const PracticeItem = function PracticeItem({ item }: { item: PracticeSess
     activitiesText = firstActivities.map((activity) => activity?.name).join(", ")
   
     if (remainingActivities.length > 1) {
-      activitiesText += ` + ${remainingActivities.length} others`
+      activitiesText += ` + ${remainingActivities.length} ${translate("practiceItem.others")}`
     }
     else if (remainingActivities.length === 1) {
       activitiesText += `, ${remainingActivities[0]?.name}`

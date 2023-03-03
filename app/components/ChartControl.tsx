@@ -12,6 +12,7 @@ import { WINDOW_WIDTH } from "@gorhom/bottom-sheet";
 import { InteractionManager } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { Timing } from "@common-ui/constants/timing";
+import { translate } from "@i18n/translate";
 
 
 type ChartControlProps = {
@@ -107,13 +108,18 @@ export function ChartControl(props: ChartControlProps) {
     }
   })
 
+  const segments = [
+    { key: "week", title: translate("chartControl.week") },
+    { key: "month", title: translate("chartControl.month") },
+    { key: "year", title: translate("chartControl.year") },
+  ]
+
   return (
     <>
       <SegmentControl
-        capitalize
         innerHorizontal={Spacing.larger}
         top={Spacing.large}
-        segments={["week", "month", "year"]}
+        segments={segments}
         selectedSegment={mode}
         onChange={changeMode}
       />

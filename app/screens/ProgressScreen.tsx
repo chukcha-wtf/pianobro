@@ -10,9 +10,9 @@ import { Screen } from "@common-ui/components/Screen"
 
 import { MainTabParamList, MainTabScreenProps } from "../navigators/MainNavigator"
 import { ROUTES } from "@navigators/AppNavigator"
-import { HugeTitle, LabelText, LargeTitle, MediumText, MediumTitle } from "@common-ui/components/Text"
+import { HugeTitle, LabelText, LargeTitle, MediumText, MediumTitle, RegularText } from "@common-ui/components/Text"
 import { Spacing } from "@common-ui/constants/spacing"
-import { If } from "@common-ui/components/Conditional"
+import { If, Ternary } from "@common-ui/components/Conditional"
 import { Card } from "@common-ui/components/Card"
 import { Cell, Row } from "@common-ui/components/Common"
 import { AggregatedActivity } from "@models/Statistics"
@@ -27,6 +27,7 @@ import { useStores } from "@models/index"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { formatDuration } from "@utils/formatDate"
+import { TxKeyPath } from "@i18n/i18n"
 
 type ActivityItemProps = {
   activity: AggregatedActivity
@@ -82,12 +83,12 @@ function ActivityItem({ activity, startDate, endDate, mode, navigation }: Activi
           <Row flex right={Spacing.medium} align="space-between">
             <Cell>
               <MediumTitle bottom={Spacing.tiny}>
-                {activity.name}
+                {translate(`activity.${activity.key}` as TxKeyPath, { defaultValue: activity.name })}
               </MediumTitle>
-              <LabelText color={Colors.dark}>{sessionsCount} Sessions</LabelText>
+              <LabelText color={Colors.dark}>{sessionsCount} {translate("progressScreen.sessions", { count: sessionsCount })}</LabelText>
             </Cell>
             <LargeTitle align="center">
-              {duration.hours}h {duration.minutes}m
+              {duration.hours}{translate("common.h")} {duration.minutes}{translate("common.m")}
             </LargeTitle>
           </Row>
           <Icon
@@ -122,8 +123,8 @@ const StatisticsHeader = observer(
     const totalDaysPracticed = daysPracticed.size
     
     const totalPracticeTimeText = totalPracticeTimeFormatted.hours?.length > 2 ?
-      `${totalPracticeTimeFormatted.hours} hr` :
-      `${totalPracticeTimeFormatted.hours}hr ${totalPracticeTimeFormatted.minutes}min`
+      `${totalPracticeTimeFormatted.hours} ${translate("common.hr")}` :
+      `${totalPracticeTimeFormatted.hours}${translate("common.hr")} ${totalPracticeTimeFormatted.minutes}${translate("common.min")}`
 
     return (
       <Cell right={FLASH_LIST_OFFSET} bottom={Spacing.larger}>
@@ -133,7 +134,7 @@ const StatisticsHeader = observer(
         <Row align="space-between">
           <Card flex>
             <MediumText align="center" bottom={Spacing.small}>
-              Time
+              {translate("progressScreen.time")}
             </MediumText>
             <LargeTitle color={Colors.primary} align="center">
               {totalPracticeTimeText}
@@ -141,7 +142,7 @@ const StatisticsHeader = observer(
           </Card>
           <Card flex left={Spacing.medium}>
             <MediumText align="center" bottom={Spacing.small}>
-              Days
+              {translate("progressScreen.days")}
             </MediumText>
             <LargeTitle align="center">
               {totalDaysPracticed}
@@ -156,9 +157,11 @@ const StatisticsHeader = observer(
           practiceGoal={remindersStore.goal}
           onDateRangeChange={onDateRangeChange}
         />
-        <MediumText top={Spacing.large} bottom={Spacing.large}>
-          Activities
-        </MediumText>
+        <If condition={activities.length > 0}>
+          <MediumText top={Spacing.large} bottom={Spacing.large}>
+            {translate("progressScreen.activities")}
+          </MediumText>
+        </If>
         {activities.map((activity) => (
           <Cell key={activity.uuid} right={FLASH_LIST_OFFSET}>
             <ActivityItem
@@ -170,9 +173,14 @@ const StatisticsHeader = observer(
             />
           </Cell>
         ))}
-        <MediumText>
-          Practice Sessions
-        </MediumText>
+        <Ternary condition={!!totalDaysPracticed}>
+          <MediumText>
+            {translate("progressScreen.practiceSessions")}
+          </MediumText>
+          <RegularText top={Spacing.larger} align="center" muted>
+            {translate("progressScreen.noPracticeSessions")}
+          </RegularText>
+        </Ternary>
       </Cell>
     )
   }
@@ -304,7 +312,7 @@ export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
                 <If condition={!statisticsStore.hasCompletedSessions}>
                   <Cell top={height / 3} align="center" justify="center">
                     <MediumTitle align="center" muted>
-                      Your progress will appear {"\n"} once you log a practice session.
+                      {translate("progressScreen.noProgress")}
                     </MediumTitle>
                   </Cell>
                 </If>

@@ -9,7 +9,6 @@ import { BottomTabDescriptorMap, BottomTabNavigationEventMap } from "@react-navi
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CompositeScreenProps, NavigationHelpers, ParamListBase, TabNavigationState } from "@react-navigation/native"
 
-
 import { AppStackParamList, AppStackScreenProps, ROUTES } from "./AppNavigator"
 import { HomeScreen, ProgressScreen, ProfileScreen } from "../screens"
 import { Colors, Palette } from "@common-ui/constants/colors"
@@ -18,7 +17,6 @@ import Icon from "@common-ui/components/Icon"
 import { SessionDetailsScreen } from "@screens/SessionDetailsScreen"
 import { ActivityDetailsScreen } from "@screens/ActivityDetailsScreen"
 import { ChartMode } from "@components/ChartControl";
-
 
 type TabParamList = {
   HomeStack: undefined

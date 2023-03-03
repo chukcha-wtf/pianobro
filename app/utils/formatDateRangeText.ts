@@ -14,8 +14,12 @@
  * 
  * formatDateRangeText(new Date("2021-01-01"), new Date("2021-01-31"), "week")
  * // => "1 Jan - 31 Jan"
+ * 
+ * * formatDateRangeText(new Date("2021-12-01"), new Date("2022-01-31"), "week")
+ * // => "1 Dec - 31 Jan, 2022"
  */
 
+import { translate } from "@i18n/translate"
 import { formatDate, formatDateTime } from "./formatDate"
 
 export const formatDateRangeText = (startDate: Date | string, endDate: Date | string | undefined, mode: "week" | "month" | "year") => {
@@ -45,7 +49,7 @@ export const formatDateRangeText = (startDate: Date | string, endDate: Date | st
     let text = `${startDay} ${startMonth} - ${endDay} ${endMonth}`
 
     if (endDateMs >= todayMs && startDateMs <= todayMs) {
-      return "This Week"
+      return translate("dates.thisWeek")
     }
 
     if (startDay === endDay && startMonth === endMonth) {
@@ -70,7 +74,7 @@ export const formatDateRangeText = (startDate: Date | string, endDate: Date | st
 
     if (startYear === todayYear) {
       if (startDateMs <= todayMs && endDateMs >= todayMs) {
-        return "This Month"
+        return translate("dates.thisMonth")
       }
 
       return month
@@ -80,7 +84,7 @@ export const formatDateRangeText = (startDate: Date | string, endDate: Date | st
   }
 
   if (mode === "year") {
-    return startYear === todayYear ? "This Year" : `${startYear}`
+    return startYear === todayYear ? translate("dates.thisYear") : `${startYear}`
   }
 
   return `${formatDateTime(startDateObj.toISOString(), "MMM dd, hh:mm a")} - ${formatDateTime(endDateObj.toISOString(), "MMM dd, hh:mm a")}`

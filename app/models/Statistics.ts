@@ -33,6 +33,7 @@ import { PracticeSession } from "./PracticeSession";
 export type AggregatedActivity = {
   uuid: string,
   name: string,
+  key: string,
   sessionUuids: string[],
   duration: number,
 }
@@ -41,6 +42,7 @@ const ActivityRecordModel = types.model("ActivityRecord").props({
   activityUuid: types.string,
   sessionUuids: types.array(types.string),
   name: types.string,
+  key: types.string,
   duration: types.number,
 })
 .actions(withSetPropAction)
@@ -130,6 +132,7 @@ export const StatisticsStoreModel = types
                   activityUuid: activity.uuid,
                   duration: sessionDuration,
                   name: activity.name || "",
+                  key: activity.key || "",
                 })
               }
             })
@@ -143,6 +146,7 @@ export const StatisticsStoreModel = types
                   sessionUuids: [uuid],
                   activityUuid: activity.uuid,
                   name: activity.name || "",
+                  key: activity.key || "",
                   duration,
                 }
                 return acc
@@ -341,6 +345,7 @@ export const StatisticsStoreModel = types
                 uuid: activityRecord.activityUuid,
                 duration: activityRecord.duration,
                 name: activityRecord.name,
+                key: activityRecord.key,
                 sessionUuids: [...activityRecord.sessionUuids],
               })
             }

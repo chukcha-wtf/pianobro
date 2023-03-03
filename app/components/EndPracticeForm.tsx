@@ -21,6 +21,8 @@ import { If } from "@common-ui/components/Conditional";
 import { ACTIVITIES, Activity } from "@models/Activity";
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding";
 import { Slider } from "@common-ui/components/Slider"
+import { translate } from "@i18n/translate"
+import { TxKeyPath } from "@i18n/i18n"
 
 type EndPracticeFormProps = {
   activeSession?: PracticeSession
@@ -85,22 +87,26 @@ export const EndPracticeForm = observer(
           contentContainerStyle={$scrollView}>
           {/* Duration Selection */}
           <LargeTitle top={Spacing.medium}>
-            <MediumTitle>You played </MediumTitle>
-            {formatDuration(duration).hours}hrs {formatDuration(duration).minutes}min
+            <MediumTitle>
+              {translate("practiceForm.title")}{" "}
+            </MediumTitle>
+            {formatDuration(duration).hours}{translate("common.hr")} {formatDuration(duration).minutes}{translate("common.min")}
             <If condition={!!activeSession}>
-              <MediumTitle> today</MediumTitle>
+              <MediumTitle> {translate("practiceForm.today")}</MediumTitle>
             </If>
           </LargeTitle>
           <DatePickerFormInput startTime={startTime} endTime={endTime} onChange={onTimeChange} />
           {/* Activities Selection */}
-          <MediumText bottom={Spacing.small}>What have you practiced?</MediumText>
+          <MediumText bottom={Spacing.small}>
+            {translate("practiceForm.whatPracticed")}
+          </MediumText>
           <Row bottom={Spacing.small} wrap align="center">
             {ACTIVITIES.map((activity) => (
               <Tag
+                randomBgColor
                 key={activity.uuid}
                 tag={activity.uuid}
-                randomBgColor
-                text={activity.name}
+                text={translate(`activity.${activity.key}` as TxKeyPath)}
                 onPress={handleTagPress}
                 bottom={Spacing.small}
                 left={Spacing.tiny}
@@ -108,7 +114,9 @@ export const EndPracticeForm = observer(
             ))}
           </Row>
           {/* Intencity */}
-          <MediumText bottom={Spacing.small}>Was it hard?</MediumText>
+          <MediumText bottom={Spacing.small}>
+            Was it hard?
+          </MediumText>
           <Cell bottom={Spacing.medium}>
             <Slider
               tapToSeek
@@ -125,13 +133,17 @@ export const EndPracticeForm = observer(
             </Row>
           </Cell>
           {/* Satisfaction */}
-          <MediumText bottom={Spacing.small}>Was it fun?</MediumText>
+          <MediumText bottom={Spacing.small}>
+            {translate("practiceForm.wasItFun")}
+          </MediumText>
           <StarPicker count={5} value={satisfaction} onChange={setSatisfaction} />
-          <MediumText top={Spacing.medium} bottom={Spacing.small}>Notes</MediumText>
+          <MediumText top={Spacing.medium} bottom={Spacing.small}>
+            {translate("practiceForm.notes")}
+          </MediumText>
           <LargeInput
             value={notes}
             onChangeText={setNotes}
-            placeholder="Add details..."
+            placeholder={translate("practiceForm.placeholder")}
           />
         </KeyboardAwareScrollView>
         <BottomContainer
@@ -142,7 +154,7 @@ export const EndPracticeForm = observer(
           <SolidButton
             large
             type="primary"
-            title="Save"
+            title={translate("common.save")}
             onPress={saveSession}
           />
         </BottomContainer>

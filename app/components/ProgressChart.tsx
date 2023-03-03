@@ -13,6 +13,7 @@ import { calculateDuration } from "@utils/calculateDuration"
 import { convertMilisecondsToHours, formatDate } from "@utils/formatDate"
 import { PracticeSession } from "@models/PracticeSession"
 import { ChartMode } from "./ChartControl"
+import { translate } from "@i18n/translate"
 
 type ProgressChartProps = {
   daysPracticed: Map<string, number>;
@@ -245,7 +246,7 @@ export function ProgressChart(props: ProgressChartProps) {
             borderRadius: Spacing.tiny,
           },
         }}
-        labels={daysPracticed.size ? [""] : ["No data"]}
+        labels={daysPracticed.size ? [""] : [translate("progressChart.noData")]}
         labelComponent={
           <VictoryLabel
             textAnchor="middle"

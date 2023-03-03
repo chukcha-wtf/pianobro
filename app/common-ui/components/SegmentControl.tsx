@@ -8,9 +8,13 @@ import { Colors } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"
 
+type Segment = {
+  key: string;
+  title: string;
+}
+
 type SegmentControlProps = {
-  capitalize?: boolean
-  segments: string[]
+  segments: Segment[]
   selectedSegment: string
   onChange: (segment: string) => void
 } & OffsetProps
@@ -18,21 +22,20 @@ type SegmentControlProps = {
 
 /**
  * SegmentControl is a component that allows the user to select one of a set of options.
- * @param {string[]} segments - selectable options
- * @param {boolean} capitalize - whether to capitalize the options
+ * @param {Segment[]} segments - selectable options
  * @param {string} selectedSegment - selected option
  * @param {function} onChange - callback function to be called when the user selects an option
  * @returns 
  */
 
 export function SegmentControl(props: SegmentControlProps) {
-  const { segments, capitalize, selectedSegment, onChange } = props
+  const { segments, selectedSegment, onChange } = props
 
   const [selected, setSelected] = React.useState(selectedSegment)
 
-  const onSegmentPress = (segment: string) => {
-    setSelected(segment)
-    onChange(segment)
+  const onSegmentPress = (segmentKey: string) => {
+    setSelected(segmentKey)
+    onChange(segmentKey)
   }
 
   const $style: ViewStyle[] = useOffsetStyles([$segmentHolder], props)
@@ -40,16 +43,13 @@ export function SegmentControl(props: SegmentControlProps) {
   return (
     <View style={$style}>
       {segments.map((segment) => {
-        const key = segment.split(" ").join("_")
-        const isSelected = segment === selected
+        const key = segment.key
+        const isSelected = segment.key === selected
 
         const handlePress = () => {
-          onSegmentPress(segment)
+          onSegmentPress(segment.key)
         }
 
-        const segmentText = capitalize ?
-          segment.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") :
-          segment
         const $segmentStyle: ViewStyle = isSelected ? $selectedSegmentStyle : $unselectedSegmentStyle
 
         return (
@@ -59,7 +59,7 @@ export function SegmentControl(props: SegmentControlProps) {
             style={$segmentStyle}
           >
             <MediumTitle muted={!isSelected} align="center">
-              {segmentText}
+              {segment.title}
             </MediumTitle>
           </TouchableOpacity>
         )

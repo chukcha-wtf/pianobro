@@ -1,6 +1,7 @@
 import React, { FC, useRef } from "react"
 import { ViewStyle } from "react-native"
 import { Switch, TouchableOpacity } from "react-native-gesture-handler"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import * as Application from "expo-application"
 import { observer } from "mobx-react-lite"
@@ -18,19 +19,19 @@ import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { Colors } from "@common-ui/constants/colors"
 
 import { useStores } from "@models/index"
-import { ReminderDate, ReminderStore, REMINDER_DATES } from "@models/Reminder"
+import { ReminderDate, ReminderStore, getReminderDates } from "@models/Reminder"
 import { populateDevData } from "@utils/populateDevData"
 import { TimePickerModal, TimePickerModalHandle } from "@components/TimePickerModal"
 import Icon from "@common-ui/components/Icon"
 import { prettifyTime } from "@utils/prettifyTime"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useAlert } from "@common-ui/contexts/AlertContext"
 import { isPushNotificationsEnabledAsync } from "@services/pushNotifications"
 import { openAppSettings } from "@utils/openLinkInBrowser"
+import { TxKeyPath } from "@i18n/i18n"
 
 function DateCell({ date, scheduledTime, onPress }: { date: string; scheduledTime: string; onPress: (date: string) => void }) {
   const isSelected = !!scheduledTime
-  const text = date.slice(0, 1).toUpperCase()
+  const text = translate(`profileScreen.dates.${date}` as TxKeyPath).slice(0, 1).toUpperCase()
 
   const $style: ViewStyle[] = [$dateCell]
 
@@ -78,11 +79,11 @@ const NotificationRemindersScheduler = observer(
 
         if (!permissionGranted) {
           showAlert(
-            "Notifications Not Enabled",
-            "Enable notifications in your phone settings to use this feature",
+            translate("profileScreen.alertTitle"),
+            translate("profileScreen.alertMessage"),
             [
               {
-                text: "Open Settings",
+                text: translate("profileScreen.alertButton"),
                 onPress: () => openAppSettings(),
               },
             ]
@@ -95,10 +96,14 @@ const NotificationRemindersScheduler = observer(
       remindersStore.toggleEnabled()  
     }
 
+    const REMINDER_DATES = getReminderDates()
+
     return (
       <>
         <Row top={Spacing.large} bottom={Spacing.tiny} align="space-between">
-          <MediumText>Practice Reminders</MediumText>
+          <MediumText>
+            {translate("profileScreen.practiceReminders")}
+          </MediumText>
           <Switch
             trackColor={{ false: "#F8F4FF", true: "#F9D262" }}
             value={remindersStore.isEnabled}
@@ -106,7 +111,7 @@ const NotificationRemindersScheduler = observer(
           />
         </Row>
         <SmallText bottom={Spacing.medium} muted>
-          Set up reminders for your practice.{"\n"}Staying consistent can help you improve results!
+        {translate("profileScreen.practiceRemindersDescription")}
         </SmallText>
         <Row bottom={Spacing.large} align="space-between">
           {REMINDER_DATES.map((date) => {
@@ -149,7 +154,9 @@ const PracticeGoalSetting = observer(
     return (
       <>
         <Row top={Spacing.large} bottom={Spacing.tiny} align="space-between">
-          <MediumText>Practice Goal</MediumText>
+          <MediumText>
+            {translate("profileScreen.practiceGoal")}
+          </MediumText>
           <TouchableOpacity onPress={handlePress}>
             <Row>
               <Icon name="clock" right={Spacing.small} />
@@ -158,11 +165,12 @@ const PracticeGoalSetting = observer(
           </TouchableOpacity>
         </Row>
         <SmallText bottom={Spacing.medium} muted>
-          Set a goal for your practice time.{"\n"}You can change this at any time.
+          {translate("profileScreen.practiceGoalDescription")}
         </SmallText>
         {/* Modal shown when manually logging practice */}
         <TimePickerModal
-          title="Set Practice Goal"
+          noAmPm
+          title={translate("profileScreen.practiceGoalPickerTitle")}
           hours={goalHours || 1}
           minutes={goalMinutes || 0}
           ref={timePickerModalRef}
@@ -186,18 +194,22 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
 
     return (
       <Screen bgColor={Colors.grayBackground} edges={["left", "right"]}>
-        <HugeTitle left={Spacing.medium} top={top + Spacing.medium} text={translate("profileScreen.title")} />
         <Content bgColor={Colors.grayBackground}>
+          <HugeTitle
+            top={top}
+            bottom={Spacing.medium}
+            text={translate("profileScreen.title")}
+          />
           <If condition={!!hasCompletedSessions}>
             <Card>
               <LargeTitle align="center" bottom={Spacing.medium}>
-                Total Progress
+                {translate("profileScreen.totalProgress")}
               </LargeTitle>
               <HugeTitle align="center" color={Colors.primary}>
-                {totalPracticeTime.hours}hr {totalPracticeTime.minutes}min
+                {totalPracticeTime.hours}{translate("common.hr")} {totalPracticeTime.minutes}{translate("common.min")}
               </HugeTitle>
               <If condition={!!settingsStore.installDate}>
-                <LabelText align="center" top={Spacing.small}>Since {settingsStore.startDate}</LabelText>
+                <LabelText align="center" top={Spacing.small}>{translate("profileScreen.since")} {settingsStore.startDate}</LabelText>
               </If>
             </Card>
           </If>
@@ -217,7 +229,7 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
 
           <BottomContainer bottom={bottomPadding + Spacing.large}>
             <Row flex align="center" top={Spacing.small}>
-              <MediumText muted>App Version: </MediumText>
+              <MediumText muted>{translate("profileScreen.appVersion")}: </MediumText>
               <RegularText muted>{Application.nativeApplicationVersion}</RegularText>
             </Row>
           </BottomContainer>

@@ -3,6 +3,7 @@ import I18n from "i18n-js"
 
 import uk from "date-fns/locale/uk"
 import en from "date-fns/locale/en-US"
+import { getCalendars } from "expo-localization"
 
 type Options = Parameters<typeof format>[2]
 export type DurationObject = {
@@ -16,6 +17,14 @@ export const getDateLocale = (): Locale => {
   return locale === "uk" ? uk : en
 }
 
+const getTimeFormat = (): string => {
+  return getCalendars()[0]?.uses24hourClock ? "HH:mm" : "hh:mm a"
+}
+
+const getDateTimeFormat = (): string => {
+  return getCalendars()[0]?.uses24hourClock ? "HH:mm MMM dd, yyyy" : "hh:mm a MMM dd, yyyy"
+}
+
 export const formatDate = (date: string, dateFormat?: string, options?: Options) => {
   const locale = getDateLocale()
 
@@ -23,6 +32,7 @@ export const formatDate = (date: string, dateFormat?: string, options?: Options)
     ...options,
     locale,
   }
+
   return format(parseISO(date), dateFormat ?? "MMM dd, yyyy", dateOptions)
 }
 
@@ -32,7 +42,8 @@ export const formatTime = (date: string, dateFormat?: string, options?: Options)
     ...options,
     locale,
   }
-  return format(parseISO(date), dateFormat ?? "hh:mm a", dateOptions)
+
+  return format(parseISO(date), dateFormat ?? getTimeFormat(), dateOptions)
 }
 
 export const formatDateTime = (date: string, dateFormat?: string, options?: Options) => {
@@ -41,7 +52,8 @@ export const formatDateTime = (date: string, dateFormat?: string, options?: Opti
     ...options,
     locale,
   }
-  return format(parseISO(date), dateFormat ?? "hh:mm a MMM dd, yyyy", dateOptions)
+
+  return format(parseISO(date), dateFormat ?? getDateTimeFormat(), dateOptions)
 }
 
 export function convertMilisecondsToHours(miliseconds: number): number {

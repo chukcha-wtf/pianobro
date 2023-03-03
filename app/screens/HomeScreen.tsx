@@ -21,8 +21,7 @@ import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { calculateDuration } from "@utils/calculateDuration"
 import { formatDuration } from "@utils/formatDate"
 import { Colors } from "@common-ui/constants/colors"
-import Animated, { FadeInDown, FadeOutDown, FadeOutUp } from "react-native-reanimated"
-import { Timing } from "@common-ui/constants/timing"
+import Animated, { FadeInDown } from "react-native-reanimated"
 
 const ActiveSession = observer(
   function ActiveSession(_props) {
@@ -47,12 +46,14 @@ const ActiveSession = observer(
       >
         <Card bottom={Spacing.medium} innerVertical={Spacing.large}>
           <LargeTitle align="center" bottom={Spacing.medium}>
-            Practice in Progress
+            {translate("homeScreen.activeSession.title")}
           </LargeTitle>
           <HugeTitle align="center" bottom={Spacing.small} color={Colors.primary}>
             {formattedDuration.hours}:{formattedDuration.minutes}:{formattedDuration.seconds}
           </HugeTitle>
-          <LabelText align="center">Shhh, let the music flow...</LabelText>
+          <LabelText align="center">
+            {translate("homeScreen.activeSession.subtitle")}
+          </LabelText>
         </Card>
       </Animated.View>
     )
@@ -101,10 +102,10 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
         <Row horizontal={Spacing.medium} top={Spacing.large} align="space-between" justify="flex-start">
           <Cell>
             <LargeTitle bottom={Spacing.extraSmall}>
-              Hey 👋
+              {translate("homeScreen.title")}
             </LargeTitle>
             <HugeTitle>
-              Let's practice!
+              {translate("homeScreen.subtitle")}
             </HugeTitle>
           </Cell>
           <Cell>
@@ -126,22 +127,26 @@ export const HomeScreen: FC<MainTabScreenProps<"Home">> = observer(
 
           <If condition={hasCompletedSessions && !practiceSessionStore.activeSession}>
             <Card bottom={Spacing.medium} innerVertical={Spacing.large}>
-              <MediumTitle align="center" bottom={Spacing.small}>You practiced today</MediumTitle>
+              <MediumTitle align="center" bottom={Spacing.small}>
+                {translate("homeScreen.practicedToday")}
+              </MediumTitle>
               <HugeTitle align="center" bottom={Spacing.small} color={Colors.primary}>
-                {statisticsStore.totalPracticeTimeToday.hours}hr {statisticsStore.totalPracticeTimeToday.minutes}min
+                {statisticsStore.totalPracticeTimeToday.hours}{translate("common.hr")} {statisticsStore.totalPracticeTimeToday.minutes}{translate("common.min")}
               </HugeTitle>
-              <LabelText align="center">Keep up the good work!</LabelText>
+              <LabelText align="center">
+                {translate("homeScreen.keepUpGoodWork")}
+              </LabelText>
             </Card>
           </If>
 
           <If condition={!hasCompletedSessions && !practiceSessionStore.activeSession}>
             <RegularText align="center" bottom={Spacing.larger}>
-              You haven't logged any practice sessions{'\n'}today yet.
+              {translate("homeScreen.noSessionsLogged")}
             </RegularText>
 
             <LinkButton
               large
-              title="Add practice session"
+              title={translate("homeScreen.addSessionLink")}
               leftIcon="plus-circle"
               leftIconSize={Spacing.larger}
               textColor={Colors.dark}

@@ -54,12 +54,10 @@ export async function registerForPushNotificationsAsync(): Promise<string> {
 }
 
 export async function scheduleLocalWeeklyPushNotification(trigger: WeeklyTriggerInput) {
-  console.log("Scheduling notification", trigger)
-
   return await Notifications.scheduleNotificationAsync({
     content: {
-      title: "It's play time 🎹",
-      body: "Don't forget to practice piano today! 🎶"
+      title: "It's play time!",
+      body: "Don't forget to practice 🎹 today!"
     },
     trigger,
   });

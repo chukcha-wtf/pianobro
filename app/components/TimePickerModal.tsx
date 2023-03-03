@@ -2,17 +2,17 @@ import React, { ForwardedRef, forwardRef, useCallback, useImperativeHandle, useM
 import { ViewStyle, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { getCalendars } from "expo-localization";
 import * as Haptics from 'expo-haptics';
 
-import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { BottomContainer, Cell, Row } from "@common-ui/components/Common";
 import { Spacing } from "@common-ui/constants/spacing";
 import { $modalBackdropStyle, $modalStyle, ModalHeader } from "@common-ui/components/Modal";
 import { SolidButton } from "@common-ui/components/Button";
 import { HugeTitle } from "@common-ui/components/Text";
 import { prettifyTime } from "@utils/prettifyTime";
-import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut, FadeOutDown } from "react-native-reanimated";
-import { Timing } from "@common-ui/constants/timing";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { If } from "@common-ui/components/Conditional";
 import { Colors } from "@common-ui/constants/colors";
 
@@ -34,6 +34,7 @@ type TimePickerModalProps = {
   title?: string
   hours?: number
   minutes?: number
+  noAmPm?: boolean
   onSave: (hours: number, minutes: number, amPm?: "AM" | "PM") => void
 }
 
@@ -60,7 +61,7 @@ const List = ({
 }: {
   data: Array<string>,
   scrollIndex: number,
-  onChange: (value: number) => void
+  onChange: (value: string) => void
 }) => {
   const getItemLayout = useCallback((data: Array<string>, index: number) => ({
     length: ITEM_SIZE,
@@ -68,12 +69,12 @@ const List = ({
     index,
   }), [])
 
-  const onScrollEnd = useCallback((event) => {
+  const onScrollEnd = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.y / ITEM_SIZE)
-    onChange(parseInt(data[index]))
+    onChange(data[index])
     
     Haptics.selectionAsync()
-  }, [])
+  }
 
   return <FlatList
     data={data}
@@ -90,20 +91,22 @@ const List = ({
     initialScrollIndex={scrollIndex}
     getItemLayout={getItemLayout}
     onMomentumScrollEnd={onScrollEnd}
-    onScrollEndDrag={onScrollEnd}
   />
 }
 
 export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModalProps>(function TimePickerModal(props: TimePickerModalProps, ref: ForwardedRef<TimePickerModalHandle>) {
-  const { title, hours, minutes, onSave } = props
+  const { title, hours, minutes, noAmPm, onSave } = props
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['50%'], []);
 
   const { bottom } = useSafeAreaInsets()
+  const use24hourClock = noAmPm || getCalendars()[0]?.uses24hourClock || false
 
   const [hour, setHour] = useState<number>(hours || new Date().getHours())
   const [minute, setMinute] = useState<number>(minutes || new Date().getMinutes())
+  const [amPm, setAmPm] = useState<"AM" | "PM">(hour >= 12 ? "PM" : "AM")
+  
   const [isVisible, setIsVisible] = useState<boolean>(false)
 
   const closeModal = () => {
@@ -124,13 +127,35 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
     close: closeModal
   }))
 
-  const hourScrollIndex = useMemo(() => {
-    return HOURS.indexOf(String(hour))
+  const updateHour = useCallback((newValue: string) => {
+    const value = Number(newValue)
+    
+    use24hourClock ? setHour(value) : setHour(value + (amPm === "PM" ? 12 : 0))
+  }, [amPm, use24hourClock])
+
+  const updateMinutes = useCallback((newValue: string) => {
+    const value = Number(newValue)
+    setMinute(value)
   }, [])
+
+  const updateAmPm = useCallback((newValue: string) => {
+    const value = newValue as "AM" | "PM"
+
+    setAmPm(value)
+    setHour(hour + (value === "PM" ? 12 : -12))
+  }, [hour])
+
+  const hourScrollIndex = useMemo(() => {
+    return use24hourClock ? HOURS.indexOf(String(hour)) : HOURS_AM_PM.indexOf(String(hour % 12))
+  }, [use24hourClock])
 
   const minuteScrollIndex = useMemo(() => {
     const roundedMinute = roundingFunction(minute, "minute")
     return MINUTES.indexOf(String(roundedMinute))
+  }, [])
+
+  const amPmScrollIndex = useMemo(() => {
+    return AM_PM.indexOf(String(hour >= 12 ? "PM" : "AM"))
   }, [])
     
   return (
@@ -163,9 +188,9 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
             <Cell flex></Cell>
             <Cell flex>
               <List
-                data={HOURS}
+                data={use24hourClock ? HOURS : HOURS_AM_PM}
                 scrollIndex={hourScrollIndex}
-                onChange={setHour}
+                onChange={updateHour}
               />
             </Cell>
             <Cell flex>
@@ -175,10 +200,18 @@ export const TimePickerModal = forwardRef<TimePickerModalHandle, TimePickerModal
               <List
                 data={MINUTES}
                 scrollIndex={minuteScrollIndex}
-                onChange={setMinute}
+                onChange={updateMinutes}
               />
             </Cell>
-            <Cell flex></Cell>
+            <Cell flex>
+              <If condition={!use24hourClock}>
+                <List
+                  data={AM_PM}
+                  scrollIndex={amPmScrollIndex}
+                  onChange={updateAmPm}
+                />
+              </If>
+            </Cell>
           </Row>
           <LinearGradient
             pointerEvents="none"

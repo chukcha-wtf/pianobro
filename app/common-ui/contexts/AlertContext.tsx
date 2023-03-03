@@ -3,13 +3,14 @@
  */
 
 import React, { createContext, useState } from 'react';
-import { Modal, Pressable, View, ViewStyle } from 'react-native';
+import { Pressable, View, ViewStyle } from 'react-native';
+import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 
 import { LargeTitle, RegularText } from '@common-ui/components/Text';
 import { Spacing } from '@common-ui/constants/spacing';
 import { Colors } from '@common-ui/constants/colors';
 import { Row } from '@common-ui/components/Common';
-import { If, Ternary } from '@common-ui/components/Conditional';
+import { If } from '@common-ui/components/Conditional';
 import { OutlinedButton, SolidButton } from '@common-ui/components/Button';
 
 type ButtonAction = {
@@ -74,46 +75,55 @@ export const AlertProvider = ({ children }) => {
   return (
     <AlertContext.Provider value={contextValue}>
       {children}
-      
-      <Modal
-        visible={!!alert}
-        transparent
-        animationType="fade"
-        onRequestClose={hideAlert}
-      >
-        <Pressable style={$alertContentHolder}>
-          <View style={$alertContent}>
-            <If condition={!!alert}>
-              <LargeTitle align='center' bottom={Spacing.medium}>
-                {alert?.title}
-              </LargeTitle>
-              <RegularText align='center'>
-                {alert?.message}
-              </RegularText>
-              <Row
-                top={Spacing.large}
-                height={Spacing.button}
-                align='center'
-              >
-                <OutlinedButton
-                  minWidth={100}
-                  title={leftButtonText}
-                  onPress={onCancelPress}
-                />
-                <SolidButton
-                  minWidth={100}
-                  left={Spacing.large}
-                  type="primary"
-                  title={rightButtonText}
-                  onPress={onConfirmPress}
-                />
-              </Row>
-            </If>
-          </View>
-        </Pressable>
-      </Modal>
+
+      <If condition={!!alert}>
+        <Animated.View
+          style={$alertStyle}
+          entering={FadeInDown}
+          exiting={FadeOutUp}
+        >      
+          <Pressable style={$alertContentHolder}>
+            <View style={$alertContent}>
+              <If condition={!!alert}>
+                <LargeTitle align='center' bottom={Spacing.medium}>
+                  {alert?.title}
+                </LargeTitle>
+                <RegularText align='center'>
+                  {alert?.message}
+                </RegularText>
+                <Row
+                  top={Spacing.large}
+                  height={Spacing.button}
+                  align='center'
+                >
+                  <OutlinedButton
+                    minWidth={100}
+                    title={leftButtonText}
+                    onPress={onCancelPress}
+                  />
+                  <SolidButton
+                    minWidth={100}
+                    left={Spacing.large}
+                    type="primary"
+                    title={rightButtonText}
+                    onPress={onConfirmPress}
+                  />
+                </Row>
+              </If>
+            </View>
+          </Pressable>
+        </Animated.View>
+      </If>
     </AlertContext.Provider>
   )
+}
+
+const $alertStyle: ViewStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
 }
 
 const $alertContentHolder: ViewStyle = {

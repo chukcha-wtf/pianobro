@@ -15,7 +15,8 @@ import { Label } from "@common-ui/components/Label"
 import { LinkButton } from "@common-ui/components/Button"
 import { Colors } from "@common-ui/constants/colors"
 import { formatDateRangeText } from "@utils/formatDateRangeText"
-import { If } from "@common-ui/components/Conditional"
+import { If, Ternary } from "@common-ui/components/Conditional"
+import { translate } from "@i18n/translate"
 
 export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = observer(
   function SessionDetailsScreen(props) {
@@ -25,19 +26,23 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
     const session = practiceSessionStore.getSessionById(activitySessionId)
 
     const deleteSession = () => {
-      Alert.alert("Delete Session", "Are you sure you want to delete this session?", [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Delete",
-          onPress: () => {
-            removeSession(activitySessionId)
-            props.navigation.goBack()
+      Alert.alert(
+        translate("sessionDetailsScreen.deleteSession"),
+        translate("sessionDetailsScreen.deleteSessionConfirmation"),
+        [
+          {
+            text: translate("common.cancel"),
+            style: "cancel"
+          },
+          {
+            text: translate("common.delete"),
+            onPress: () => {
+              removeSession(activitySessionId)
+              props.navigation.goBack()
+            }
           }
-        }
-      ])
+        ]
+      )
     }
 
     if (!session) {
@@ -65,19 +70,19 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
         <Content bgColor={Colors.grayBackground}>
           <Card>
             <LargeTitle align="center" bottom={Spacing.medium}>
-              Practice Time
+              {translate("sessionDetailsScreen.practiceTime")}
             </LargeTitle>
             <HugeTitle align="center" color={Colors.primary}>
-              {session.formattedDuration.hours}hr {session.formattedDuration.minutes}min
+              {session.formattedDuration.hours}{translate("common.hr")} {session.formattedDuration.minutes}{translate("common.min")}
             </HugeTitle>
           </Card>          
           <MediumText top={Spacing.large} bottom={Spacing.small}>
-            Rating
+            {translate("sessionDetailsScreen.rating")}
           </MediumText>
           <Row align="space-between">
             <Card flex>
               <MediumText align="center" bottom={Spacing.small}>
-                Difficulty
+                {translate("sessionDetailsScreen.difficulty")}
               </MediumText>
               <LargeTitle align="center">
                 {session.intencity} / 10
@@ -85,16 +90,21 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
             </Card>
             <Card flex left={Spacing.medium}>
               <MediumText align="center" bottom={Spacing.small}>
-                Fun
+                {translate("sessionDetailsScreen.fun")}
               </MediumText>
               <Row align="center">
-                <SatisfactionStars satisfaction={session.satisfaction} size={Spacing.mediumXL} />
+                <Ternary condition={session.satisfaction > 0}>
+                  <SatisfactionStars satisfaction={session.satisfaction} size={Spacing.mediumXL} />
+                  <MediumText align="center">
+                    {translate("sessionDetailsScreen.noFun")}
+                  </MediumText>
+                </Ternary>
               </Row>
             </Card>
           </Row>
           <If condition={!!session.activities?.length}>
             <MediumText top={Spacing.large} bottom={Spacing.small}>
-              Categories
+              {translate("sessionDetailsScreen.categories")}
             </MediumText>
             <Row wrap>
               {session.activities.map((activity, index) => (
@@ -110,14 +120,14 @@ export const SessionDetailsScreen: FC<MainTabScreenProps<"SessionDetails">> = ob
           </If>
           <If condition={!!session.notes}>
             <MediumText top={Spacing.large} bottom={Spacing.small}>
-              Comments
+              {translate("sessionDetailsScreen.comments")}
             </MediumText>
             <RegularText text={session.notes} />
           </If>
           <BottomContainer>
             <LinkButton
               type="danger"
-              title="Delete"
+              title={translate("common.delete")}
               onPress={deleteSession}
               bottom={Spacing.medium}
             />
