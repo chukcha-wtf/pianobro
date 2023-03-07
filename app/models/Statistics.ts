@@ -306,52 +306,79 @@ export const StatisticsStoreModel = types
       return dayRecord?.sessionUuids || []
     },
 
-    getRecordsBetween(start: Date, end: Date) {
-      const interval = eachDayOfInterval({ start, end })
-
+    getRecordsBetween(start: Date, end: Date, mode: "week" | "month" | "year" = "week") { 
       const sessionUuids: string[] = []
       const activities: Map<string, AggregatedActivity> = new Map()
       const daysPracticed: Map<string, number> = new Map()
       let totalPracticeTime = 0
 
-      interval.forEach(date => {
-        const dayRecord = store.getDayRecord(date)
+      const s = new Date().getTime()
 
-        if (dayRecord) {
-          const year = date.getFullYear().toString()
-          const month = date.getMonth().toString()
-          const day = date.getDate().toString()
-          
-          // Add day to days practiced
-          daysPracticed.set(`${year}.${month}.${day}`, dayRecord.totalDuration)
+      const buildDayData = (dayRecord, year, month, day) => {
+        // Add day to days practiced
+        daysPracticed.set(`${year}.${month}.${day}`, dayRecord.totalDuration)
 
-          // Populate sessionUuids
-          sessionUuids.push(...dayRecord.sessionUuids)
-          
-          totalPracticeTime += dayRecord.totalDuration
+        // Populate sessionUuids
+        sessionUuids.push(...dayRecord.sessionUuids)
+        
+        totalPracticeTime += dayRecord.totalDuration
 
-          const dayRecordActivities = Object.fromEntries(activities.entries())
+        const dayRecordActivities = Object.fromEntries(activities.entries())
 
-          dayRecord.activities.forEach(activityRecord => {
-            const activity = dayRecordActivities[activityRecord.activityUuid]
+        dayRecord.activities.forEach(activityRecord => {
+          const activity = dayRecordActivities[activityRecord.activityUuid]
 
-            if (activity) {
-              activity.duration += activityRecord.duration
-              activity.sessionUuids.push(...activityRecord.sessionUuids)
-              activities.set(activityRecord.activityUuid, activity)
-            }
-            else {
-              activities.set(activityRecord.activityUuid, {
-                uuid: activityRecord.activityUuid,
-                duration: activityRecord.duration,
-                name: activityRecord.name,
-                key: activityRecord.key,
-                sessionUuids: [...activityRecord.sessionUuids],
-              })
-            }
+          if (activity) {
+            activity.duration += activityRecord.duration
+            activity.sessionUuids.push(...activityRecord.sessionUuids)
+            activities.set(activityRecord.activityUuid, activity)
+          }
+          else {
+            activities.set(activityRecord.activityUuid, {
+              uuid: activityRecord.activityUuid,
+              duration: activityRecord.duration,
+              name: activityRecord.name,
+              key: activityRecord.key,
+              sessionUuids: [...activityRecord.sessionUuids],
+            })
+          }
+        })
+      }
+
+      if (mode === "week") {
+        const interval = eachDayOfInterval({ start, end })
+  
+        interval.forEach(date => {
+          const dayRecord = store.getDayRecord(date)
+  
+          if (dayRecord) {
+            const year = date.getFullYear().toString()
+            const month = date.getMonth().toString()
+            const day = date.getDate().toString()
+            
+            buildDayData(dayRecord, year, month, day)
+          }
+        })
+      }
+
+      if (mode === "month") {
+        const year = start.getFullYear().toString()
+        const month = start.getMonth().toString()
+
+        store.progress.get(year)?.months.get(month)?.days.forEach((dayRecord, day) => {          
+          buildDayData(dayRecord, year, month, day)
+        })
+      }
+
+      if (mode === "year") {
+        const year = start.getFullYear().toString()
+
+        store.progress.get(year)?.months.forEach((monthRecord, month) => {
+          monthRecord.days.forEach((dayRecord, day) => {
+            buildDayData(dayRecord, year, month, day)
           })
-        }
-      })
+        })
+      }
 
       return {
         sessionUuids,

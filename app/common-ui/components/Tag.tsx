@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react"
-import { TouchableOpacity, ColorValue, ViewStyle, TextStyle } from "react-native"
+import { ColorValue, ViewStyle, TextStyle } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
+
 import { Colors, ColorTypes, Palette } from "@common-ui/constants/colors"
 import { Spacing } from "@common-ui/constants/spacing"
 import { OffsetProps, useOffsetStyles } from "@common-ui/utils/useOffset"

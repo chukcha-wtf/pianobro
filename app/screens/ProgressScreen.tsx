@@ -1,9 +1,9 @@
-import React, { FC, useCallback, useMemo } from "react"
-import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, FlatList, ViewStyle, View } from "react-native"
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ViewStyle, View, LayoutAnimation } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import Animated, { Extrapolate, interpolate, useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { observer } from "mobx-react-lite"
-import { NavigationProp } from "@react-navigation/native"
+import { NavigationProp, useIsFocused } from "@react-navigation/native"
 import { translate } from "@i18n/translate"
 
 import { Screen } from "@common-ui/components/Screen"
@@ -19,7 +19,7 @@ import { AggregatedActivity } from "@models/Statistics"
 import { ChartControl, ChartMode, getChartEndDate, getChartStartDate } from "@components/ChartControl"
 import { Colors, Palette } from "@common-ui/constants/colors"
 import { PracticeSession } from "@models/PracticeSession"
-import { PracticeItem } from "@components/PracticeItem"
+import { PracticeItem, PRACTICE_ITEM_HEIGHT } from "@components/PracticeItem"
 import { FLASH_LIST_OFFSET } from "./ActivityDetailsScreen"
 import Icon from "@common-ui/components/Icon"
 
@@ -28,6 +28,7 @@ import { formatDateRangeText } from "@utils/formatDateRangeText"
 import { useBottomPadding } from "@common-ui/utils/useBottomPadding"
 import { formatDuration } from "@utils/formatDate"
 import { TxKeyPath } from "@i18n/i18n"
+import { FlashList } from "@shopify/flash-list"
 
 type ActivityItemProps = {
   activity: AggregatedActivity
@@ -161,18 +162,18 @@ const StatisticsHeader = observer(
           <MediumText top={Spacing.large} bottom={Spacing.large}>
             {translate("progressScreen.activities")}
           </MediumText>
+          {activities.map((activity) => (
+            <Cell key={activity.uuid} right={FLASH_LIST_OFFSET}>
+              <ActivityItem
+                activity={activity}
+                navigation={navigation}
+                startDate={startDate}
+                endDate={endDate}
+                mode={mode}
+              />
+            </Cell>
+          ))}
         </If>
-        {activities.map((activity) => (
-          <Cell key={activity.uuid} right={FLASH_LIST_OFFSET}>
-            <ActivityItem
-              activity={activity}
-              navigation={navigation}
-              startDate={startDate}
-              endDate={endDate}
-              mode={mode}
-            />
-          </Cell>
-        ))}
         <Ternary condition={!!totalDaysPracticed}>
           <MediumText>
             {translate("progressScreen.practiceSessions")}
@@ -194,16 +195,19 @@ const renderListItem = ({ item }: { item: PracticeSession }) => {
   )
 }
 
+const keyExtractorFunc = (item: PracticeSession, index: number) => `${item.uuid}_${index}`
+
 const HEADER_EXPANDED_HEIGHT = 52
 const HEADER_COLLAPSED_HEIGHT = 44
 
-export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
-  function ProgressScreen(props) {
+export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = function ProgressScreen(props) {
     const { navigation } = props
+    
     const { practiceSessionStore, statisticsStore } = useStores()
+    const isFocused = useIsFocused()
     const bottomPadding = useBottomPadding()
     
-    const [dateRange, setDateRange] = React.useState<{
+    const [dateRange, setDateRange] = useState<{
       startDate: Date
       endDate: Date,
       mode: keyof typeof ChartMode
@@ -213,6 +217,40 @@ export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
       mode: ChartMode.week,
     })
 
+    const [dataset, setDataset] = useState<{
+      sessions: PracticeSession[];
+      activities: AggregatedActivity[];
+      daysPracticed: Map<string, number>;
+      totalPracticeTime: number;
+    }>({
+      sessions: [],
+      activities: [],
+      daysPracticed: new Map(),
+      totalPracticeTime: 0,
+    })
+
+    const { sessions, activities, daysPracticed, totalPracticeTime } = dataset
+
+    useEffect(() => {
+      const {
+        sessionUuids: completedSessionUuids,
+        activities,
+        daysPracticed,
+        totalPracticeTime,
+      } = statisticsStore.getRecordsBetween(dateRange.startDate, dateRange.endDate, dateRange.mode)
+      
+      const sessions = practiceSessionStore.getSessionsFromUuids(completedSessionUuids)
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+
+      setDataset({
+        sessions,
+        activities,
+        daysPracticed,
+        totalPracticeTime,
+      })
+    }, [isFocused, dateRange.startDate, dateRange.endDate, dateRange.mode])
+
     const onDateRangeChange = (startDate: Date, endDate: Date, mode: keyof typeof ChartMode) => {
       setDateRange({
         startDate,
@@ -220,15 +258,6 @@ export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
         mode,
       })
     }
-
-    const {
-      sessionUuids: completedSessionUuids,
-      activities,
-      daysPracticed,
-      totalPracticeTime,
-    } = statisticsStore.getRecordsBetween(dateRange.startDate, dateRange.endDate)
-    
-    const sessionsCompleted = practiceSessionStore.getSessionsFromUuids(completedSessionUuids)
 
     const dayTitle = useMemo(() => {
       return formatDateRangeText(dateRange.startDate, dateRange.endDate, dateRange.mode)
@@ -282,17 +311,19 @@ export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
           innerLeft={Spacing.medium}
           innerRight={Spacing.medium - FLASH_LIST_OFFSET}
         >
-          <FlatList
+          <FlashList
             contentContainerStyle={$scrollViewContent}
-            data={sessionsCompleted}
+            data={sessions}
             onScroll={onScroll}
             scrollEventThrottle={16}
-            initialNumToRender={10}
-            maxToRenderPerBatch={10}
+            // initialNumToRender={1}
+            // maxToRenderPerBatch={10}
             scrollEnabled={statisticsStore.hasCompletedSessions}
             showsVerticalScrollIndicator={false}
-            keyExtractor={(item, index) => `${item.uuid}_${index}`}
+            keyExtractor={keyExtractorFunc}
             renderItem={renderListItem}
+            // getItemLayout={getItemLayout}
+            estimatedItemSize={PRACTICE_ITEM_HEIGHT}
             ListHeaderComponent={
               <If condition={statisticsStore.hasCompletedSessions}>
                 <StatisticsHeader
@@ -307,17 +338,15 @@ export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
                 />
               </If>
             }
-            ListEmptyComponent={() => {
-              return (
-                <If condition={!statisticsStore.hasCompletedSessions}>
-                  <Cell top={height / 3} align="center" justify="center">
-                    <MediumTitle align="center" muted>
-                      {translate("progressScreen.noProgress")}
-                    </MediumTitle>
-                  </Cell>
-                </If>
-              )
-            }}
+            ListEmptyComponent={
+              <If condition={!statisticsStore.hasCompletedSessions}>
+                <Cell top={height / 3} align="center" justify="center">
+                  <MediumTitle align="center" muted>
+                    {translate("progressScreen.noProgress")}
+                  </MediumTitle>
+                </Cell>
+              </If>
+            }
           />
           <View style={$solidBackgroundStyle} />
           <Animated.View style={$largeTitleHeaderStyle}>
@@ -330,7 +359,6 @@ export const ProgressScreen: FC<MainTabScreenProps<"Progress">> = observer(
       </Screen>
     )
   }
-)
 
 const $solidBackgroundStyle: ViewStyle = {
   position: "absolute",

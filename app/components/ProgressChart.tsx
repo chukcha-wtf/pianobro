@@ -1,17 +1,15 @@
-import React, { useMemo } from "react"
+import React from "react"
 import { Dimensions } from "react-native"
 import { processFontFamily } from "expo-font"
 
 import { DomainTuple } from "victory-core"
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryLine, VictoryLabel } from "victory-native"
-import { addDays, addMonths, endOfDay, endOfMonth, startOfDay, startOfMonth } from "date-fns"
+import { addDays, addMonths, startOfDay } from "date-fns"
 
 import { Spacing } from "@common-ui/constants/spacing"
 import { Colors } from "@common-ui/constants/colors"
 import { Fonts } from "@common-ui/constants/typography"
-import { calculateDuration } from "@utils/calculateDuration"
 import { convertMilisecondsToHours, formatDate } from "@utils/formatDate"
-import { PracticeSession } from "@models/PracticeSession"
 import { ChartMode } from "./ChartControl"
 import { translate } from "@i18n/translate"
 
@@ -41,8 +39,6 @@ const CHART_SETTINGS = {
     timeTickLabelFontSize: 12,
     getLength: () => 7,
     addFunction: addDays,
-    compareDateStartFunction: startOfDay,
-    compareDateEndFunction: endOfDay,
     formatFunction: (date: string) => formatDate(date, "EEE"),
   },
   month : {
@@ -52,8 +48,6 @@ const CHART_SETTINGS = {
     timeTickLabelFontSize: 12,
     getLength: (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(),
     addFunction: addDays,
-    compareDateStartFunction: startOfDay,
-    compareDateEndFunction: endOfDay,
     formatFunction: (date: string) => formatDate(date, "d"),
   },
   year: {
@@ -63,8 +57,6 @@ const CHART_SETTINGS = {
     timeTickLabelFontSize: 10,
     getLength: () => 12,
     addFunction: addMonths,
-    compareDateStartFunction: startOfMonth,
-    compareDateEndFunction: endOfMonth,
     formatFunction: (date: string) => formatDate(date, "MMM"),
   },
 }
@@ -81,54 +73,6 @@ function getBarColor(value: number, goal?: number): string {
   }
 
   return Colors.chartBarNormal
-}
-
-function aggregateFunction(
-  session: PracticeSession,
-  date: Date,
-  mode: keyof typeof ChartMode,
-): number {
-  const sessionStart = new Date(session.startTime)
-  const sessionEnd = new Date(session.endTime)
-  const sessionStartMils = sessionStart.getTime()
-  const sessionEndMils = sessionEnd.getTime()
-  const dateToCompareStart = CHART_SETTINGS[mode].compareDateStartFunction(date)
-  const dateToCompareEnd = CHART_SETTINGS[mode].compareDateEndFunction(date)
-  const dateToCompareMils = dateToCompareStart.getTime()
-  const endOfDayTimeMils = dateToCompareEnd.getTime() 
-
-  // If the session is in the current date range, add its duration to the totalPlayedMils
-  // There are five possible scenarios:
-  // 1. The session is within one day and in the current date range
-  // 2. The session is longer than one day and starts today
-  // 3. The session is longer than one day and starts before today and ends after today
-  // 4. The session is longer than one day and ends today
-  // 5. The session is outside the current date range
-
-  // 1. The session is within one day and in the current date range
-  if (sessionStartMils >= dateToCompareMils && sessionEndMils <= endOfDayTimeMils) {
-    return session.duration
-  }
-
-  // 2. The session is longer than one day and starts today
-  else if (sessionStartMils >= dateToCompareMils && sessionEndMils >= endOfDayTimeMils && sessionStartMils <= endOfDayTimeMils) {
-    const rangeDuration = calculateDuration(sessionStart.toISOString(), dateToCompareEnd.toISOString())
-    return rangeDuration
-  }
-  
-  // 3. The session is longer than one day and starts before today and ends after today
-  else if (sessionStartMils <= dateToCompareMils && sessionEndMils >= endOfDayTimeMils) {
-    const rangeDuration = calculateDuration(dateToCompareStart.toISOString(), dateToCompareEnd.toISOString())
-    return rangeDuration
-  }
-  // 4. The session is longer than one day and ends today
-  else if (sessionStartMils <= dateToCompareMils && sessionEndMils <= endOfDayTimeMils && sessionEndMils >= dateToCompareMils) {
-    const rangeDuration = calculateDuration(dateToCompareStart.toISOString(), sessionEnd.toISOString())
-    return rangeDuration
-  }
-  
-  // 5. The session is outside the current date range
-  return 0
 }
 
 function getDurationForDate(

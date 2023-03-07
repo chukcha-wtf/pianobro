@@ -190,7 +190,7 @@ export const ProfileScreen: FC<MainTabScreenProps<"Profile">> = observer(
     const { remindersStore, settingsStore, statisticsStore } = store
     const { totalPracticeTime, hasCompletedSessions } = statisticsStore
 
-    const handleButton = () => populateDevData(store, 2500)
+    const handleButton = () => populateDevData(store, 250)
 
     return (
       <Screen bgColor={Colors.grayBackground} edges={["left", "right"]}>
