@@ -48,13 +48,27 @@ const uk: Translations = {
     practicedToday: "Зіграно сьогодні",
     keepUpGoodWork: "Так тримати!",
     noSessionsLogged: "Сьогодні ще не було жодних вправ",
-    addSessionLink: "Додати тренування",
+    addSessionLink: "Додати заняття",
     mainButtonTextActive: "Стоп",
     mainButtonTextInactive: "Розпочати",
     activeSession: {
       title: "Заняття розпочато",
       subtitle: "Тихесенько, не відволікайся...",
     }
+  },
+  insights: {
+    days: {
+      one: "день",
+      other: "днів",
+    },
+    daysPracticedText: "Зіграно протягом минулого тижня.",
+    timePracticedText: "Грали протягом останніх 7 днів.",
+    timePracticedSubText: "Це %{context} ніж тиждень до того.",
+    prefixAn: "",
+    prefixThe: "",
+    dynamicsIncrease: "менше",
+    dynamicsDecrease: "більше",
+    activitiesText: "Найпопулярніші вправи того тижня.",
   },
   profileScreen: {
     title: "Профіль",

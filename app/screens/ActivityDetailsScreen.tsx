@@ -36,7 +36,7 @@ type ListHeaderProps = {
 // ScrollView have some weird UI glitch where it tends to cut about 1px to the right
 // of the list. This is a hack to fix that. We first cut the right padding of the container
 // by 2px, then we add a padding to the list item to make up for the lost 2px.
-export const FLASH_LIST_OFFSET = 2
+export const FLASH_LIST_OFFSET = 4
 
 function ListHeader(props: ListHeaderProps) {
   const { startDay, endDay, mode, daysPracticed, practiceGoal, totalPracticeTime, onDateRangeChange } = props

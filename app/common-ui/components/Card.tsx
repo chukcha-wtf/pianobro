@@ -47,7 +47,9 @@ const Base = (props: BaseProps): React.ReactElement => {
     if (!outline) {
       style.push({ backgroundColor: color })
     }
-
+    else {
+      style.push({ borderColor: color, shadowColor: color })
+    }
   }
 
   return <View style={style}>{children}</View>

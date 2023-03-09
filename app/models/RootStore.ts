@@ -1,3 +1,4 @@
+import differenceInDays from "date-fns/differenceInDays"
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { Activity, ActivityStoreModel } from "./Activity"
 import { PianoQuoteStoreModel } from "./PianoQuote"
@@ -20,6 +21,17 @@ export const RootStoreModel = types.model("RootStore").props({
 })
 .actions((store) => {
   return {
+    hasInsights() {
+      // If there are any records in the store and the app 
+      // has been installed for more than 7 days, then we
+      // can show the insights.
+
+      const hasRecords = store.statisticsStore.progress.size > 0
+      const daysDifference = differenceInDays(new Date(), new Date(store.settingsStore.installDate))
+      
+      return hasRecords && daysDifference >= 7
+    },
+
     completeSession(practiceSession: PracticeSession, activities: Array<Activity>) {
       const { practiceSessionStore, statisticsStore } = store
 

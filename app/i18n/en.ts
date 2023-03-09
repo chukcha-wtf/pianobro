@@ -54,6 +54,20 @@ const en = {
       subtitle: "Shhh, let the music flow...",
     }
   },
+  insights: {
+    days: {
+      one: "day",
+      other: "days",
+    },
+    daysPracticedText: "You've practiced for over the past week.",
+    timePracticedText: "You've played for over the past 7 days.",
+    timePracticedSubText: "That's %{context} from the week before.",
+    prefixAn: "an",
+    prefixThe: "the",
+    dynamicsIncrease: "increase",
+    dynamicsDecrease: "decrease",
+    activitiesText: "Some of the most popular activities last week.",
+  },
   profileScreen: {
     title: "Profile",
     reportBugs: "Report bugs",

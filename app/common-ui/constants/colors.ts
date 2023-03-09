@@ -45,6 +45,7 @@ export const Colors = {
   warning: Palette.yellow, // yellow
   success: Palette.green, // green
   info: Palette.pink, // light blue
+  
   darkGrey: Palette.black700, // dark grey
   midGrey: Palette.black300, // mid grey
   lightGrey: Palette.black100, // light grey
@@ -68,6 +69,27 @@ export const Colors = {
   // colors
   transparent: Palette.transparent,
   white: Palette.white,
+
+  // generic
+  blue: Palette.blue,
+  lightBlue: Palette.blue800,
+  softBlue: Palette.blue100,
+  
+  yellow: Palette.yellow,
+  lightYellow: Palette.yellow800,
+  softYellow: Palette.yellow100,
+
+  green: Palette.green,
+  lightGreen: Palette.green800,
+  softGreen: Palette.green100,
+
+  red: Palette.red,
+  lightRed: Palette.red800,
+  softRed: Palette.red100,
+
+  pink: Palette.pink,
+  lightPink: Palette.pink800,
+  softPink: Palette.pink100,
 }
 
 /**
@@ -79,4 +101,25 @@ export enum ColorTypes {
   warning = "warning",
   success = "success",
   info = "info",
+
+  blue = "blue",
+  lightBlue = "lightBlue",
+  softBlue = "softBlue",
+  
+  yellow = "yellow",
+  lightYellow = "lightYellow",
+  softYellow = "softYellow",
+  
+  green = "green",
+  lightGreen = "lightGreen",
+  softGreen = "softGreen",
+  
+  red = "red",
+  lightRed = "lightRed",
+  softRed = "softRed",
+  
+  pink = "pink",
+  lightPink = "lightPink",
+  softPink = "softPink",
+
 }

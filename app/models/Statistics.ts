@@ -6,6 +6,7 @@ import { formatDuration } from "@utils/formatDate";
 
 import { withSetPropAction } from "./helpers/withSetPropAction";
 import { PracticeSession } from "./PracticeSession";
+import subDays from "date-fns/subDays";
 
 /**
  * A Statistics model.
@@ -37,6 +38,14 @@ export type AggregatedActivity = {
   sessionUuids: string[],
   duration: number,
 }
+
+export enum DynamicsOptions {
+  increase = "increase",
+  decrease = "decrease",
+  same = "same",
+}
+
+export type Dynamics = keyof typeof DynamicsOptions
 
 const ActivityRecordModel = types.model("ActivityRecord").props({
   activityUuid: types.string,
@@ -306,13 +315,70 @@ export const StatisticsStoreModel = types
       return dayRecord?.sessionUuids || []
     },
 
+    get insights() {
+      // Over the past 7 days you played on average 2hrs a day
+      let timePlayedLastWeek = 0
+      let timePlayedTwoWeeksAgo = 0
+
+      // Over the past week you've spent 3 days playing, that's 2 days more (less) than a week before
+      let daysPlayedLastWeek = 0
+      let daysPlayedTwoWeeksAgo = 0
+
+      // Over the past 7 days you've spent the most time practicing Hanon, Song Learning and Arpeggios
+      const activitiesPlayedLastWeek: { [key: string]: number } = {}
+
+      const today = new Date()
+      const weekAgo = subDays(today, 7)
+      const twoWeeksAgo = subDays(today, 14)
+
+      const weekAgoInterval = eachDayOfInterval({ start: weekAgo, end: today })
+      const twoWeeksAgoInterval = eachDayOfInterval({ start: twoWeeksAgo, end: today })
+
+      weekAgoInterval.forEach(date => {
+        const dayRecord = store.getDayRecord(date)
+
+        if (dayRecord) {
+          daysPlayedLastWeek += 1
+          timePlayedLastWeek += dayRecord.totalDuration || 0
+          
+          dayRecord.activities.forEach(activityRecord => {
+            if (activitiesPlayedLastWeek[activityRecord.key]) {
+              activitiesPlayedLastWeek[activityRecord.key] += 1
+            }
+            else {
+              activitiesPlayedLastWeek[activityRecord.key] = 1
+            }
+          })
+        }
+      })
+
+      twoWeeksAgoInterval.forEach(date => {
+        const dayRecord = store.getDayRecord(date)
+
+        if (dayRecord) {
+          daysPlayedTwoWeeksAgo += 1
+          timePlayedTwoWeeksAgo += dayRecord.totalDuration || 0
+        }
+      })
+
+      const timeDynamics = timePlayedLastWeek > timePlayedTwoWeeksAgo ? DynamicsOptions.increase : DynamicsOptions.decrease
+      const daysDynamics = daysPlayedLastWeek > daysPlayedTwoWeeksAgo ? DynamicsOptions.increase : DynamicsOptions.decrease
+
+      const popularActivities = Object.keys(activitiesPlayedLastWeek).sort((a, b) => activitiesPlayedLastWeek[b] - activitiesPlayedLastWeek[a]).slice(0, 2)
+
+      return {
+        time: [formatDuration(timePlayedLastWeek), formatDuration(timePlayedTwoWeeksAgo), timeDynamics],
+        days: [daysPlayedLastWeek, daysPlayedTwoWeeksAgo, daysDynamics],
+        activities: popularActivities
+      } as const
+    },
+  }))
+  .views((store) => ({
     getRecordsBetween(start: Date, end: Date, mode: "week" | "month" | "year" = "week") { 
       const sessionUuids: string[] = []
       const activities: Map<string, AggregatedActivity> = new Map()
       const daysPracticed: Map<string, number> = new Map()
       let totalPracticeTime = 0
-
-      const s = new Date().getTime()
 
       const buildDayData = (dayRecord, year, month, day) => {
         // Add day to days practiced
@@ -421,22 +487,6 @@ export const StatisticsStoreModel = types
         totalPracticeTime,
       }
     },
-
-    getDaysWithCompletedSessionsCountBetween(start: Date, end: Date) {
-      const interval = eachDayOfInterval({ start, end })
-
-      let count = 0
-      interval.forEach(date => {
-        const dayRecord = store.getDayRecord(date)
-        
-        if (dayRecord) {
-          count++
-        }
-      })
-
-      return count
-    },
-
 
   }))
 
