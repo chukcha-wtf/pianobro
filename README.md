@@ -1,5 +1,14 @@
 # Piano Bro
-## Help make your Piano your Bro
+## Helps to make your Piano your Bro
+
+
+
+
+
+https://user-images.githubusercontent.com/1046073/224116043-a684e6ae-46ec-4a7d-aba4-dfaebe32e2ce.mp4
+
+
+
 
 Simple tracker for your Piano music practices. Track what you've played exactly when you've played it.
 Rate your performance and see your progress over time.
